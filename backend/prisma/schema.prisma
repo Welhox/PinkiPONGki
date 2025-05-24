@@ -28,6 +28,7 @@ model User {
   played      Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  profilePic  String?
 
   matchesAsPlayer   Match[] @relation("PlayerMatches")
   matchesAsOpponent Match[] @relation("OpponentMatches")

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 
 interface ProfilePicProps {
-	pic: File | null;
+	pic: File | string | null;
 	onChange: (file: File | null) => void;
-	//onSave: () => void; // optional save handler -> figure out flow for pic saving
+	onSave?: (file: File | null) => void;
 }
 
 /*
@@ -13,7 +13,7 @@ won't display the erroneous filename next to Choose file button. Displays a prop
 picture file in the circle and changes will be committed only after user clicks Save.
 Allows only file types .jpg, .jpeg and .png. Max file size is limited to 2MB.
 */
-const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange/*, onSave */}) => {
+const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) => {
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [newPic, setNewPic] = useState<File | null>(null); // holds unconfirmed file
 	const [error, setError] = useState<string | null>(null);
@@ -29,14 +29,20 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange/*, onSave */}
 
 		if (newPic) {
 			url = URL.createObjectURL(newPic);
-		} else if (pic) {
+		} else if (pic instanceof File) {
 			url = URL.createObjectURL(pic);
+		} else if (typeof pic === 'string') {
+			url = pic;
 		}
 
 		setPreviewUrl(url);
 
+		console.log("Preview URL set to:", url);
+
 		return () => {
-			if (url) URL.revokeObjectURL(url); // clean up
+			if (newPic || pic instanceof File) {
+				URL.revokeObjectURL(url!);
+			}
 		};
 
 	}, [pic, newPic]);
@@ -63,6 +69,7 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange/*, onSave */}
 		}
 		setError(null);
 		setNewPic(file);
+		console.log(file);
 	};
 
 	const resetInput = () => {
@@ -73,8 +80,8 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange/*, onSave */}
 
 	const handleSave = () => {
 		if (newPic) {
-			onChange(newPic);
-			//onSave(); // this is undefined and hitting save will make console go red
+			onChange(newPic); // updates parent state
+			onSave?.(newPic); // triggers the actual upload
 			setNewPic(null);
 			setSuccess(true);
 			resetInput();

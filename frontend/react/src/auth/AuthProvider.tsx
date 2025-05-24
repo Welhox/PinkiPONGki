@@ -6,6 +6,7 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 export interface User {
 	id: string;
 	username: string;
+	profilePic?: string;
 }
 
 export interface AuthContextType {
@@ -30,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			});
 			if (response.status === 200 && response.data.id) {
 				setUser(response.data);
+				console.log('Profile pic data fetched in refreshSession:', user?.profilePic);
 				setStatus('authorized');
 			} else {
 				setUser(null);

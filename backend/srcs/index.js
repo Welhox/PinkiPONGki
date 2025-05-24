@@ -6,18 +6,22 @@ import { sessionRoute } from './routes/session.js'
 import { statsRoute } from './routes/stats.js'
 import { otpRoutes } from './routes/otp.js'
 import { friendRoutes } from './routes/friends.js'
+import { profilePicRoutes } from './routes/profile_pic.js'
+import { resolve, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import seedUsers from './seed.js'
-import fastifyJwt from '@fastify/jwt';
-import cookie from '@fastify/cookie';
+import fastifyJwt from '@fastify/jwt'
+import cookie from '@fastify/cookie'
+import fastifyMultipart from '@fastify/multipart'
 import dotenv from 'dotenv';
 const fastify = Fastify({ logger: true})
 
-dotenv.config({ path: './.env' });
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const assetsPath = resolve(__dirname, '../assets');
+const fastifyStatic = (await import('@fastify/static')).default;
 
-fastify.addHook('onSend', async (request, reply, payload) => { // tells fastify that all content type is JSON by default
-	reply.type('application/json');
-	return payload;
-});
+dotenv.config({ path: './.env' });
 
 const start = async () => {
   try {
@@ -43,12 +47,20 @@ const start = async () => {
       },
     });
 
+	fastify.register(fastifyStatic, {
+		root: assetsPath,
+		prefix: '/assets/', // this will serve at /assets/filename.jpg
+	});
+
+	fastify.register(fastifyMultipart);
+
     //connect the routes to the backend
     fastify.register(userRoutes);
 	fastify.register(sessionRoute);
 	fastify.register(statsRoute);
     fastify.register(otpRoutes);
 	fastify.register(friendRoutes);
+	fastify.register(profilePicRoutes);
     //add a seed of 5 users to the db
     try {
     await seedUsers()
