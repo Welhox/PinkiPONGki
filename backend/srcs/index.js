@@ -6,13 +6,15 @@ import { sessionRoute } from './routes/session.js'
 import { statsRoute } from './routes/stats.js'
 import { otpRoutes } from './routes/otp.js'
 import { friendRoutes } from './routes/friends.js'
-import { profilePicRoutes } from './routes/profile_pic.js'
+import { profilePicRoute } from './routes/profile_pic.js'
+import { settingsRoutes } from './routes/settings.js'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import seedUsers from './seed.js'
 import fastifyJwt from '@fastify/jwt'
 import cookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
+import rateLimit from '@fastify/rate-limit'
 import dotenv from 'dotenv';
 const fastify = Fastify({ logger: true})
 
@@ -58,13 +60,23 @@ const start = async () => {
 		}
 	});
 
+	await fastify.register(rateLimit, {
+		global: true,
+		max: 5,
+		timeWindow: '1 minute',
+		keyGenerator: (request) => {
+			return request.session?.user?.id?.toString() || request.ip
+		}
+	});
+
     //connect the routes to the backend
     fastify.register(userRoutes);
 	fastify.register(sessionRoute);
 	fastify.register(statsRoute);
     fastify.register(otpRoutes);
 	fastify.register(friendRoutes);
-	fastify.register(profilePicRoutes);
+	fastify.register(profilePicRoute);
+	fastify.register(settingsRoutes);
     //add a seed of 5 users to the db
     try {
     await seedUsers()

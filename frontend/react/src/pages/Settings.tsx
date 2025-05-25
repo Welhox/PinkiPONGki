@@ -15,10 +15,13 @@ const Settings: React.FC = () => {
 	const { status, user, refreshSession } = useAuth();
 
 	// import current settings from backend
-	const [email, setEmail] = useState("users.current@email.com");
-	const [password, setPassword] = useState("teehee");
+	const [email, setEmail] = useState(user?.email || "");
 	const [language, setLanguage] = useState("en");
 	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+
+	useEffect(() => {
+		if (user?.email) setEmail(user.email);
+	}, [user]);
 
 	if (status === 'loading') return <p>Loading...</p>
 	if (status === 'unauthorized') return <Navigate to="/" replace />;
@@ -93,8 +96,8 @@ const Settings: React.FC = () => {
 				pic={user?.profilePic ? `${apiUrl}${user.profilePic}` : `${apiUrl}/assets/default_avatar.png`}
 				onChange={() => {}}
 				onSave={uploadProfilePic} />
-			<SettingsField label="Email" type="email" value={email} onSave={setEmail} />
-			<SettingsField label="Password" type="password" value={password} onSave={setPassword} mask />
+			<SettingsField label="Email" type="email" value={email} onUpdate={(newEmail) => setEmail(newEmail)} />
+			<SettingsField label="Password" type="password" value="********" />
 			<LanguageSelector value={language} onChange={setLanguage} />
 			<ToggleSwitch
 				label="Enable Two-Factor Authentication"

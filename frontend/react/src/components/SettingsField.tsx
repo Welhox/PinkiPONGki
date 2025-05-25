@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 interface FieldProps {
-	label: string;
-	type?: "text" | "email" | "password";
+	label: "Email" | "Password"
+	type?: "email" | "password";
 	value: string;
-	onSave: (val: string) => void;
-	mask?: boolean; // for password
+	onUpdate?: (newValue: string) => void;
 }
 
 /*
@@ -16,65 +18,78 @@ const SettingsField: React.FC<FieldProps> = ({
 	label,
 	type = "text",
 	value,
-	onSave,
-	mask = false,
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
 	const [inputValue, setInputValue] = useState(value);
+	const [confirmInput, setConfirmInput] = useState("");
+	const [currentPassword, setCurrentPassword] = useState(""); 
 	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
 
-	const mocPwd = "password";
+	const validateInput = () => {
+		if (inputValue.trim() !== confirmInput.trim()) {
+			return "New values don't match.";
+		}
 
-	const displayValue = mask ? "*".repeat(mocPwd.length) : value;
-
-	const validateInput = (input: string) => {
-		const trimmed = input.trim();
 		if (type === "password") {
-			if (trimmed.length < 8 || trimmed.length > 42) {
+			if (inputValue.length < 8 || inputValue.length > 42) {
 				return "Password must be between 8 and 42 characters.";
 			}
 			const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-			if (!pwdRegex.test(trimmed)) {
+			if (!pwdRegex.test(inputValue)) {
 				return "Password must be at least 8 characters, including uppercase, lowercase, number and special character.";
 			}
 		} else if (type === "email") {
-			if (trimmed.length > 42) {
-				return "Email must be 42 characters of less.";
-			}
+			if (inputValue.length > 42) return "Email must be 42 characters of less.";
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			if (!emailRegex.test(trimmed)) {
+			if (!emailRegex.test(inputValue)) {
 				return "Please enter a valid email address.";
 			}
-		} else {
-			if (trimmed.length > 42) {
-				return "Value must be less than 42 characters.";
-			}
+		} 
+
+		if (!currentPassword/* || currentPassword.length < 8*/) { // COMMENT BACK IN FOR FINAL PRODUCT!!
+			return "Current password required.";
 		}
+
 		return null;
 	};
 
-	const handleSave = () => {
-		const validationError = validateInput(inputValue);
+	const handleSave = async () => {
+		const validationError = validateInput();
 
 		if (validationError) {
 			setError(validationError);
 			return;
 		}
-		onSave(inputValue.trim());
-		setIsEditing(false);
-		setInputValue(""); // reset field after save
-		setError(null);
+
+		try {
+			const endpoint = type === "email" ? apiUrl + "/user/email" : apiUrl + "/user/password";
+			await axios.put(endpoint, {
+				newValue: inputValue.trim(),
+				currentPassword: currentPassword.trim(),
+			}, { withCredentials: true });
+
+			setSuccess(`${label} updated successfully.`);
+			setError(null);
+			setIsEditing(false);
+			onUpdate?.(inputValue.trim());
+		} catch (error: any) {
+			setError(error?.response?.data?.message || "Update failed.");
+		}
 	};
 
 	const handleCancel = () => {
 		setIsEditing(false);
 		setInputValue("");
+		setConfirmInput("");
+		setCurrentPassword("");
 		setError(null);
+		setSuccess(null);
 	};
 
 	return (
 		<div>
-			<strong>{label}:</strong>{" "}{displayValue}{" "}
+			<strong>{label}:</strong>{" "}{value}{" "}
 			{!isEditing ? (
 				<>
 					<button className="px-5 mx-3 my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 
@@ -92,14 +107,27 @@ const SettingsField: React.FC<FieldProps> = ({
 					<input
 						type={type}
 						value={inputValue}
-						placeholder={`Enter new ${label.toLowerCase()}`}
+						placeholder={`New ${label}`}
 						onChange={(e) => setInputValue(e.target.value)}
 					/>
+					<input
+						type={type}
+						value={confirmInput}
+						placeholder={`Confirm ${label}`}
+						onChange={(e) => setConfirmInput(e.target.value)}
+					/>
+					<input
+						type="password"
+						value={currentPassword}
+						placeholder="Current password"
+						onChange={(e) => setCurrentPassword(e.target.value)}
+					/>
 					<div>
-						<button onClick={handleSave} disabled={!inputValue.trim()}>Save</button>{" "}
+						<button onClick={handleSave}>Save</button>{" "}
 						<button onClick={handleCancel}>Cancel</button>
 					</div>
-					{error && <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>}
+					{error && <div className="text-red-600">{error}</div>}
+					{success && <div className="text-green-600">{success}</div>}
 				</>
 			)}
 		</div>
