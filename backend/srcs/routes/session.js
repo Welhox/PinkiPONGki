@@ -25,13 +25,15 @@ export async function sessionRoute(fastify, options) {
 				select: { profilePic: true },
 			});
 
-			let profilePic = null;
-			const absolutePath = path.resolve(UPLOAD_DIR, path.basename(user.profilePic));
+			let profilePic = '/assets/default_avatar.png';
 
-			if (user?.profilePic && fs.existsSync(absolutePath)) {
-				profilePic = `/assets/${path.basename(user.profilePic)}`;
-			} else {
-				profilePic = '/assets/default_avatar.png';
+			if (user?.profilePic) {
+				const picName = path.basename(user.profilePic);
+				const absolutePath = path.resolve(UPLOAD_DIR, picName);
+
+				if (fs.existsSync(absolutePath)) {
+					profilePic = `/assets/${picName}`;
+				}
 			}
 
 			return reply.send({ id, username, profilePic });

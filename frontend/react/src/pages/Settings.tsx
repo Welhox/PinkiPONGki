@@ -8,7 +8,7 @@ import LanguageSelector from '../components/LanguageSelector';
 import ToggleSwitch from '../components/ToggleSwitch';
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
