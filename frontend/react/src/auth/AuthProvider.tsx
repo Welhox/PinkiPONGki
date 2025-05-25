@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			});
 			if (response.status === 200 && response.data.id) {
 				setUser(response.data);
-				console.log('Profile pic data fetched in refreshSession:', user?.profilePic);
 				setStatus('authorized');
 			} else {
 				setUser(null);

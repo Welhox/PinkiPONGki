@@ -25,27 +25,16 @@ export async function profilePicRoutes(fastify, opts) {
 
 			const { filename, mimetype } = part;
 			const allowedTypes = ['image/jpeg', 'image/png'];
-			const maxSize = 2 * 1024 * 1024;
 			if (!allowedTypes.includes(mimetype)) {
 				return reply.status(400).send({ error: 'Invalid file type' });
 			}
 
-			let size = 0;
 			const fileExt = path.extname(filename);
-			console.log('FILEEXT:', fileExt);
 			const safeName = `${userId}_${Date.now()}${fileExt}`;
 			const tempPath = path.join(UPLOAD_DIR, safeName);
 			const publicPath = `/assets/${safeName}`; // for frontend use
 
 			const writeStream = fs.createWriteStream(tempPath);
-			part.file.on('data', chunk => {
-				size += chunk.length;
-				if (size > maxSize) {
-					part.file.destroy();
-					writeStream.destroy();
-					if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-				}
-			});
 
 			try {
 				await pipeline(part.file, writeStream);
@@ -68,32 +57,8 @@ export async function profilePicRoutes(fastify, opts) {
 				where: { id: userId },
 				data: { profilePic: publicPath },
 			});
-
 			return reply.send({ success: true, profilePicUrl: publicPath });
 		}
 		return reply.status(400).send({ error: 'No file uploaded' });
 	});
-
-	// this is never called
-	/* fastify.get('/user/profile-pic/:id', { preHandler: authenticate } , async (req, reply) => {
-		const { id } = req.params;
-		const user = await prisma.user.findUnique({ where: { id: parseInt(id) } });
-
-		const fallbackPath = path.join(UPLOAD_DIR, 'default_avatar.png');
-		let filePath;
-
-		if (user?.profilePic) {
-			const picFileName = path.basename(user.profilePic);
-			const localPicPath = path.join(UPLOAD_DIR, picFileName);
-			if (fs.existsSync(localPicPath)) {
-				filePath = localPicPath;
-			} else {
-				filePath = fallbackPath;
-			}
-		} else {
-			filePath = fallbackPath;
-		}
-
-		return reply.sendFile(path.basename(filePath));
-	}); */
 }

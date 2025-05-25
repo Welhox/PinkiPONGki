@@ -52,7 +52,11 @@ const start = async () => {
 		prefix: '/assets/', // this will serve at /assets/filename.jpg
 	});
 
-	fastify.register(fastifyMultipart);
+	fastify.register(fastifyMultipart, {
+		limits: {
+			fileSize: 2 * 1024 * 1024,
+		}
+	});
 
     //connect the routes to the backend
     fastify.register(userRoutes);

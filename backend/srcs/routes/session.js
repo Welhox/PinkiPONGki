@@ -4,6 +4,8 @@ import prisma from '../prisma.js'
 import fs from 'fs'
 import path from 'path'
 
+const UPLOAD_DIR = path.resolve('assets');
+
 export async function sessionRoute(fastify, options) {
 
 	// for session verification; returns username and user ID
@@ -24,9 +26,10 @@ export async function sessionRoute(fastify, options) {
 			});
 
 			let profilePic = null;
+			const absolutePath = path.resolve(UPLOAD_DIR, path.basename(user.profilePic));
 
-			if (user?.profilePic && fs.existsSync(user.profilePic)) {
-				profilePic = `/assets/profile-pics/${path.basename(user.profilePic)}`;
+			if (user?.profilePic && fs.existsSync(absolutePath)) {
+				profilePic = `/assets/${path.basename(user.profilePic)}`;
 			} else {
 				profilePic = '/assets/default_avatar.png';
 			}

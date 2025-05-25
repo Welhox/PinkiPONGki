@@ -37,8 +37,6 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
 
 		setPreviewUrl(url);
 
-		console.log("Preview URL set to:", url);
-
 		return () => {
 			if (newPic || pic instanceof File) {
 				URL.revokeObjectURL(url!);
