@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import DeleteAccountButton from '../components/DeleteAccount';
@@ -6,6 +6,10 @@ import EditProfilePic from '../components/EditProfilePic';
 import SettingsField from '../components/SettingsField';
 import LanguageSelector from '../components/LanguageSelector';
 import ToggleSwitch from '../components/ToggleSwitch';
+import axios from 'axios';
+import { useEffect } from 'react';
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // add fields for user customization:
 	// - change password
@@ -28,6 +32,25 @@ const Settings: React.FC = () => {
 	if (status === 'loading') return <p>Loading...</p>
 	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
+	useEffect(() => {
+		// Fetch user settings from the backend
+		const fetchUserSettings = async () => {
+			try {
+				const response = await axios.get(apiUrl + '/users/settings', { withCredentials: true });
+				console.log('RESPONSE:' + response.data);
+				setEmail(response.data.email);
+				// setProfilePic(response.data.profilePic);
+				setLanguage(response.data.language);
+				setIs2FAEnabled(response.data.is2FAEnabled);
+			} catch (error) {
+				console.error('Error fetching user settings:', error);
+			}
+		};
+		if (status === 'authorized') {
+			fetchUserSettings();
+		}
+	}, [status]);
+
 	const handleReturn = () => {
 		navigate('/');
 	}
@@ -39,7 +62,19 @@ const Settings: React.FC = () => {
 		console.log("Account deleted!");
 	};
 
-	// INTEGRATE SAVING OF SETTINGS HERE
+	//toggle mfa on/off
+	// send request to backend to update mfa status
+	const handle2FAToggle = async () => {
+		try {
+			// send request to backend to update 2FA status
+			const response = await axios.post(apiUrl + '/auth/mfa', { mfaInUse: !is2FAEnabled }, { withCredentials: true });
+			setIs2FAEnabled(response.data.mfaInUse);
+			console.log("2FA toggled!");
+		}
+		catch (error) {
+			console.error('Error updating 2FA status:', error);
+		}
+	};
 
 	return (
 		<div className="text-center dark:text-white">
@@ -51,7 +86,7 @@ const Settings: React.FC = () => {
 			<ToggleSwitch
 				label="Enable Two-Factor Authentication"
 				enabled={is2FAEnabled}
-				onToggle={setIs2FAEnabled}
+				onToggle={handle2FAToggle}
 			/>
 			<DeleteAccountButton onDelete={handleDelete} />
 			<button className="font-semibold block mx-auto my-5 px-20 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 

@@ -5,7 +5,7 @@ import bcryptjs from 'bcryptjs'
 //import the schema for the user
 import { deleteUserSchema, getUserByEmailSchema, getUserByUsernameSchema, getUserByIdSchema, registerUserSchema, loginUserSchema } from '../schemas/userSchemas.js'
 import { authenticate } from '../middleware/authenticate.js'
-
+import { handleOtp } from '../handleOtp.js';
 
 export async function userRoutes(fastify, options) {
 
@@ -45,6 +45,42 @@ export async function userRoutes(fastify, options) {
 			// return 401 for invalid credentials
 		  return reply.code(401).send({ error: 'Invalid username or password' })
 		}
+
+		//if mfa is activated for the user, then generate and send a otp to be validated
+		//also send a token, which dose not give access, but in order to validate later that
+		//login had been successfull.
+		if (user.mfaInUse === true) {
+			try
+			{
+				//make and send OTP to the matchin email
+				await handleOtp(user.email)
+				
+				const otpToken = fastify.jwt.sign(
+					{
+						id: user.id,
+						email: user.email,
+					},
+					{
+						expiresIn: '5min',
+					}
+				)
+				//set a otp token to the user and reply so that frontend knows to redirect to OTP page.
+				reply.setCookie('otpToken', otpToken, {
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'strict',
+					path: '/',
+					maxAge: 5 * 60,
+				})
+				console.log('MFA activated')
+				return reply.code(200).send({ message: 'MFA still required', mfaRequired: true })
+			} catch(error) {
+				console.log('MFA catch activated:', error)
+				return reply.code(401).send({ error: 'Invalid email for mfa' }) 
+			}
+
+		}
+
 		//credentials are valid, so we can create a JWT token
 		const token = fastify.jwt.sign(
 			{
@@ -287,5 +323,55 @@ fastify.get('/users/allInfo', async (req, reply) => {
 			}))
 		);
 	});
-  }
 
+
+  //Rout to get the settings of the users using JWT token
+  fastify.get('/users/settings', { preHandler: authenticate }, async (request, reply) => {
+	const userId = request.user?.id;
+  
+	if (typeof userId !== 'number') {
+	  return reply.code(400).send({ error: 'Invalid or missing user ID' });
+	}
+  
+	try {
+	  const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: { mfaInUse: true, email: true, language: true /* and the profile picture */ }
+	  });
+  
+	  if (!user) {
+		return reply.code(404).send({ error: 'User not found' });
+	  }
+  
+	  reply.send(user);
+	} catch (err) {
+	  request.log.error(err);
+	  reply.code(500).send({ error: 'Failed to retrieve settings' });
+	}
+  });
+  
+
+  //to update the mfaInUse boolean, using the JWT TOKEN
+  fastify.post('/auth/mfa', { preHandler: authenticate }, async (request, reply) => {
+	const { mfaInUse } = request.body;
+  
+	// This should get the information from the JWT token
+	const userId = request.user?.id;
+  
+	if (typeof userId !== 'number' || typeof mfaInUse !== 'boolean') {
+	  return reply.code(400).send({ error: 'Invalid input or missing authentication' });
+	}
+  
+	try {
+	  const updatedUser = await prisma.user.update({
+		where: { id: userId },
+		data: { mfaInUse },
+	  });
+  
+	  reply.send({ message: 'MFA status updated', mfaInUse: updatedUser.mfaInUse });
+	} catch (err) {
+	  fastify.log.error(err);
+	  return reply.code(500).send({ error: 'Failed to update MFA status' });
+	}
+  });
+}
