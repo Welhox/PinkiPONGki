@@ -74,7 +74,20 @@ export async function handleOtp(email) {
     throw new Error('User not found')
   }
   const userId = user.id;
-	try {
+  
+  try {
+    //check if there is already a Otp created under a minute ago, and do not make a new one in that case
+    //to guard against OTP spamming
+    try {
+      const previousOtp = await prisma.otp.findFirst({
+        where: { userId }
+      })
+      if (previousOtp && Date.now() - new Date(previousOtp.updatedAt).getTime() < 60_000)
+      {
+        console.log('wait before requesting a new OTP')
+        return { success: false}
+      }
+    } catch{}
     const code = await makeOTP(userId);
 	  await sendOTP(email, code);
 	  

@@ -53,6 +53,28 @@ const Mfa: React.FC = () => {
 			setIsLoading(false);
 		}
 	};
+
+	const handleResendOtp = async () => {
+		setError(null);
+		setIsLoading(true);
+		try {
+			const response = await axios.get(apiUrl + '/auth/otp-wait-time',  { withCredentials: true})
+			const waitTime = response.data.secondsLeft
+
+			if (waitTime > 0) {
+				setError(`Please wait ${waitTime} seconds before requesting a new OTP.`);
+			} else {
+				await axios.post(apiUrl + '/auth/resend-otp', {}, { withCredentials: true });
+				setError('OTP has been resent. Please check your email.');
+			}
+		} catch (error) {
+			console.error('Error resending OTP:', error);
+			setError('An error occurred while resending the OTP. Please try again later.');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
 			<h1 className="text-2xl font-bold mb-4">Multi-Factor Authentication</h1>
@@ -77,6 +99,14 @@ const Mfa: React.FC = () => {
 					{isLoading ? 'Verifying...' : 'Verify'}
 				</button>
 			</form>
+				<button
+					onClick={handleResendOtp}
+					type="submit"
+					className={`w-full shadow-md max-w-sm bg-blue-600 text-white font-semibold py-2 px-4 rounded ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+					disabled={isLoading}
+				>
+					{isLoading ? 'Resend OTP' : 'Resend OTP'}
+				</button>
 		</div>
 	);
 }
