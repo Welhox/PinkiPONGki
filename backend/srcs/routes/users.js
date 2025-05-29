@@ -176,6 +176,12 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	// route to delete a user from the database
 	fastify.delete('/users/delete/:id', { schema: deleteUserSchema, preHandler: authenticate }, async (req, reply) => {
 	  const { id } = req.params
+	  const user = req.user
+
+	  if (!user || user.id !== Number(id)) {
+		return reply.status(403).send({ error: 'Forbidden' });
+	  }
+
 	  console.log('Deleting user with ID:', id)
 	  try {
 
@@ -198,6 +204,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		  where: { id: Number(id) },
 		})
 		return reply.code(200).send({ message: 'User deleted successfully' })
+		
 	  } catch (err) {
 		console.log('Error deleting user:', err);
 		if (err.code === 'P2025') {

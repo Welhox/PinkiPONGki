@@ -66,14 +66,6 @@ model Match {
 }
 // what happens to a match data if one of the players who participated in the game gets deleted?
 
-
-
-
-
-
-
-
-
 model FriendRequest {
   id			Int      @id @default(autoincrement())
   sender		User     @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)

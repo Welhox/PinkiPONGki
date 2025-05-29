@@ -35,6 +35,7 @@ const start = async () => {
     await fastify.register(cors, {
       origin: true, // according to chatGPT this good for development, but we gotta figure out something else for the final product
       credentials: true,
+	  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     });
 
     fastify.register(cookie, {
