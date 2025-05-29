@@ -1,5 +1,5 @@
 import prisma from '../prisma.js'
-import bcryptjs from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 import { authenticate } from '../middleware/authenticate.js'
 
 export async function settingsRoutes(fastify, options) {
@@ -9,7 +9,7 @@ export async function settingsRoutes(fastify, options) {
 			rateLimit: {
 				max: 1,
 				timeWindow: '1 hour',
-				keyGenerator: (request) => request.session?.user?.id?.toString() || request.ip,
+				keyGenerator: (request) => request.user?.id?.toString() || request.ip,
 			}
 		}
 	};
@@ -23,7 +23,7 @@ export async function settingsRoutes(fastify, options) {
 		handler: async (request, reply) => {
 
 		const { newValue, currentPassword } = request.body;
-		const userId = request.session.user?.id;
+		const userId = request.user?.id;
 
 		if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
 
@@ -59,7 +59,7 @@ export async function settingsRoutes(fastify, options) {
 		handler: async (request, reply) => {
 
 		const { newValue, currentPassword } = request.body;
-		const userId = request.session.user?.id;
+		const userId = request.user?.id;
 
 		if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
 

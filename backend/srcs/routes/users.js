@@ -19,7 +19,7 @@ export async function userRoutes(fastify, options) {
 			rateLimit: {
 				max: 5,
 				timeWindow: '1 minute',
-				keyGenerator: (request) => request.session?.user?.id?.toString() || request.ip,
+				keyGenerator: (request) => request.user?.id?.toString() || request.ip,
 			}
 		}
 	};

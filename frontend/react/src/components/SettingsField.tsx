@@ -29,6 +29,8 @@ const SettingsField: React.FC<FieldProps> = ({
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLInputElement>(null);
+  const currentPasswordRef = useRef<HTMLInputElement>(null);
   const [liveMessage, setLiveMessage] = useState<string | null>(null);
   const liveRegionRef = useRef<HTMLDivElement>(null); // for screen reader aria announcements
 
@@ -143,14 +145,29 @@ const SettingsField: React.FC<FieldProps> = ({
             type={type}
             ref={inputRef}
             value={inputValue}
-            placeholder={`Enter new ${label.toLowerCase()}`}
+            placeholder={`New ${label}`}
             onChange={(e) => setInputValue(e.target.value)}
+          />
+          <br />
+          <input
+            type={type}
+            ref={confirmRef}
+            value={confirmInput}
+            placeholder={`Confirm ${label}`}
+            onChange={(e) => setConfirmInput(e.target.value)}
+          />
+          <br />
+          <input
+            type="password"
+            ref={currentPasswordRef}
+            value={currentPassword}
+            placeholder="Current password"
+            onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <div>
             <button
               className={buttonStyles}
               onClick={handleSave}
-              disabled={!inputValue.trim()}
             >
               Save
             </button>{" "}
@@ -160,6 +177,9 @@ const SettingsField: React.FC<FieldProps> = ({
           </div>
           {error && (
             <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>
+          )}
+          {success && (
+            <div className="text-green-600">{success}</div>
           )}
           {/* This next part is a secret div, visible only to screen readers, which ensures that the error
 	  or success messages get announced using aria. */}
