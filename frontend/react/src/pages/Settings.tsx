@@ -28,10 +28,10 @@ const Settings: React.FC = () => {
 		const fetchUserSettings = async () => {
 			try {
 				const response = await axios.get(apiUrl + '/users/settings', { withCredentials: true });
-				console.log('RESPONSE:' + response.data);
+				console.log('RESPONSE:', response.data);
 				setEmail(response.data.email);
 				setLanguage(response.data.language);
-				setIs2FAEnabled(response.data.is2FAEnabled);
+				setIs2FAEnabled(response.data.mfaInUse);
 			} catch (error) {
 				console.error('Error fetching user settings:', error);
 			}
