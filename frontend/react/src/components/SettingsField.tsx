@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
@@ -18,13 +18,18 @@ const SettingsField: React.FC<FieldProps> = ({
 	label,
 	type = "text",
 	value,
+	onUpdate,
 }) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [inputValue, setInputValue] = useState(value);
+	const [inputValue, setInputValue] = useState("");
 	const [confirmInput, setConfirmInput] = useState("");
 	const [currentPassword, setCurrentPassword] = useState(""); 
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
+
+	useEffect(() => {
+		setInputValue(value);
+	}, [value]);
 
 	const validateInput = () => {
 		if (inputValue.trim() !== confirmInput.trim()) {

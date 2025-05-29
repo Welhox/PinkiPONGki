@@ -60,14 +60,7 @@ const start = async () => {
 		}
 	});
 
-	await fastify.register(rateLimit, {
-		global: true,
-		max: 5,
-		timeWindow: '1 minute',
-		keyGenerator: (request) => {
-			return request.session?.user?.id?.toString() || request.ip
-		}
-	});
+	await fastify.register(rateLimit);
 
     //connect the routes to the backend
     fastify.register(userRoutes);

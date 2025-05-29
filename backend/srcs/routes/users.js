@@ -14,8 +14,18 @@ export async function userRoutes(fastify, options) {
 		console.log('📥 Request received:', request.raw.url);
 	  }); */
 
+	const rateLimitConfig = {
+		config: {
+			rateLimit: {
+				max: 5,
+				timeWindow: '1 minute',
+				keyGenerator: (request) => request.session?.user?.id?.toString() || request.ip,
+			}
+		}
+	};
+
 	// login user
-	fastify.post('/users/login', {schema:loginUserSchema}, async (req, reply) => {
+	fastify.post('/users/login', { schema:loginUserSchema, ...rateLimitConfig }, async (req, reply) => {
 		try {
 		const { username, password } = req.body
 	  
@@ -145,7 +155,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	
 
 	// route to insert a user into the database
-	fastify.post('/users/register', {schema: registerUserSchema}, async (req, reply) => {
+	fastify.post('/users/register', { schema: registerUserSchema, ...rateLimitConfig }, async (req, reply) => {
 	  const { username, email, password } = req.body
 	  const hashedPassword = await bcryptjs.hash(password, 10)
   

@@ -1,4 +1,4 @@
-import React, { use, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import DeleteAccountButton from '../components/DeleteAccount';
@@ -15,16 +15,13 @@ const Settings: React.FC = () => {
 	const { status, user, refreshSession } = useAuth();
 
 	// import current settings from backend
-	const [email, setEmail] = useState(user?.email || "");
+	const [email, setEmail] = useState("");
 	const [language, setLanguage] = useState("en");
 	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
-	useEffect(() => {
+	useEffect(() => { // add profile pic update here too?
 		if (user?.email) setEmail(user.email);
 	}, [user]);
-
-	if (status === 'loading') return <p>Loading...</p>
-	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	useEffect(() => {
 		// Fetch user settings from the backend
@@ -88,6 +85,9 @@ const Settings: React.FC = () => {
 			alert('Upload failed: ' + (error.response?.data?.error || error.message));
 		}
 	}
+
+	if (status === 'loading') return <p>Loading...</p>
+	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	return (
 		<div className="text-center dark:text-white">
