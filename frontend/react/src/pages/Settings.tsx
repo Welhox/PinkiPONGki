@@ -30,7 +30,6 @@ const Settings: React.FC = () => {
 				const response = await axios.get(apiUrl + '/users/settings', { withCredentials: true });
 				console.log('RESPONSE:' + response.data);
 				setEmail(response.data.email);
-				// setProfilePic(response.data.profilePic);
 				setLanguage(response.data.language);
 				setIs2FAEnabled(response.data.is2FAEnabled);
 			} catch (error) {
@@ -86,6 +85,22 @@ const Settings: React.FC = () => {
 		}
 	}
 
+	const handleLanguageChange = async (newLang: string) => {
+		try {
+			const response = await axios.post(
+				apiUrl + '/user/language',
+				{ language: newLang },
+				{ withCredentials: true }
+			);
+
+			setLanguage(response.data.language);
+			console.log('Language updated to:', response.data.language);
+		} catch (error: any) {
+			console.error('Failed to update language:', error);
+			alert('Failed to update language preference. Please try again.');
+		}
+	}
+
 	if (status === 'loading') return <p>Loading...</p>
 	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
@@ -98,7 +113,7 @@ const Settings: React.FC = () => {
 				onSave={uploadProfilePic} />
 			<SettingsField label="Email" type="email" value={email} onUpdate={(newEmail) => setEmail(newEmail)} />
 			<SettingsField label="Password" type="password" value="********" />
-			<LanguageSelector value={language} onChange={setLanguage} />
+			<LanguageSelector value={language} onChange={handleLanguageChange} />
 			<ToggleSwitch
 				label="Enable Two-Factor Authentication"
 				enabled={is2FAEnabled}

@@ -15,11 +15,9 @@ export async function sessionRoute(fastify, options) {
 		},
 		handler: async (req, reply) => {
 		await authenticateOptional(req, reply);
-		//if (reply.sent) return;
 
 		if (!req.user || !req.user.id || !req.user.username) {
 			return reply.send(null);
-			//return reply.code(401).send({ error: 'Unauthorized' });
 		}
 
 		const { id, username } = req.user;

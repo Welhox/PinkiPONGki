@@ -79,4 +79,29 @@ export async function settingsRoutes(fastify, options) {
 		reply.send({ message: 'Password updated' });
 	}
 	});
+
+	fastify.post('/user/language', { preHandler: authenticate }, async (request, reply) => {
+		const { language } = request.body;
+		const userId = request.user?.id;
+
+		if (!userId) {
+			return reply.status(401).send({ error: 'Unauthorized' });
+		}
+
+		if (!language || !['en', 'fi', 'se'].includes(language)) {
+			return reply.status(400).send({ error: 'Invalid language code' });
+		}
+
+		try {
+			const updatedUser = await prisma.user.update({
+				where: { id: userId },
+				data: { language },
+			});
+
+			reply.send({ language: updatedUser.language });
+		} catch (error) {
+			request.log.error();
+			reply.status(500).send({ error: 'Failed to update language' });
+		}
+	});
 }
