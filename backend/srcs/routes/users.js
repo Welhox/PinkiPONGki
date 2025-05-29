@@ -102,6 +102,11 @@ export async function userRoutes(fastify, options) {
 			}
 		);
 
+		await prisma.user.update({
+			where: { id: user.id },
+			data: { isOnline: true },
+		});
+
 		// store JWT in cookie (httpOnly)
 		// httpOnly means the cookie cannot be accessed via JavaScript, which helps mitigate XSS attacks
 		// secure means the cookie will only be sent over HTTPS connections
@@ -120,8 +125,15 @@ export async function userRoutes(fastify, options) {
 		}
 	});
 
-	fastify.post('/users/logout', async (req, reply) => {
-		reply
+	fastify.post('/users/logout', { preHandler: authenticate } , async (req, reply) => {
+		const userId = req.user.id;
+
+		await prisma.user.update({
+			where: { id: userId },
+			data: { isOnline: false },
+		});
+
+		return reply
 		.clearCookie('token', { path: '/' }) // tells the browser to delete the cookie, path should match the path used in .setCookie
 		.send({ message: 'Logged out' });
 	});
@@ -292,10 +304,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 				where: { id: userId },
 				include: {
 					friends: {
-						select: { id: true, username: true },
+						select: { id: true, username: true, isOnline: true },
 					},
 					friendOf: {
-						select: { id: true, username: true },
+						select: { id: true, username: true, isOnline: true },
 					},
 				},
 			});
