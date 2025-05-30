@@ -5,13 +5,9 @@ import SearchPals from '../components/SearchPals';
 import { FriendList } from '../components/FriendList';
 import { PendingRequests } from '../components/PendingRequests';
 import { useAuth } from '../auth/AuthProvider';
+import { Friend } from '../types/friend';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
-
-type Friend = {
-	id: string;
-	username: string;
-}
 
 const PongPals: React.FC = () => {
 	const navigate = useNavigate();
@@ -43,8 +39,8 @@ const PongPals: React.FC = () => {
 		navigate('/');
 	}
 
-	const handleFriendAdded = (newFriend: Friend) => {
-		setFriends((prev) => [...prev, newFriend]);
+	const handleFriendAdded = (newFriend: Omit<Friend, 'isOnline'>) => {
+		setFriends((prev) => [...prev, { ...newFriend, isOnline: false }]);
 	};
 
 	const inputStyles = "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

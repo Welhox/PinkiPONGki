@@ -231,7 +231,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		const { id } = req.query
 		const user = await prisma.user.findUnique({
 		  where: { id: Number(id) },
-		  select: { id: true, username: true, email: true },
+		  select: { id: true, username: true, email: true, isOnline: true },
 		})
 		if (!user) {
 		  return reply.code(404).send({ error: 'User not found' })

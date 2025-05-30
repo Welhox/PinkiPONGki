@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Friend } from "../types/friend";
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
-
-type Friend = {
-	id: string;
-	username: string;
-	isOnline: boolean;
-}
 
 type FriendListProps = {
 	friends: Friend[];
