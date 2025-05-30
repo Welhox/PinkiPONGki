@@ -128,14 +128,21 @@ export async function userRoutes(fastify, options) {
 	fastify.post('/users/logout', { preHandler: authenticate } , async (req, reply) => {
 		const userId = req.user.id;
 
-		await prisma.user.update({
-			where: { id: userId },
-			data: { isOnline: false },
-		});
+		try {
+			const updatedUser = await prisma.user.update({
+				where: { id: userId },
+				data: { isOnline: false },
+			});
+	
+			return reply
+			.clearCookie('token', { path: '/' }) // tells the browser to delete the cookie, path should match the path used in .setCookie
+			.send({ message: 'Logged out' });
 
-		return reply
-		.clearCookie('token', { path: '/' }) // tells the browser to delete the cookie, path should match the path used in .setCookie
-		.send({ message: 'Logged out' });
+		} catch (error) {
+			if (err.code === 'P2025')
+				return reply.code(404).send({ error: 'User not found' });
+			return reply.code(500).send({ error: 'Internal server error' });
+		}		
 	});
 
 	//route to fetch all users - passwords
@@ -198,7 +205,6 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	  try {
 
 		// manually disconnects user from all friendships since Cascade is not supported
-		// more thorough deletion needed?
 
 		await prisma.user.update({
 			where: { id: user.id },
@@ -225,6 +231,58 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		reply.code(500).send({ error: 'Internal server error' })
 	  }
 	})
+
+	// axios doesnt support sending a body in delete request in all browsers, hence post:
+	fastify.post('/users/delete/:id', { preHandler: authenticate }, async (req, reply) => {
+		const { id } = req.params
+		const { password } = req.body
+		const user = req.user
+  
+		if (!user || user.id !== Number(id)) {
+		  return reply.status(403).send({ error: 'Forbidden' });
+		}
+  
+		console.log('Deleting user with ID:', id)
+
+		try {
+			const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+
+			if (!dbUser) {
+				return reply.code(404).send({ error: 'User not found' });
+			}
+
+			const isMatch = await bcryptjs.compare(password, dbUser.password);
+			if (!isMatch) {
+				return reply.code(401).send({ error: 'Incorrect password' });
+			}
+
+			reply.clearCookie('token', { path: '/' });
+  
+			await prisma.user.update({
+				where: { id: user.id },
+				data: {
+					friends: {
+						disconnect: user.friends,
+					},
+					friendOf: {
+						disconnect: user.friendOf,
+					},
+				},
+			})
+	
+			await prisma.user.delete({
+				where: { id: Number(id) },
+			})
+			return reply.code(200).send({ message: 'User deleted successfully' })
+		  
+		} catch (err) {
+		  console.log('Error deleting user:', err);
+		  if (err.code === 'P2025') {
+			return reply.code(404).send({ error: 'User not found' }) //should maybe be 409
+		  }
+		  reply.code(500).send({ error: 'Internal server error' })
+		}
+	  })
 
 	// get user information with id (username, id, email)
 	fastify.get('/users/id', { schema: getUserByIdSchema, preHandler: authenticate }, async (req, reply) => {

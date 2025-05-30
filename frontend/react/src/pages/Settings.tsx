@@ -45,15 +45,16 @@ const Settings: React.FC = () => {
 		navigate('/');
 	}
 
-	const handleDelete = async () => {
+	const handleDelete = async (password: string) => {
 		if (!user?.id) throw new Error('No user ID available');
 
 		try {
-			await axios.delete(`${apiUrl}/users/delete/${user?.id}`, { withCredentials: true });
-			await axios.post(`${apiUrl}/users/logout`, {}, { withCredentials: true });
+			await axios.post(`${apiUrl}/users/delete/${user?.id}`, {password}, { withCredentials: true });
 			localStorage.clear();
 			sessionStorage.clear();
 			await refreshSession();
+
+			alert('Your account has been deleted.');
 			navigate('/');
 		} catch (error: any) {
 			console.error('Failed to delete account:', error);
