@@ -13,7 +13,7 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ status, user }) => {
 
 	return (
-		<div className="text-center">
+		<div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
 			<div className="flex justify-center"><img className="object-contain max-h-full m-auto" src={placeholderImage}></img></div>
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Welcome!</h1>
 
@@ -21,7 +21,7 @@ const Home: React.FC<HomeProps> = ({ status, user }) => {
 				<p>Checkin session...</p>
 			) : status === 'authorized' && user ? (
 				<>
-					<p className="dark:text-white">Hello, {user.username}</p>
+					<p className="dark:text-white pb-10">Hello, {user.username}</p>
 				</>
 			) : (
 				<>
