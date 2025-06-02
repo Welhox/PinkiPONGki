@@ -15,15 +15,13 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ status, user }) => {
-  const { t } = useTranslation();
+  	const { t } = useTranslation();
 
-  useEffect(() => {
-    if (status !== 'authorized') {
-      // force English if logged out
-      i18n.changeLanguage('en');
-	}
-	else {}
-  }, [status, user]);
+	useEffect(() => {
+    	if (status !== 'authorized') {
+    		i18n.changeLanguage('en');
+    	}
+	}, [status, user]);
 
 	return (
 		<div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg my-5">
