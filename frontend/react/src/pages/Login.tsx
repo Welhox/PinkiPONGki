@@ -109,7 +109,7 @@ const Login: React.FC = () => {
 	
   return (
     <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
-      <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Player Login</h1>
+      <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-5 p-5">Player Login</h1>
 	  <form className="max-w-sm mx-auto" onSubmit={handleLogin} autoComplete="off">
 	  <div className="mb-5"><label className={labelStyles} htmlFor="username">Username:</label>
 	  <input className={inputStyles}

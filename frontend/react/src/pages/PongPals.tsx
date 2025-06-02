@@ -50,7 +50,7 @@ const PongPals: React.FC = () => {
 
 	// add friend request header to component
 	return (
-		<div className="dark:text-white text-center">
+		<div className="mt-5 py-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg dark:text-white">
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Pong Pals</h1>
 			<PendingRequests userId={user!.id.toString()} onFriendAdded={handleFriendAdded} />
 			<h2 className="text-3xl text-center text-teal-800 dark:text-teal-300 m-3">Search users</h2>
@@ -60,7 +60,7 @@ const PongPals: React.FC = () => {
 			<button className="block mx-auto px-20 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 
 							   focus:outline-none focus:ring-blue-300 rounded-lg text-sm w-full 
 							   sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
-							   dark:focus:ring-teal-800 font-semibold" onClick={handleReturn}>Back</button>
+							   dark:focus:ring-teal-800 font-semibold mt-5" onClick={handleReturn}>Back</button>
 		</div>
 	);
 };
