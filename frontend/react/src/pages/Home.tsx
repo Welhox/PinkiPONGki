@@ -14,7 +14,7 @@ const Home: React.FC<HomeProps> = ({ status, user }) => {
 
 	return (
 		<div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
-			<div className="flex justify-center"><img className="object-contain max-h-full m-auto" src={placeholderImage}></img></div>
+			<div className="flex justify-center my-5"><img className="object-contain max-h-full m-auto" src={placeholderImage}></img></div>
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Welcome!</h1>
 
 			{status === 'loading' ? (
