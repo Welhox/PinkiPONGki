@@ -115,7 +115,7 @@ const Settings: React.FC = () => {
 	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	return (
-		<div className="text-center dark:text-white">
+		<div className="p-5 mt-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg text-center dark:text-white">
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Settings</h1>
 			<EditProfilePic
 				pic={user?.profilePic ? `${apiUrl}${user.profilePic}` : `${apiUrl}/assets/default_avatar.png`}

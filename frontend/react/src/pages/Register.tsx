@@ -97,8 +97,8 @@ const Register: React.FC = () => {
   const inputStyles =
     "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
   return (
-    <div>
-      <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
+    <div className="m-5 p-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
+      <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 pb-5">
         Create an account
       </h1>
       <div>
@@ -191,7 +191,7 @@ const Register: React.FC = () => {
             className="block mx-auto px-20 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 
 								  focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full 
 								  sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
-								  dark:focus:ring-teal-800"
+								  dark:focus:ring-teal-800 hover:font-bold hover:underline hover:text-amber-200"
             type="submit"
           >
             Register
@@ -205,7 +205,7 @@ const Register: React.FC = () => {
           className="text-white bg-amber-700 hover:bg-amber-800 
 										 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium 
 										 rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mx-3 text-center
-										  dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800"
+										  dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800 hover:font-bold hover:underline hover:text-amber-100"
           to="/login"
         >
           Login
