@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import DeleteAccountButton from '../components/DeleteAccount';
@@ -7,29 +7,22 @@ import SettingsField from '../components/SettingsField';
 import LanguageSelector from '../components/LanguageSelector';
 import ToggleSwitch from '../components/ToggleSwitch';
 import axios from 'axios';
-import { useEffect } from 'react';
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-
-// add fields for user customization:
-	// - change password
-	// - change email address: needs to trigger email verification process
-	// - change language preference
-	// - upload avatar / choose a default one: set up max size 2MB
-	// - remove user data and delete account
+const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
-	const { status } = useAuth();
+	const { status, user, refreshSession } = useAuth();
 
 	// import current settings from backend
-	const [email, setEmail] = useState("users.current@email.com");
-	const [password, setPassword] = useState("teehee");
-	const [profilePic, setProfilePic] = useState<File | null>(null);
+	const [email, setEmail] = useState("");
 	const [language, setLanguage] = useState("en");
 	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
-	
+	useEffect(() => { // add profile pic update here too?
+		if (user?.email) setEmail(user.email);
+	}, [user]);
+
 	useEffect(() => {
 		// Fetch user settings from the backend
 		const fetchUserSettings = async () => {
@@ -37,7 +30,6 @@ const Settings: React.FC = () => {
 				const response = await axios.get(apiUrl + '/users/settings', { withCredentials: true });
 				console.log('RESPONSE:', response.data);
 				setEmail(response.data.email);
-				// setProfilePic(response.data.profilePic);
 				setLanguage(response.data.language);
 				setIs2FAEnabled(response.data.mfaInUse);
 			} catch (error) {
@@ -49,18 +41,25 @@ const Settings: React.FC = () => {
 		}
 	}, [status]);
 
-	if (status === 'loading') return <p>Loading...</p>
-	if (status === 'unauthorized') return <Navigate to="/" replace />;
-
 	const handleReturn = () => {
 		navigate('/');
 	}
 
-	const handleDelete = () => {
-		// delete user from database
-		// make all credentials invalid
-		// redirect user to "/"
-		console.log("Account deleted!");
+	const handleDelete = async (password: string) => {
+		if (!user?.id) throw new Error('No user ID available');
+
+		try {
+			await axios.post(`${apiUrl}/users/delete/${user?.id}`, {password}, { withCredentials: true });
+			localStorage.clear();
+			sessionStorage.clear();
+			await refreshSession();
+
+			alert('Your account has been deleted.');
+			navigate('/');
+		} catch (error: any) {
+			console.error('Failed to delete account:', error);
+			alert('Failed to delete account. Please try again later.');
+		}
 	};
 
 	//toggle mfa on/off
@@ -76,14 +75,55 @@ const Settings: React.FC = () => {
 			console.error('Error updating 2FA status:', error);
 		}
 	};
+	
+	const uploadProfilePic = async (file: File | null) => {
+		if (!file) return;
+
+		const formData = new FormData();
+		formData.append("file", file);
+
+		try {
+			const res = await axios.post(apiUrl + '/user/profile-pic', formData, {
+				withCredentials: true,
+			});
+
+			await refreshSession();
+			console.log(user);
+		} catch (error: any) {
+			console.error('Error uploading file:', error);
+			alert('Upload failed: ' + (error.response?.data?.error || error.message));
+		}
+	}
+
+	const handleLanguageChange = async (newLang: string) => {
+		try {
+			const response = await axios.post(
+				apiUrl + '/user/language',
+				{ language: newLang },
+				{ withCredentials: true }
+			);
+
+			setLanguage(response.data.language);
+			console.log('Language updated to:', response.data.language);
+		} catch (error: any) {
+			console.error('Failed to update language:', error);
+			alert('Failed to update language preference. Please try again.');
+		}
+	}
+
+	if (status === 'loading') return <p>Loading...</p>
+	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	return (
 		<div className="text-center dark:text-white">
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Settings</h1>
-			<EditProfilePic pic={profilePic} onChange={setProfilePic} />
-			<SettingsField label="Email" type="email" value={email} onSave={setEmail} />
-			<SettingsField label="Password" type="password" value={password} onSave={setPassword} mask />
-			<LanguageSelector value={language} onChange={setLanguage} />
+			<EditProfilePic
+				pic={user?.profilePic ? `${apiUrl}${user.profilePic}` : `${apiUrl}/assets/default_avatar.png`}
+				onChange={() => {}}
+				onSave={uploadProfilePic} />
+			<SettingsField label="Email" type="email" value={email} onUpdate={(newEmail) => setEmail(newEmail)} />
+			<SettingsField label="Password" type="password" value="********" />
+			<LanguageSelector value={language} onChange={handleLanguageChange} />
 			<ToggleSwitch
 				label="Enable Two-Factor Authentication"
 				enabled={is2FAEnabled}
@@ -99,4 +139,4 @@ const Settings: React.FC = () => {
 	);
 };
 
-export default Settings
+export default Settings;
