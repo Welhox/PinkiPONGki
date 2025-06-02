@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { User, AuthContextType } from '../auth/AuthProvider'
 import NavigationHeader from '../components/NavigationHeader';
 import placeholderImage from '../../assets/pong-placeholder.gif'
+import PongGame from '../components/PongGame';
 
 interface HomeProps {
 	status: AuthContextType["status"];
@@ -13,8 +14,10 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ status, user }) => {
 
 	return (
-		<div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
-			<div className="flex justify-center my-5"><img className="object-contain max-h-full m-auto" src={placeholderImage}></img></div>
+		<div className="text-center">
+			<div className="flex justify-center">
+				<PongGame />
+			</div>
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Welcome!</h1>
 
 			{status === 'loading' ? (
