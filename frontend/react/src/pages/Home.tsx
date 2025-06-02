@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User, AuthContextType } from '../auth/AuthProvider'
 import NavigationHeader from '../components/NavigationHeader';
@@ -6,32 +6,42 @@ import placeholderImage from '../../assets/pong-placeholder.gif'
 import PongGame from '../components/PongGame';
 import PongGameWithRegistration from '../components/PongGameWithRegistration';
 
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 interface HomeProps {
-	status: AuthContextType["status"];
-	user: AuthContextType["user"];
+  status: AuthContextType["status"];
+  user: AuthContextType["user"];
 }
 
-/* need to add typenames here */
 const Home: React.FC<HomeProps> = ({ status, user }) => {
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (status !== 'authorized') {
+      // force English if logged out
+      i18n.changeLanguage('en');
+	}
+	else {}
+  }, [status, user]);
 
 	return (
 		<div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg my-5">
 			<div className="flex justify-center">
 				<PongGameWithRegistration />
 			</div>
-			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Welcome!</h1>
+			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">{t('home.welcome')}</h1>
 
 			{status === 'loading' ? (
-				<p>Checkin session...</p>
+				<p>{t('home.checkingSession')}</p>
 			) : status === 'authorized' && user ? (
 				<>
-					<p className="dark:text-white pb-10">Hello, {user.username}</p>
+					<p className="dark:text-white pb-10">{t('home.hello')}, {user.username}</p>
 				</>
 			) : (
 				<>
-					<p className="dark:text-white text-center">Please log in to access exclusive Pong content and connect with other registered players!</p>
-					<p className="dark:text-white text-center font-bold p-5">No account?{' '} <Link className="text-amber-900 dark:text-amber-300 font:bold hover:font-extrabold" to="/register">Register</Link></p>
+					<p className="dark:text-white text-center">{t('home.pleaseLogin')}</p>
+					<p className="dark:text-white text-center font-bold p-5">{t('home.noAccount')}{' '} <Link className="text-amber-900 dark:text-amber-300 font:bold hover:font-extrabold" to="/register">{t('home.register')}</Link></p>
 				</>
 			)}
 		</div>
