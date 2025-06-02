@@ -92,7 +92,7 @@ const Login: React.FC = () => {
 
 			setAttempts(prev => prev + 1);
 
-			if (error.response?.status === 400) {
+			if (error.response?.status === 401) {
 				console.error('Invalid username or password');
 			} else {
 				console.log('Epic failure: ', response);
