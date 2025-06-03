@@ -4,6 +4,8 @@ import { User, AuthContextType } from '../auth/AuthProvider'
 import NavigationHeader from '../components/NavigationHeader';
 import placeholderImage from '../../assets/pong-placeholder.gif'
 import PongGame from '../components/PongGame';
+import PongGameWithRegistration from '../components/PongGameWithRegistration';
+
 
 interface HomeProps {
 	status: AuthContextType["status"];
@@ -16,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ status, user }) => {
 	return (
 		<div className="text-center">
 			<div className="flex justify-center">
-				<PongGame />
+				<PongGameWithRegistration />
 			</div>
 			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Welcome!</h1>
 
