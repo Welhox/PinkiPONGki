@@ -16,6 +16,7 @@ import cookie from '@fastify/cookie'
 import fastifyMultipart from '@fastify/multipart'
 import rateLimit from '@fastify/rate-limit'
 import dotenv from 'dotenv';
+import { matchesRoute } from './routes/matches.js'
 const fastify = Fastify({ logger: true})
 
 const __filename = fileURLToPath(import.meta.url)
@@ -71,6 +72,7 @@ const start = async () => {
 	fastify.register(friendRoutes);
 	fastify.register(profilePicRoute);
 	fastify.register(settingsRoutes);
+	fastify.register(matchesRoute);
     //add a seed of 5 users to the db
     try {
     await seedUsers()

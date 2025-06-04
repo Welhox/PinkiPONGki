@@ -13,31 +13,25 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({ label, onRegister }) 
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username) {
-      setError('Username required');
-      return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!username) {
+    setError('Username required');
+    return;
+  }
+  if (!password) {
+    // Guest registration: allow any alias, no backend check
+    onRegister({ username, isGuest: true });
+  } else {
+    // Registered user login
+    try {
+      await axios.post(apiUrl + '/auth/login', { username, password }, { withCredentials: true });
+      onRegister({ username, isGuest: false });
+    } catch {
+      setError('Login failed. Check your credentials.');
     }
-    if (!password) {
-      // Guest registration
-      // Check if username is taken by a registered user
-      try {
-        await axios.get(apiUrl + '/users/username', { params: { username } });
-        setError('Username taken by a registered user. Please choose another or log in.');
-      } catch {
-        onRegister({ username, isGuest: true });
-      }
-    } else {
-      // Registered user login
-      try {
-        await axios.post(apiUrl + '/auth/login', { username, password }, { withCredentials: true });
-        onRegister({ username, isGuest: false });
-      } catch {
-        setError('Login failed. Check your credentials.');
-      }
-    }
-  };
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col items-center w-full">

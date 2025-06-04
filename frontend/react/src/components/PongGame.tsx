@@ -1,8 +1,10 @@
+import axios from 'axios';
 import React, { useRef, useEffect, useState } from 'react';
 
 const paddleSound = new Audio('../../assets/paddle.mp3');
 const scoreSound = new Audio('../../assets/score.mp3');
 const wallSound = new Audio('../../assets/wall.mp3');
+const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
 interface PongGameProps {
   player1: { username: string; isGuest: boolean };
@@ -200,6 +202,14 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2 }) => {
         setWinner(leftScore === 11 ? player1.username : player2.username);
         setScore({ left: leftScore, right: rightScore });
         gameOver = true;
+		axios.post(apiUrl + '/matches', {
+			player: player1.isGuest ? 'guest' : player1.username,
+			opponent: player2.isGuest ? 'guest' : player2.username,
+			winner: leftScore === 11 ? player1.username : player2.username,
+			loser: leftScore === 11 ? player2.username : player1.username,
+			leftScore,
+			rightScore,
+		}).catch(console.error);
       }
     }
 
