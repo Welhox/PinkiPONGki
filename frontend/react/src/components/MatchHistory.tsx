@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -21,6 +22,8 @@ interface MatchHistoryProps {
 }
 
 const MatchHistory: React.FC<MatchHistoryProps> = ({ userId }) => {
+	const { t } = useTranslation();
+
 	const [stats, setStats] = useState<UserStats | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -43,28 +46,28 @@ const MatchHistory: React.FC<MatchHistoryProps> = ({ userId }) => {
 				});
 			} catch (error) {
 				console.error(error);
-				setError('Failed to fetch stats');
+				setError(t('matchHistory.errorFetching'));
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		if (userId) fetchStats();
-	}, [userId]);
+	}, [userId, t]);
 
-	if (loading) return <div>Loading stats...</div>;
-	if (error) return <div>Error: {error}</div>;
+	if (loading) return <div>{t('matchHistory.loadingStats')}</div>;
+	if (error) return <div>{error}</div>;
 	if (!stats) return null;
 
 	return (
 		<div className="pb-5">
 			<div className="mt-5 text-center dark:text-white">
-				<p>Total Wins: {stats?.totalWins}</p>
-				<p>Total Losses: {stats?.totalLosses}</p>
-				<p>Total Tournaments Won: {stats?.totalTournamentsWon}</p>
+				<p>{t('matchHistory.totalWins')}: {stats?.totalWins}</p>
+				<p>{t('matchHistory.totalLosses')}: {stats?.totalLosses}</p>
+				<p>{t('matchHistory.totalTournamentsWon')}: {stats?.totalTournamentsWon}</p>
 			</div>
 
-			<h2 className="text-4xl mt-5 text-center text-teal-800 dark:text-teal-300">Match History</h2>
+			<h2 className="text-4xl mt-5 text-center text-teal-800 dark:text-teal-300">{t('matchHistory.matchHistoryTitle')}</h2>
 
 			{stats.matchHistory?.length ? (
 				<ul className="mt-4 space-y-3">
@@ -79,7 +82,7 @@ const MatchHistory: React.FC<MatchHistoryProps> = ({ userId }) => {
 					))}
 				</ul>
 			) : (
-				<p className="mt-4 text-center text-gray-600 dark:text-gray-400">No match history available</p>
+				<p className="mt-4 text-center text-gray-600 dark:text-gray-400">{t('matchHistory.noHistory')}</p>
 			)}
 		</div>
 	);

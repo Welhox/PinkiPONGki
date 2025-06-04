@@ -1,0 +1,24 @@
+{
+	"home": {
+		"welcome": "Tervetuloa!",
+		"checkingSession": "Tarkistetaan istuntoa...",
+		"hello": "Hei",
+		"pleaseLogin": "Kirjaudu sisään päästäksesi eksklusiiviseen Pong-sisältöön ja yhdistääksesi muihin rekisteröityihin pelaajiin!",
+		"noAccount": "Ei tiliä?",
+		"register": "Rekisteröidy"
+	},
+	"stats": {
+		"loading": "Ladataan...",
+		"unknownUser": "Tuntematon käyttäjä",
+		"fetchError": "Käyttäjänimen hakeminen epäonnistui"
+	},
+	"matchHistory": {
+		"loadingStats": "Ladataan tilastoja...",
+		"errorFetching": "Tilastojen hakeminen epäonnistui",
+		"totalWins": "Voitot yhteensä",
+		"totalLosses": "Häviöt yhteensä",
+		"totalTournamentsWon": "Voitetut turnaukset yhteensä",
+		"matchHistoryTitle": "Otteluhistoria",
+		"noHistory": "Ei otteluhistoriaa saatavilla"
+	}
+}

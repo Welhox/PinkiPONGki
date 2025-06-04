@@ -1,0 +1,24 @@
+{
+	"home": {
+	  "welcome": "Welcome!",
+	  "checkingSession": "Checking session...",
+	  "hello": "Hello",
+	  "pleaseLogin": "Please log in to access exclusive Pong content and connect with other registered players!",
+	  "noAccount": "No account?",
+	  "register": "Register"
+	},
+	"stats": {
+	  "loading": "Loading...",
+	  "unknownUser": "Unknown User",
+	  "fetchError": "Failed to fetch username for viewed user"
+	},
+	"matchHistory": {
+		"loadingStats": "Loading stats...",
+		"errorFetching": "Failed to fetch stats",
+		"totalWins": "Total Wins",
+		"totalLosses": "Total Losses",
+		"totalTournamentsWon": "Total Tournaments Won",
+		"matchHistoryTitle": "Match History",
+		"noHistory": "No match history available"
+	}
+}

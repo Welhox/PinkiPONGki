@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, AuthContextType } from '../auth/AuthProvider'
+import { User, AuthContextType } from '../auth/AuthProvider';
 import NavigationHeader from '../components/NavigationHeader';
-import placeholderImage from '../../assets/pong-placeholder.gif'
 import PongGame from '../components/PongGame';
 import PongGameWithRegistration from '../components/PongGameWithRegistration';
 
