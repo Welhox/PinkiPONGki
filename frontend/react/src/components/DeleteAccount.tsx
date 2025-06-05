@@ -7,9 +7,16 @@ const DeleteAccountButton: React.FC<{
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const [liveMessage, setLiveMessage] = useState<string | null>(null);
+  const liveRegionRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (showForm) {
+      setLiveMessage(null);
+      setPassword("");
+      setLiveMessage("Enter your password to confirm deletion of your account");
+      setTimeout(() => {
+        liveRegionRef.current?.focus();
+      }, 10);
       setTimeout(() => {
         // this is necessary to workaround a known issue in Voiceover, which moves the focus to the full window
         inputRef.current?.focus();
@@ -29,12 +36,24 @@ const DeleteAccountButton: React.FC<{
     <div className="my-4">
       {showForm ? (
         <div className="flex flex-col gap-2 items-center">
-          <label htmlFor="delPassword">Enter your password</label>
+          {/* This next part is a secret div, visible only to screen readers, which ensures that the error
+	  or success messages get announced using aria. */}
+          {liveMessage && (
+            <div
+              ref={liveRegionRef}
+              tabIndex={-1}
+              aria-live="assertive"
+              aria-atomic="true"
+              className="sr-only"
+            >
+              {liveMessage}
+            </div>
+          )}
           <input
             type="password"
             id="delPassword"
             placeholder="Enter your password"
-            aria-label="Enter your password"
+            aria-label="Enter your password to confirm deleting your account"
             ref={inputRef}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
