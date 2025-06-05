@@ -10,8 +10,35 @@
 	"stats": {
 	  "loading": "Loading...",
 	  "unknownUser": "Unknown User",
-	  "fetchError": "Failed to fetch username for viewed user"
+	  "fetchError": "Failed to fetch username for viewed user",
+	  "title": "{{username}}'s Pong Stats"
 	},
+	"forgotPassword": {
+    	"title": "Reset Password",
+    	"emailLabel": "Email address:",
+    	"submitButton": "Send Reset Link",
+    	"successMessage": "If that email is registered, you'll receive password reset instructions shortly.",
+    	"returnButton": "Return",
+    	"genericError": "Something went wrong. Please try again."
+	},
+	"pongPals": {
+		"title": "Pong Pals",
+		"searchUsers": "Search users",
+		"yourFriends": "Your friends",
+		"back": "Back"
+	},
+	"settings": {
+    	"title": "Settings",
+    	"email": "Email",
+    	"password": "Password",
+    	"language": "Language",
+    	"twoFactorAuth": "Enable Two-Factor Authentication",
+    	"deleteAccountConfirm": "Your account has been deleted.",
+    	"deleteAccountError": "Failed to delete account. Please try again later.",
+    	"languageError": "Failed to update language preference. Please try again.",
+    	"back": "Back",
+    	"save": "Save"
+  	},
 	"matchHistory": {
 		"loadingStats": "Loading stats...",
 		"errorFetching": "Failed to fetch stats",

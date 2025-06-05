@@ -8,13 +8,15 @@ import LanguageSelector from '../components/LanguageSelector';
 import ToggleSwitch from '../components/ToggleSwitch';
 import axios from 'axios';
 import ConfirmOtpField from '../components/ConfirmOtpField';
+import { useTranslation } from 'react-i18next';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
 	const { status, user, refreshSession } = useAuth();
-
+	const { t, i18n } = useTranslation();
+	
 	// import current settings from backend
 	const [email, setEmail] = useState("");
 	const [language, setLanguage] = useState("en");
@@ -59,11 +61,11 @@ const Settings: React.FC = () => {
 			sessionStorage.clear();
 			await refreshSession();
 
-			alert('Your account has been deleted.');
+			alert(t('settings.deleteAccountConfirm'));
 			navigate('/');
 		} catch (error: any) {
 			console.error('Failed to delete account:', error);
-			alert('Failed to delete account. Please try again later.');
+			alert(t('settings.deleteAccountError'));
 		}
 	};
 
@@ -138,26 +140,27 @@ const Settings: React.FC = () => {
 			);
 
 			setLanguage(response.data.language);
+			i18n.changeLanguage(response.data.language);
 			console.log('Language updated to:', response.data.language);
 		} catch (error: any) {
 			console.error('Failed to update language:', error);
-			alert('Failed to update language preference. Please try again.');
+			alert(t('settings.languageError'));
 		}
 	}
 
 
 	return (
 		<div className="p-5 mt-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg text-center dark:text-white">
-			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">Settings</h1>
+			<h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">{t('settings.title')}</h1>
 			<EditProfilePic
 				pic={user?.profilePic ? `${apiUrl}${user.profilePic}` : `${apiUrl}/assets/default_avatar.png`}
 				onChange={() => {}}
 				onSave={uploadProfilePic} />
-			<SettingsField label="Email" type="email" value={email} onUpdate={(newEmail) => setEmail(newEmail)} />
-			<SettingsField label="Password" type="password" value="********" />
+			<SettingsField label={t('settings.email')} type="email" value={email} onUpdate={(newEmail) => setEmail(newEmail)} />
+			<SettingsField label={t('settings.password')} type="password" value="********" />
 			<LanguageSelector value={language} onChange={handleLanguageChange} />
 			<ToggleSwitch
-				label="Enable Two-Factor Authentication"
+				label={t('settings.twoFactorAuth')}
 				enabled={is2FAEnabled}
 				onToggle={handle2FAToggle}
 			/>
@@ -172,7 +175,7 @@ const Settings: React.FC = () => {
 								  focus:outline-none focus:ring-blue-300 rounded-lg text-sm w-full 
 								  sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
 								  dark:focus:ring-teal-800"
-					onClick={handleReturn}>Back</button>
+					onClick={handleReturn}>{t('settings.back')}</button>
 		</div>
 	);
 };

@@ -14,6 +14,7 @@ import { AuthContextType, User, useAuth} from './auth/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Mfa from './pages/Mfa';
+import i18n from './i18n';
 
 const App: React.FC = () => {
 	const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -26,6 +27,8 @@ const App: React.FC = () => {
 				},
 				withCredentials: true, 
 			});
+			i18n.changeLanguage('en');
+    		localStorage.removeItem('language')
 			await refreshSession();
 			
 		} catch (error) {

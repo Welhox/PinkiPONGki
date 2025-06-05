@@ -4,8 +4,8 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 interface FieldProps {
-	label: "Email" | "Password"
-	type?: "email" | "password";
+	label: string
+	type?: string
 	value: string;
 	onUpdate?: (newValue: string) => void;
 }

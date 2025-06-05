@@ -10,7 +10,35 @@
 	"stats": {
 		"loading": "Laddar...",
 		"unknownUser": "Okänd användare",
-		"fetchError": "Misslyckades att hämta användarnamn för visad användare"
+		"fetchError": "Misslyckades att hämta användarnamn för visad användare",
+		"title": "Pong-statistik för {{username}}"
+	},
+	"forgotPassword": {
+		"title": "Återställ lösenord",
+		"emailLabel": "E-postadress:",
+		"submitButton": "Skicka återställningslänk",
+		"successMessage": "Om den e-postadressen är registrerad får du snart instruktioner för att återställa lösenordet.",
+		"returnButton": "Tillbaka",
+		"genericError": "Något gick fel. Försök igen."
+	},
+	"pongPals": {
+		"title": "Pong Vänner",
+		"searchUsers": "Sök användare",
+		"yourFriends": "Dina vänner",
+		"back": "Tillbaka"
+	},
+	"settings": {
+    	"title": "Inställningar",
+    	"email": "E-post",
+    	"password": "Lösenord",
+    	"language": "Språk",
+    	"twoFactorAuth": "Aktivera tvåfaktorsautentisering",
+    	"deleteAccountConfirm": "Ditt konto har raderats.",
+    	"deleteAccountError": "Konto radering misslyckades. Försök igen senare.",
+    	"languageError": "Det gick inte att uppdatera språkinställningen. Försök igen.",
+    	"back": "Tillbaka",
+		"save": "spara"
+
 	},
 	"matchHistory": {
 		"loadingStats": "Laddar statistik...",

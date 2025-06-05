@@ -10,7 +10,8 @@
 	"stats": {
 		"loading": "Ladataan...",
 		"unknownUser": "Tuntematon käyttäjä",
-		"fetchError": "Käyttäjänimen hakeminen epäonnistui"
+		"fetchError": "Käyttäjän hakeminen epäonnistui",
+    	"title": "{{username}}:n Pong tulokset"
 	},
 	"matchHistory": {
 		"loadingStats": "Ladataan tilastoja...",
@@ -20,5 +21,31 @@
 		"totalTournamentsWon": "Voitetut turnaukset yhteensä",
 		"matchHistoryTitle": "Otteluhistoria",
 		"noHistory": "Ei otteluhistoriaa saatavilla"
-	}
+	},
+	"forgotPassword": {
+		"title": "Palauta salasana",
+		"emailLabel": "Sähköpostiosoite:",
+		"submitButton": "Lähetä palautuslinkki",
+		"successMessage": "Jos sähköposti on rekisteröity, saat pian ohjeet salasanan palauttamiseksi.",
+		"returnButton": "Takaisin",
+		"genericError": "Jotain meni pieleen. Yritä uudelleen."
+	},
+	"pongPals": {
+		"title": "Pongaverit",
+		"searchUsers": "Etsi käyttäjiä",
+		"yourFriends": "Kaverisi",
+		"back": "Takaisin"
+	},
+	"settings": {
+    	"title": "Asetukset",
+    	"email": "Sähköposti",
+    	"password": "Salasana",
+    	"language": "Kieli",
+    	"twoFactorAuth": "Käytä kaksivaiheista tunnistautumista",
+    	"deleteAccountConfirm": "Tilisi on poistettu.",
+    	"deleteAccountError": "Tilin poistaminen epäonnistui. Yritä myöhemmin uudelleen.",
+    	"languageError": "Kielen vaihtaminen epäonnistui. Yritä uudelleen.",
+    	"back": "Takaisin",
+		"save": "tallenna"
+  }
 }
