@@ -7,6 +7,7 @@ import SettingsField from '../components/SettingsField';
 import LanguageSelector from '../components/LanguageSelector';
 import ToggleSwitch from '../components/ToggleSwitch';
 import axios from 'axios';
+import ConfirmOtpField from '../components/ConfirmOtpField';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -18,11 +19,12 @@ const Settings: React.FC = () => {
 	const [email, setEmail] = useState("");
 	const [language, setLanguage] = useState("en");
 	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-
-	useEffect(() => { // add profile pic update here too?
-		if (user?.email) setEmail(user.email);
-	}, [user]);
-
+	const [otp, setOtp] = useState('');
+	const [showOtpField, setShowOtpField] = useState(false);
+	
+	//this effect runs twice at the moment as it also triggers on email change
+	// this is because the email state is updated after fetching user settings
+	// the email state is needed for updating the is2FAEnabled state upon email change
 	useEffect(() => {
 		// Fetch user settings from the backend
 		const fetchUserSettings = async () => {
@@ -39,7 +41,10 @@ const Settings: React.FC = () => {
 		if (status === 'authorized') {
 			fetchUserSettings();
 		}
-	}, [status]);
+	}, [status, email]);
+
+	if (status === 'loading') return <p>Loading...</p>
+	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	const handleReturn = () => {
 		navigate('/');
@@ -64,12 +69,41 @@ const Settings: React.FC = () => {
 
 	//toggle mfa on/off
 	// send request to backend to update mfa status
+	//is a a guard against spamming otps needed?
 	const handle2FAToggle = async () => {
 		try {
 			// send request to backend to update 2FA status
-			const response = await axios.post(apiUrl + '/auth/mfa', { mfaInUse: !is2FAEnabled }, { withCredentials: true });
-			setIs2FAEnabled(response.data.mfaInUse);
-			console.log("2FA toggled!");
+			if(is2FAEnabled === true)
+			{
+				const response = await axios.post(apiUrl + '/auth/mfa', { mfaInUse: !is2FAEnabled }, { withCredentials: true });
+				setIs2FAEnabled(response.data.mfaInUse);
+				console.log("2FA toggled!");
+			}
+			else //check if email is already validated and show the Otp field to validate email if not
+			{
+				const user = await axios.get(apiUrl + '/users/emailStatus', { withCredentials: true });
+				if (user.data.emailVerified === true) {
+					const response = await axios.post(apiUrl + '/auth/mfa', { mfaInUse: !is2FAEnabled }, { withCredentials: true });
+					setIs2FAEnabled(response.data.mfaInUse);
+					console.log("2FA toggled!");
+				} else {
+				// send otp to email
+				try {
+					const response = await axios.get(apiUrl + '/auth/otp-wait-time',  { withCredentials: true})
+					const waitTime = response.data.secondsLeft
+					
+					if( waitTime > 0) {
+						alert(`Please wait ${waitTime} seconds before requesting a new OTP.`);
+					} else {
+					await axios.post(apiUrl + '/auth/otp/send-otp', {}, { withCredentials: true });
+					setShowOtpField(true);
+					}
+				}
+				catch (error) {
+					console.error('Error sending OTP:', error);
+					alert('Failed to send OTP. Please try again later.');
+				}
+			}}
 		}
 		catch (error) {
 			console.error('Error updating 2FA status:', error);
@@ -111,8 +145,6 @@ const Settings: React.FC = () => {
 		}
 	}
 
-	if (status === 'loading') return <p>Loading...</p>
-	if (status === 'unauthorized') return <Navigate to="/" replace />;
 
 	return (
 		<div className="p-5 mt-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg text-center dark:text-white">
@@ -129,6 +161,12 @@ const Settings: React.FC = () => {
 				enabled={is2FAEnabled}
 				onToggle={handle2FAToggle}
 			/>
+			{showOtpField && <ConfirmOtpField 
+				setIs2FAEnabled={setIs2FAEnabled} 
+				setShowOtpField={setShowOtpField}
+				apiUrl={apiUrl}
+				otp={otp}
+				setOtp={setOtp} />}
 			<DeleteAccountButton onDelete={handleDelete} />
 			<button className="font-semibold block mx-auto my-5 px-20 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 
 								  focus:outline-none focus:ring-blue-300 rounded-lg text-sm w-full 

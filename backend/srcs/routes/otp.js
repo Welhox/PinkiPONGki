@@ -2,13 +2,61 @@ import nodemailer from 'nodemailer';
 import prisma from '../prisma.js'
 import bcryptjs from 'bcryptjs';
 import { handleOtp } from '../handleOtp.js';
+import { authenticate } from '../middleware/authenticate.js'
+import { authenticateOptional } from '../middleware/authenticateOptional.js';
 
 export async function otpRoutes(fastify, options) {
 
-  // check if the OTP is valid and not expired
-fastify.post('/auth/verify-otp', async (req, reply) => {
+// a rout for verifing the OTP witout making a cookie
+fastify.post('/auth/otp/verify', { preHandler: authenticate }, async (request, reply) => {
   
-  const temp = req.cookies.otpToken
+  const userId = request.user?.id;
+  try {
+	if (typeof userId !== 'number') {
+	  return reply.code(400).send({ error: 'Invalid or missing user ID' });
+	}
+
+  const { code } = request.body;
+  console.log('Verifying OTP for user ID:', userId, 'with code:', code);
+
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  // const userId = user.id;
+    const otp = await prisma.otp.findFirst({
+      where: {
+        userId,
+      },
+    });
+    if (!otp) {
+      return reply.code(401).send({ error: 'OTP not found' });
+    }
+    const isValid = await bcryptjs.compare(code, otp.code);
+    if (!isValid) {
+      return reply.code(401).send({ error: 'Invalid OTP' });
+    }
+    //check that otp has not expired
+    const now = new Date();
+    if (now > otp.expiresAt) {
+      return reply.code(403).send({ error: 'OTP expired' });
+    }
+    // delete the OTP after successful verification
+    await prisma.otp.delete({
+      where: {
+        id: otp.id,
+      },
+    });
+
+    reply.code(200).send({ message: 'OTP verified!' });
+  } catch (err) {
+    fastify.log.error(err);
+    reply.code(500).send({ error: 'Failed to verify OTP' });
+  } 
+  });
+
+
+  // check if the OTP is valid and not expired
+fastify.post('/auth/verify-otp', async (request, reply) => {
+  
+  const temp = request.cookies.otpToken
   if (!temp) {
     return reply.code(401).send({ error: 'Missing token'})
   }
@@ -24,7 +72,7 @@ fastify.post('/auth/verify-otp', async (req, reply) => {
     return reply.code(401).send({ error: 'Unauthorized'})
   }
   
-  const { code } = req.body;
+  const { code } = request.body;
   const email = token.email
   const user = await prisma.user.findUnique({
     where: {email},
@@ -91,12 +139,21 @@ fastify.post('/auth/verify-otp', async (req, reply) => {
 
 
 
- // check if therre is a Otp and how long beofre a new one can be generated
-fastify.get('/auth/otp-wait-time', async (req, reply) => {
+ // check if there is a Otp and how long beofre a new one can be generated
+fastify.get('/auth/otp-wait-time', { preHandler: authenticateOptional },async (req, reply) => {
   const temp = req.cookies.otpToken
-  if (!temp) {
+  const userId = req.user?.id;
+
+  if (!temp && !userId) {
     return reply.code(401).send({ error: 'Missing token'})
   }
+  let otp;
+  if (userId) {
+    otp = await prisma.otp.findFirst({
+      where: { userId }
+    })
+  }
+  else {
   let token
   try {
     token = fastify.jwt.verify(temp);
@@ -105,9 +162,10 @@ fastify.get('/auth/otp-wait-time', async (req, reply) => {
     return reply.code(401).send({ error: 'Invalid or expired token'})
   }
   
-  const otp = await prisma.otp.findFirst({
+  otp = await prisma.otp.findFirst({
     where: { userId: token.id }
   })
+  }
   if (!otp) {
     return reply.send({ secondsLeft: 0 })
   }
@@ -145,4 +203,34 @@ fastify.get('/auth/otp-wait-time', async (req, reply) => {
   }
   return reply.code(200).send({message: 'new code sent'})
   })
+
+
+// a route for sending a new otp
+fastify.post('/auth/otp/send-otp', { preHandler: authenticate }, async (request, reply) => {
+  
+  const userId = request.user?.id;
+	
+  if (typeof userId !== 'number') {
+	  return reply.code(400).send({ error: 'Invalid or missing user ID' });
+	}
+	try {
+	  const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: { email: true }
+	  });
+  console.log('send OTP to', user.email);
+	if (typeof user.email !== 'string') {
+	  return reply.code(400).send({ error: 'Invalid or missing user email' });
+	}
+    const result = await handleOtp(user.email);
+    if (result.success) {
+      reply.code(200).send({ message: 'OTP sent'});
+    }
+    else {
+      reply.code(400).send({ error: 'unable to send OTP'});
+    }
+  } catch {
+      reply.code(400).send({ error: 'unable to send OTP catch'});    
+  }
+})
 }
