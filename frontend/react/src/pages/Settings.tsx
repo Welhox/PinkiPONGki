@@ -115,10 +115,10 @@ const Settings: React.FC = () => {
 	const uploadProfilePic = async (file: File | null) => {
 		if (!file) return;
 
-		const formData = new FormData();
-		formData.append("file", file);
-
 		try {
+			const formData = new FormData();
+			formData.append("file", file);
+
 			const res = await axios.post(apiUrl + '/user/profile-pic', formData, {
 				withCredentials: true,
 			});
