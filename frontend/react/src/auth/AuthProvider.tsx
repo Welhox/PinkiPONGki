@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+//import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import i18n from '../i18n';
 
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [status, setStatus] = useState<'loading' | 'authorized' | 'unauthorized'>('loading');
 	const [user, setUser] = useState<User | null>(null);
+	//const navigate = useNavigate();
 
 	const refreshSession = async () => {
 		try {

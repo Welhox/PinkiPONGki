@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../auth/AuthProvider';
 import i18n from '../i18n';
@@ -24,9 +24,19 @@ const Login: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [attempts, setAttempts] = useState(0);
 	const [cooldown, setCooldown] = useState(0);
+	//const [sessionExpired, setSessionExpired] = useState(false);
 
 	const navigate = useNavigate();
+	//const location = useLocation();
 	const { status, refreshSession } = useAuth();
+
+	/* useEffect(() => {
+		// check for "reason=expired" in URL query params
+		const params = new URLSearchParams(location.search);
+		if (params.get('reason') === 'expired') {
+			setSessionExpired(true);
+		}
+	}, [location.search]); */
 
 	useEffect(() => {
 		let timer: ReturnType<typeof setTimeout>;
@@ -118,6 +128,11 @@ const Login: React.FC = () => {
   return (
     <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">
       <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-5 p-5">Player Login</h1>
+	  {/*{sessionExpired && (
+		<p className="text-red-600 font-bold mb-4">
+			Your session has expired. Please log in again.
+		</p>
+	  )}*/}
 	  <form className="max-w-sm mx-auto" onSubmit={handleLogin} autoComplete="off">
 	  <div className="mb-5"><label className={labelStyles} htmlFor="username">Username:</label>
 	  <input className={inputStyles}
