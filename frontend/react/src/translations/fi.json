@@ -11,7 +11,7 @@
 		"loading": "Ladataan...",
 		"unknownUser": "Tuntematon käyttäjä",
 		"fetchError": "Käyttäjän hakeminen epäonnistui",
-    	"title": "{{username}}:n Pong tulokset"
+    	"title": "{{username}} Pong Tulokset"
 	},
 	"matchHistory": {
 		"loadingStats": "Ladataan tilastoja...",
@@ -31,11 +31,38 @@
 		"genericError": "Jotain meni pieleen. Yritä uudelleen."
 	},
 	"pongPals": {
-		"title": "Pongaverit",
+		"title": "Pongkaverit",
 		"searchUsers": "Etsi käyttäjiä",
 		"yourFriends": "Kaverisi",
 		"back": "Takaisin"
 	},
+	"befriendButton": {
+  		"befriend": "Lähetä kaveripyyntö",
+  		"unfriend": "Poista ystävä",
+  		"friend_request_pending": "Kaveripyyntö lähetetty..."
+	},
+	"confirmOtp": {
+		"invalid_otp_format": "Syötä kelvollinen 6-numeroinen vahvistus koodi.",
+		"email_verified_success": "Sähköposti vahvistettu ja kaksivaiheinen todennus aktivoitu!",
+		"otp_invalid": "Virheellinen tai vanhentunut vahvistus koodi. Yritä uudelleen.",
+		"otp_placeholder": "Syötä sähköpostiisi lähetetty 6-numeroinen koodi",
+		"confirm": "Vahvista"
+	},
+	"deleteAccount": {
+  		"ariaPrompt": "Syötä salasanasi vahvistaaksesi tilin poistamisen",
+  		"enterPassword": "Syötä salasanasi",
+  		"passwordPlaceholder": "Syötä salasanasi",
+  		"ariaLabel": "Syötä salasanasi vahvistaaksesi tilin poistamisen",
+  		"confirm": "Vahvista poisto",
+  		"cancel": "Peruuta",
+  		"delete": "Poista tili"
+	},
+	"editProfilePic": {
+    	"onlyImages": "Vain JPG- ja PNG-kuvatiedostot ovat sallittuja.",
+    	"fileTooLarge": "Tiedoston koko saa olla enintään 2 Mt.",
+    	"saved": "Kuva tallennettu!",
+    	"save": "Tallenna"
+  	},
 	"settings": {
     	"title": "Asetukset",
     	"email": "Sähköposti",
@@ -46,6 +73,67 @@
     	"deleteAccountError": "Tilin poistaminen epäonnistui. Yritä myöhemmin uudelleen.",
     	"languageError": "Kielen vaihtaminen epäonnistui. Yritä uudelleen.",
     	"back": "Takaisin",
-		"save": "tallenna"
-  }
+		"updateButton": "Päivitä",
+		"newLabel": "Uusi {{label}}",
+		"confirmLabel": "Vahvista {{label}}",
+		"currentPassword": "Nykyinen salasana",
+		"passwordErrorLength": "Salasanan on oltava 8 – 42 merkkiä pitkä.",
+		"passwordErrorFormat": "Salasanan on sisällettävä vähintään 8 merkkiä, mukaan lukien isoja ja pieniä kirjaimia, numeroita ja erikoismerkkejä.",
+		"emailErrorLength": "Sähköpostin on oltava enintään 42 merkkiä.",
+		"emailErrorFormat": "Anna kelvollinen sähköpostiosoite.",
+		"valuesMismatch": "Uudet arvot eivät täsmää.",
+		"currentPasswordRequired": "Nykyinen salasana vaaditaan.",
+		"updateSuccess": "{{label}} päivitettiin onnistuneesti.",
+		"updateFailed": "Päivitys epäonnistui.",
+		"somethingWentWrong": "Jokin meni pieleen.",
+		"save": "Tallenna",
+		"cancel": "Peruuta"
+	},
+	"friendList": {
+		"noFriends": "Sinulla ei ole vielä kavereita"
+	},
+	"navigation": {
+    	"home": "Etusivu",
+    	"myStats": "Omat tilastot",
+    	"pongPals": "Pong-kaverit",
+    	"tournaments": "Turnaukset",
+    	"settings": "Asetukset",
+    	"logout": "Kirjaudu ulos",
+    	"login": "Kirjaudu sisään"
+  	},
+	"passcode": {
+    	"label": "Syötä vahvistuskoodi:",
+    	"errorTooShort": "Koodi on liian lyhyt",
+    	"submit": "Lähetä"
+  	},
+	"friendRequests": {
+    	"title": "Odottavat kaveripyynnöt:",
+    	"request": "{{username}} haluaa olla ystäväsi!",
+    	"accept": "Hyväksy",
+    	"decline": "Hylkää",
+    	"accepted": "Olet nyt ystävä {{username}} kanssa",
+    	"declined": "Pyyntö hylätty",
+    	"error": "Jotain meni pieleen. Yritä uudelleen."
+  	},
+	"playerBox": {
+		"usernameRequired": "Käyttäjänimi vaaditaan",
+		"loginFailed": "Kirjautuminen epäonnistui. Tarkista tunnuksesi.",
+		"usernamePlaceholder": "Käyttäjänimi tai nimimerkki",
+		"passwordPlaceholder": "Salasana (tyhjäksi vieraalle)",
+		"continue": "Jatka",
+		"guestHint": "Pidä salasana tyhjänä rekisteröityäksesi vieraana"
+  	},
+	"results": {
+  		"Win": "Voitto",
+  		"Loss": "Tappio"
+	},
+	"searchPals": {
+		"placeholder": "Anna käyttäjänimi",
+		"errorInvalidUsername": "Käyttäjänimissä saa olla vain kirjaimia ja numeroita.",
+		"errorSearchFailed": "Hakeminen epäonnistui. Yritä uudelleen.",
+		"noUsersFound": "Vastaavia käyttäjiä ei löytynyt."
+  	},
+	"statsHeader": {
+		"back": "Takaisin"
+	}
 }

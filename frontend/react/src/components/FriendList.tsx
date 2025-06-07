@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Friend } from "../types/friend";
+import { useTranslation } from "react-i18next";
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -9,8 +10,9 @@ type FriendListProps = {
 }
 
 export const FriendList: React.FC<FriendListProps> = ({ friends }) => {
+	const { t } = useTranslation();
 
-	if (friends.length === 0) return <div>You don't have any pals yet</div>;
+	if (friends.length === 0) return <div>{t('friendList.noFriends')}</div>;
 
 	return (
 		<ul className="m-5 flex flex-col items-center">

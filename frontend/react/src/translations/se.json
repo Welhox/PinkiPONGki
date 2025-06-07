@@ -37,9 +37,75 @@
     	"deleteAccountError": "Konto radering misslyckades. Försök igen senare.",
     	"languageError": "Det gick inte att uppdatera språkinställningen. Försök igen.",
     	"back": "Tillbaka",
-		"save": "spara"
-
+		"updateButton": "Uppdatera",
+		"newLabel": "Ny {{label}}",
+		"confirmLabel": "Bekräfta {{label}}",
+		"currentPassword": "Nuvarande lösenord",
+		"passwordErrorLength": "Lösenordet måste vara mellan 8 och 42 tecken.",
+		"passwordErrorFormat": "Lösenordet måste innehålla minst 8 tecken, inklusive versaler, gemener, siffror och specialtecken.",
+		"emailErrorLength": "E-post måste vara 42 tecken eller mindre.",
+		"emailErrorFormat": "Ange en giltig e-postadress.",
+		"valuesMismatch": "Nya värden matchar inte.",
+		"currentPasswordRequired": "Nuvarande lösenord krävs.",
+		"updateSuccess": "{{label}} uppdaterades.",
+		"updateFailed": "Uppdateringen misslyckades.",
+		"somethingWentWrong": "Något gick fel.",
+		"save": "Spara",
+		"cancel": "Avbryt"
 	},
+	"befriendButton": {
+  		"befriend": "Bli vän",
+  		"unfriend": "Ta bort vän",
+  		"friend_request_pending": "Vänförfrågan skickad..."
+	},
+	"confirmOtp": {
+		"invalid_otp_format": "Ange en giltig 6-siffrig bekräftelsekod",
+		"email_verified_success": "E-post verifierad och tvåfaktorsautentisering aktiverad!",
+		"otp_invalid": "Ogiltig eller utgången bekräftelsekod. Försök igen.",
+		"otp_placeholder": "Ange den 6-siffriga koden som skickats till din e-post",
+		"confirm": "Bekräfta"
+	},
+	"deleteAccount": {
+  		"ariaPrompt": "Ange ditt lösenord för att bekräfta borttagning av kontot",
+  		"enterPassword": "Ange ditt lösenord",
+  		"passwordPlaceholder": "Ange ditt lösenord",
+  		"ariaLabel": "Ange ditt lösenord för att bekräfta borttagning av kontot",
+  		"confirm": "Bekräfta borttagning",
+  		"cancel": "Avbryt",
+  		"delete": "Radera konto"
+	},
+	"editProfilePic": {
+   		"onlyImages": "Endast JPG- och PNG-bilder är tillåtna.",
+    	"fileTooLarge": "Filstorleken får vara högst 2 MB.",
+    	"saved": "Bilden har sparats!",
+    	"save": "Spara"
+  	},
+	"friendList": {
+		"noFriends": "Du har inga kompisar ännu"
+	},
+	"navigation": {
+    	"home": "Hem",
+    	"myStats": "Mina statistik",
+    	"pongPals": "Pong-vänner",
+    	"tournaments": "Turneringar",
+    	"settings": "Inställningar",
+    	"logout": "Logga ut",
+    	"login": "Logga in"
+  	},
+	"passcode": {
+    	"label": "Ange verifieringskod:",
+    	"errorTooShort": "Koden är för kort",
+    	"submit": "Skicka"
+  	},
+	"friendRequests": {
+    	"title": "Vänförfrågningar som väntar:",
+    	"request": "{{username}} vill bli din vän!",
+    	"accept": "Acceptera",
+    	"decline": "Avböj",
+    	"accepted": "Du är nu vän med {{username}}",
+    	"declined": "Förfrågan avböjd",
+    	"error": "Något gick fel. Försök igen."
+  	},
 	"matchHistory": {
 		"loadingStats": "Laddar statistik...",
 		"errorFetching": "Misslyckades att hämta statistik",
@@ -48,5 +114,26 @@
 		"totalTournamentsWon": "Totala vunna turneringar",
 		"matchHistoryTitle": "Matchhistorik",
 		"noHistory": "Ingen matchhistorik tillgänglig"
+	},
+	"playerBox": {
+		"usernameRequired": "Användarnamn krävs",
+		"loginFailed": "Inloggning misslyckades. Kontrollera dina uppgifter.",
+		"usernamePlaceholder": "Användarnamn eller alias",
+		"passwordPlaceholder": "Lösenord (lämna tomt för gäst)",
+		"continue": "Fortsätt",
+		"guestHint": "Lämna lösenordet tomt för att registrera som gäst"
+  	},
+	"results": {
+  		"Win": "Vinst",
+  		"Loss": "Förlust"
+	},
+	"searchPals": {
+		"placeholder": "Ange användarnamn",
+		"errorInvalidUsername": "Användarnamn får endast innehålla bokstäver och siffror.",
+		"errorSearchFailed": "Något gick fel vid sökningen.",
+		"noUsersFound": "Inga matchande användare hittades."
+  	},
+	"statsHeader": {
+		"back": "Tillbaka"
 	}
 }

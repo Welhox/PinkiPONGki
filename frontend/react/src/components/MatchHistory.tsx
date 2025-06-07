@@ -77,7 +77,7 @@ const MatchHistory: React.FC<MatchHistoryProps> = ({ userId }) => {
 							className="text-center text-gray-700 mx-5 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 p-3 rounded shadow"
 						>
 							{new Date(match.date).toLocaleDateString()} -{' '}
-							{match.result.charAt(0).toUpperCase() + match.result.slice(1)} vs {match.opponent}
+							{t(`results.${match.result}`)} vs {match.opponent}
 						</li>
 					))}
 				</ul>

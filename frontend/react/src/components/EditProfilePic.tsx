@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ProfilePicProps {
 	pic: File | string | null;
@@ -14,6 +15,7 @@ picture file in the circle and changes will be committed only after user clicks 
 Allows only file types .jpg, .jpeg and .png. Max file size is limited to 2MB.
 */
 const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) => {
+  const { t } = useTranslation();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [newPic, setNewPic] = useState<File | null>(null); // holds unconfirmed file
   const [error, setError] = useState<string | null>(null);
@@ -31,14 +33,14 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
     if (error || success) {
       setLiveMessage(null); // force remount
       setTimeout(() => {
-        setLiveMessage(error || (success ? "Picture saved!" : ""));
+        setLiveMessage(error || (success ? t("editProfilePic.saved") : ""));
         // Give React time to render it
         setTimeout(() => {
           liveRegionRef.current?.focus();
         }, 10);
       }, 100); // wait for file input focus shift to complete
     }
-  }, [error, success]);
+  }, [error, success, t]);
 
   // update preview URL for either existing pic or newPic
   useEffect(() => {
@@ -70,14 +72,14 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
     const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
 
     if (!isValidType) {
-      setError("Only JPG and PNG images are allowed.");
+      setError(t("editProfilePic.onlyImages"));
       setNewPic(null);
       resetInput();
       return;
     }
 
 		if (!isValidSize) {
-			setError("File size must be less than 2MB.");
+			setError(t("editProfilePic.fileTooLarge"));
 			setNewPic(null);
 			resetInput();
 			return;
@@ -144,7 +146,7 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
         )}
         {success && (
           <span className="text-green-700 dark:text-green-500 mt-0.5">
-            Picture saved!
+            {t("editProfilePic.saved")}
           </span>
         )}
       </div>
@@ -171,7 +173,7 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
 								  dark:focus:ring-teal-800"
             onClick={handleSave}
           >
-            Save
+            {t("editProfilePic.save")}
           </button>
         </div>
       )}
