@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -16,6 +17,7 @@ const SearchPals: React.FC = () => {
 	const [results, setResults] = useState<User[]>([]);
 	const [hasSearched, setHasSearched] = useState(false);
 	const { user } = useAuth();
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		const delayDebounce = setTimeout(() => {
@@ -30,7 +32,7 @@ const SearchPals: React.FC = () => {
 			const isValid = /^[a-zA-Z0-9]+$/.test(trimmed);
 
 			if (!isValid) {
-				setError("Usernames only contain letters and numbers.");
+				setError(t('searchPals.errorInvalidUsername'));
 				setResults([]);
 				setHasSearched(false);
 				return;
@@ -57,7 +59,7 @@ const SearchPals: React.FC = () => {
 					setHasSearched(true);
 				} catch (error) {
 					console.error('Search failed:', error);
-					setError('Something went wrong while searching.');
+					setError(t('searchPals.errorSearchFailed'));
 					setHasSearched(false);
 				}
 			};
@@ -74,7 +76,7 @@ const SearchPals: React.FC = () => {
 		<div>
 			<input className={inputStyles}
 				type="text"
-				placeholder="Give username"
+				placeholder={t('searchPals.placeholder')}
 				value={query}
 				onChange={(e) => setQuery(e.target.value)}
 				maxLength={42}
@@ -83,7 +85,7 @@ const SearchPals: React.FC = () => {
 			{error && <div style={{ color: "red", marginTop: "0.5rem" }}>{error}</div>}
 
 			{hasSearched && results.length === 0 && !error && query.toLowerCase() !== user?.username.toLowerCase() && (
-				<p className="text-amber-900 dark:text-amber-300 font:bold mt-4">No matching users found.</p>
+				<p className="text-amber-900 dark:text-amber-300 font:bold mt-4">{t('searchPals.noUsersFound')}</p>
 			)}
 
 			<ul>

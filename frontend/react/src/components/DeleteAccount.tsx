@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const DeleteAccountButton: React.FC<{
   onDelete: (password: string) => void;
 }> = ({ onDelete }) => {
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +15,7 @@ const DeleteAccountButton: React.FC<{
     if (showForm) {
       setLiveMessage(null);
       setPassword("");
-      setLiveMessage("Enter your password to confirm deletion of your account");
+      setLiveMessage(t("deleteAccount.ariaPrompt"));
       setTimeout(() => {
         liveRegionRef.current?.focus();
       }, 10);
@@ -22,10 +24,11 @@ const DeleteAccountButton: React.FC<{
         inputRef.current?.focus();
       }, 10);
     }
-  }, [showForm]);
+  }, [showForm, t]);
+
   const handleSubmit = () => {
     if (!password) {
-      setError("Please enter your password");
+      setError(t("deleteAccount.enterPassword"));
       return;
     }
     setError("");
@@ -52,8 +55,8 @@ const DeleteAccountButton: React.FC<{
           <input
             type="password"
             id="delPassword"
-            placeholder="Enter your password"
-            aria-label="Enter your password to confirm deleting your account"
+            placeholder={t("deleteAccount.passwordPlaceholder")}
+            aria-label={t("deleteAccount.ariaLabel")}
             ref={inputRef}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +71,7 @@ const DeleteAccountButton: React.FC<{
 										dark:focus:ring-amber-800"
               onClick={handleSubmit}
             >
-              Confirm Delete
+              {t("deleteAccount.confirm")}
             </button>
             <button
               className="px-5 mx-3 my-2 text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 
@@ -77,7 +80,7 @@ const DeleteAccountButton: React.FC<{
 										dark:focus:ring-amber-800"
               onClick={() => setShowForm(false)}
             >
-              Cancel
+              {t("deleteAccount.cancel")}
             </button>
           </div>
         </div>
@@ -89,7 +92,7 @@ const DeleteAccountButton: React.FC<{
 									dark:focus:ring-amber-800"
           onClick={() => setShowForm(true)}
         >
-          Delete Account
+          {t("deleteAccount.delete")}
         </button>
       )}
     </div>

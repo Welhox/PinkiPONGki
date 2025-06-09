@@ -1,5 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 type NavigationHeaderProps = {
   	handleLogout: () => Promise<void>;
   	status: string;
@@ -17,6 +19,8 @@ const NavigationHeader = ({ handleLogout, status, user }: NavigationHeaderProps)
 	const [isOpen, setIsOpen] = useState(false);
 
 	const navigate = useNavigate();
+
+	const { t } = useTranslation();
 
 	const NavLink = ({target, text}: NavigationLinkProps) => {
 		return <Link to={target} 
@@ -44,11 +48,11 @@ const NavigationHeader = ({ handleLogout, status, user }: NavigationHeaderProps)
 		return (
 	<>
 	<nav className="hidden sm:flex justify-between bg-teal-700 p-2">
-		<NavLink target='/' text='Home'/>
-		<NavLink target={`/stats/${user.id}`} text='My Stats'/>
-		<NavLink target='pongpals' text='Pong Pals'/>
-		<NavLink target='/settings' text='Settings'/>
-		<LogoutButton insideText="Logout" handler={onLogoutClick}></LogoutButton>
+		<NavLink target='/' text={t('navigation.home')}/>
+		<NavLink target={`/stats/${user.id}`} text={t('navigation.myStats')}/>
+		<NavLink target='pongpals' text={t('navigation.pongPals')}/>
+		<NavLink target='/settings' text={t('navigation.settings')}/>
+		<LogoutButton insideText={t('navigation.logout')} handler={onLogoutClick}></LogoutButton>
 	</nav>
 	<nav className="sm:hidden flex justify-between bg-teal-700 p-2">
 		<button
@@ -58,22 +62,22 @@ const NavigationHeader = ({ handleLogout, status, user }: NavigationHeaderProps)
 		           text-white text-4xl p-2 rounded-2xl">≡</button></nav>
 	
 	{isOpen && (<nav className="sm:hidden flex flex-col space-y-4 px-4 pt-2 pb-4">
-		<NavLink target='/' text='Home'/>
-		<NavLink target={`/stats/${user.id}`} text='My Stats'/>
-		<NavLink target='pongpals' text='Pong Pals'/>
-		<NavLink target='/tournaments' text='Tournaments'/>
-		<NavLink target='/settings' text='Settings'/>
-		<LogoutButton insideText="Logout" handler={onLogoutClick}></LogoutButton>
+		<NavLink target='/' text={t('navigation.home')}/>
+		<NavLink target={`/stats/${user.id}`} text={t('navigation.myStats')}/>
+		<NavLink target='pongpals' text={t('navigation.pongPals')}/>
+		<NavLink target='/tournaments' text={t('navigation.tournaments')}/>
+		<NavLink target='/settings' text={t('navigation.settings')}/>
+		<LogoutButton insideText={t('navigation.logout')} handler={onLogoutClick}></LogoutButton>
 	</nav>)}</>
 )
 	else
 		return(
 			<><nav className="hidden sm:flex justify-between bg-teal-700 p-2">
-				<NavLink target='/' text='Home'/>
-				<NavLink target='/login' text='Login'/>
+				<NavLink target='/' text={t('navigation.home')}/>
+				<NavLink target='/login' text={t('navigation.login')}/>
 			</nav>
 			<nav className="sm:hidden flex justify-between bg-teal-700 p-2">
-			<NavLink target='/login' text='Login'/>
+			<NavLink target='/login' text={t('navigation.login')}/>
 		</nav></>
 		)
 };

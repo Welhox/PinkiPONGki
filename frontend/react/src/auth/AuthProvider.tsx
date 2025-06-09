@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import i18n from '../i18n';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -8,6 +9,7 @@ export interface User {
 	username: string;
 	email?: string;
 	profilePic?: string;
+	language?: string; 
 }
 
 export interface AuthContextType {
@@ -30,22 +32,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				},
 				withCredentials: true,
 			});
-			if (response.status === 200 && response.data.id) {
-				setUser(response.data);
-				setStatus('authorized');
-			} else {
+			const data = response.data;
+			
+			if (response.status === 200 && data?.id) {
+				const userLang = data.language ?? 'en';
+      			await i18n.changeLanguage(userLang);
+      			localStorage.setItem('language', userLang);
+
+        		setUser(data);
+        		setStatus('authorized');
+      		} else {
 				setUser(null);
 				setStatus('unauthorized');
+				await i18n.changeLanguage('en');
+				localStorage.removeItem('language');
 			}
 		} catch {
 			setUser(null);
 			setStatus('unauthorized');
+			await i18n.changeLanguage('en');
+			localStorage.removeItem('language');
 		}
 	};
 
 	useEffect(() => {
 		refreshSession();
 	}, []);
+
+	if (status === 'loading') {
+		return null;
+	}
 
 	return (
 		<AuthContext.Provider value={{ status, user, refreshSession }}>

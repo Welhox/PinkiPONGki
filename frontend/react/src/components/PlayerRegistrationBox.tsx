@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 interface PlayerBoxProps {
   label: string;
@@ -12,11 +13,12 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({ label, onRegister }) 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!username) {
-    setError('Username required');
+    setError(t('playerBox.usernameRequired'));
     return;
   }
   if (!password) {
@@ -28,7 +30,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       await axios.post(apiUrl + '/auth/login', { username, password }, { withCredentials: true });
       onRegister({ username, isGuest: false });
     } catch {
-      setError('Login failed. Check your credentials.');
+      setError(t('playerBox.loginFailed'));
     }
   }
 };
@@ -38,21 +40,21 @@ const handleSubmit = async (e: React.FormEvent) => {
       <label className="mb-2 font-bold">{label}</label>
       <input
         className="mb-2 p-2 border rounded w-48"
-        placeholder="Username or alias"
+        placeholder={t('playerBox.usernamePlaceholder')}
         value={username}
         onChange={e => setUsername(e.target.value)}
       />
       <input
         className="mb-2 p-2 border rounded w-48"
         type="password"
-        placeholder="Password (leave blank for guest)"
+        placeholder={t('playerBox.passwordPlaceholder')}
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
       <button className="bg-teal-700 text-white px-4 py-2 rounded" type="submit">
-        Continue
+        {t('playerBox.continue')}
       </button>
-      <span className="text-xs mt-1 text-gray-500">Keep password clear to sign up as guest</span>
+      <span className="text-xs mt-1 text-gray-500">{t('playerBox.guestHint')}</span>
       {error && <div className="text-red-500 mt-2">{error}</div>}
     </form>
   );

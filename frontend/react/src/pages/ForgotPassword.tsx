@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { useTranslation } from 'react-i18next';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -11,6 +12,7 @@ const ForgotPassword: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
 	const { status } = useAuth();
+	const { t } = useTranslation();
 	
 	if (status === 'loading') return <p>Loading...</p>
 	if (status === 'unauthorized') return <Navigate to="/" replace />;
@@ -37,29 +39,31 @@ const ForgotPassword: React.FC = () => {
 
 	return (
 		<div>
-			<h1>Reset Password</h1>
+			<h1>{t('forgotPassword.title')}</h1>
 
 			{submitted ? (
 				<>
-					<p>If that email is registered, you'll receive password reset instructions shortly.</p>
-					<button onClick={handleReturn}>Return</button>
+					<p>{t('forgotPassword.successMessage')}</p>
+					<button onClick={handleReturn}>
+						{t('forgotPassword.returnButton')}
+					</button>
 				</>
 			) : (
 				<form onSubmit={handleSubmit}>
-					<label htmlFor="email">Email address:</label>
+					<label htmlFor="email">{t('forgotPassword.emailLabel')}</label>
 					<input
 						type="email"
 						id="email"
 						required
 						value={email}
-						onChange={(e) => setEmail(e.target.value)}	
+						onChange={(e) => setEmail(e.target.value)}
 					/>
-					<button type="submit">Send Reset Link</button>
-					{error && <p style={{ color: 'red'}}>{error}</p>}
+					<button type="submit">{t('forgotPassword.submitButton')}</button>
+					{error && <p style={{ color: 'red' }}>{error}</p>}
 				</form>
 			)}
 		</div>
 	);
 };
 
-export default ForgotPassword
+export default ForgotPassword;

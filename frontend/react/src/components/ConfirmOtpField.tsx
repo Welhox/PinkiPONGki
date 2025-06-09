@@ -1,6 +1,7 @@
 import react from "react";
 import axios from "axios";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
 	apiUrl: string;
@@ -12,10 +13,11 @@ interface Props {
 
 const ConfirmOtpField: React.FC<Props> = ({apiUrl, otp, setOtp, setIs2FAEnabled, setShowOtpField}) => {
 	const [error, setError] = useState<string>('');
+	const { t } = useTranslation();
 
 	const handleSubmit = async () => {
 		if (otp.length !== 6) {
-			setError("Please enter a valid 6-digit OTP.");
+			setError(t("confirmOtp.invalid_otp_format"));
 			return;
 		}
 		try {
@@ -27,16 +29,16 @@ const ConfirmOtpField: React.FC<Props> = ({apiUrl, otp, setOtp, setIs2FAEnabled,
 				setIs2FAEnabled(true);
 				setOtp('');
 				axios.post(apiUrl + '/users/emailActivation', { emailVerified: true}, { withCredentials: true });
-				setError('Email verified and 2FA enabled successfully!');
+				setError(t("confirmOtp.email_verified_success"));
 				await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
 				setError(''); // Clear the error message after 2 seconds
 				setShowOtpField(false);
 				console.log("OTP verified and 2FA enabled!");
 			} else {
-				setError("Invalid or expired OTP. Please try again.");
+				setError(t("confirmOtp.otp_invalid"));
 			}
 		} catch (error) {
-			setError("Invalid or expired OTP. Please try again.");
+			setError(t("confirmOtp.otp_invalid"));
 			// console.error('Error verifying OTP:', error);
 		}
 	}
@@ -49,7 +51,7 @@ const ConfirmOtpField: React.FC<Props> = ({apiUrl, otp, setOtp, setIs2FAEnabled,
 				pattern="\d{6}"
 				maxLength={6}
 				aria-label="OTP Input"
-				placeholder="Verifiy by entering the 6-digit OTP sent to your email"
+				placeholder={t("confirmOtp.otp_placeholder")}
 				value={otp}
 				onChange={(e) => {
 					setOtp(e.target.value.replace(/\D/g, '')); // Allow only digits
@@ -66,7 +68,7 @@ const ConfirmOtpField: React.FC<Props> = ({apiUrl, otp, setOtp, setIs2FAEnabled,
 				className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
 				onClick={handleSubmit}
 				>
-				Confirm
+				{t("confirmOtp.confirm")}
 			</button>
 		</div>
 	);

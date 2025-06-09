@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import i18n from '../i18n';
+import { useTranslation } from 'react-i18next';
 
 interface SelectorProps {
 	value: string;
@@ -18,6 +20,7 @@ has changed.
 */
 const LanguageSelector: React.FC<SelectorProps> = ({ value, onChange }) => {
 	const [selectedLang, setSelectedLang] = useState(value);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 		setSelectedLang(value);
@@ -25,6 +28,8 @@ const LanguageSelector: React.FC<SelectorProps> = ({ value, onChange }) => {
 
 	const handleSave = () => {
 		if (selectedLang !== value) {
+			i18n.changeLanguage(selectedLang);
+			localStorage.setItem('language', selectedLang);
 			onChange(selectedLang);
 		}
 	};
@@ -33,7 +38,7 @@ const LanguageSelector: React.FC<SelectorProps> = ({ value, onChange }) => {
 
 	return (
 		<div className="block">
-			<strong>Language:</strong>{" "}
+			<strong>{t('settings.language')}:</strong>{" "}
 			<div className="flex flex-row justify-center items-center">
 				<div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
 					{languages.map((lang) => (
@@ -52,7 +57,7 @@ const LanguageSelector: React.FC<SelectorProps> = ({ value, onChange }) => {
 				</div>
 				{hasChanges && (
 					<div>
-						<button onClick={handleSave}>Save</button>
+						<button onClick={handleSave}>{t('settings.save')}</button>
 					</div>
 				)}
 			</div>

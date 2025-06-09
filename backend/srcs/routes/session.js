@@ -25,7 +25,7 @@ export async function sessionRoute(fastify, options) {
 		try {
 			const user = await prisma.user.findUnique({
 				where: { id: req.user.id },
-				select: { profilePic: true, email: true },
+				select: { profilePic: true, email: true, language: true },
 			});
 
 			let profilePic = '/assets/default_avatar.png';
@@ -39,7 +39,7 @@ export async function sessionRoute(fastify, options) {
 				}
 			}
 
-			return reply.send({ id, username, profilePic, email: user?.email });
+			return reply.send({ id, username, profilePic, email: user?.email, language: user?.language || 'en' });
 	
 		} catch (error) {
 			console.error('Session route failed:', error);

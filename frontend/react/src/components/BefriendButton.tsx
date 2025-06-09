@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -11,6 +12,7 @@ interface BefriendButtonProps {
 const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUserId }) => {
 	const [isFriend, setIsFriend] = useState(false);
 	const [friendRequestSent, setFriendRequestSent] = useState(false);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 
@@ -81,12 +83,12 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 				sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
 				dark:focus:ring-teal-800 m-5"
 				onClick={handleUnfriend}>
-					Unfriend
+					{t('befriendButton.unfriend')}
 			</button>
 		);
 	}
 		
-	if (friendRequestSent) return <p className="text-4xl text-center text-teal-800 dark:text-teal-300 m-3">Friend request pending...</p>;
+	if (friendRequestSent) return <p className="text-4xl text-center text-teal-800 dark:text-teal-300 m-3">{t('befriendButton.friend_request_pending')}</p>;
 
 	return (
 		<button 
@@ -95,7 +97,7 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 			sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
 			dark:focus:ring-teal-800 m-5"
 			onClick={handleSendFriendRequest}>
-				Befriend
+				{t('befriendButton.befriend')}
 		</button>
 	);
 };

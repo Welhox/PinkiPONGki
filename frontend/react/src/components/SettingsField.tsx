@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
+import { useTranslation } from "react-i18next";
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 interface FieldProps {
-	label: "Email" | "Password"
-	type?: "email" | "password";
+	label: string
+	type?: string
 	value: string;
 	onUpdate?: (newValue: string) => void;
 }
@@ -22,6 +23,7 @@ const SettingsField: React.FC<FieldProps> = ({
 	value,
 	onUpdate,
 }) => {
+  const { t } = useTranslation();
 	const [isEditing, setIsEditing] = useState(false);
 	const [inputValue, setInputValue] = useState("");
 	const [confirmInput, setConfirmInput] = useState("");
@@ -53,27 +55,27 @@ const SettingsField: React.FC<FieldProps> = ({
 
 	const validateInput = () => {
 		if (inputValue.trim() !== confirmInput.trim()) {
-			return "New values don't match.";
+			return t('settings.valuesMismatch');
 		}
 
 		if (type === "password") {
 			if (inputValue.length < 8 || inputValue.length > 42) {
-				return "Password must be between 8 and 42 characters.";
+				return t('settings.passwordErrorLength');
 			}
 			const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
 			if (!pwdRegex.test(inputValue)) {
-				return "Password must be at least 8 characters, including uppercase, lowercase, number and special character.";
+				return t('settings.passwordErrorFormat');
 			}
 		} else if (type === "email") {
-			if (inputValue.length > 42) return "Email must be 42 characters of less.";
+			if (inputValue.length > 42) return t('settings.emailErrorLength');
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 			if (!emailRegex.test(inputValue)) {
-				return "Please enter a valid email address.";
+				return t('settings.emailErrorFormat');
 			}
 		} 
 
 		if (!currentPassword/* || currentPassword.length < 8*/) { // COMMENT BACK IN FOR FINAL PRODUCT!!
-			return "Current password required.";
+			return t('settings.currentPasswordRequired');
 		}
 
 		return null;
@@ -94,12 +96,12 @@ const SettingsField: React.FC<FieldProps> = ({
 				currentPassword: currentPassword.trim(),
 			}, { withCredentials: true });
 
-			setSuccess(`${label} updated successfully.`);
+			setSuccess(t('settings.updateSuccess', { label }));
 			setError(null);
 			setIsEditing(false);
 			onUpdate?.(inputValue.trim());
 		} catch (error: any) {
-			setError(error?.response?.data?.message || "Update failed.");
+			setError(error?.response?.data?.message || t('settings.updateFailed'));
 		}
 	};
 
@@ -112,7 +114,7 @@ const SettingsField: React.FC<FieldProps> = ({
 		setSuccess(null);
 	};
 
-  const button_aria_label = "update " + label;
+  const button_aria_label = t('settings.updateButton') + " " + label;
 
   return (
     <div>
@@ -128,14 +130,13 @@ const SettingsField: React.FC<FieldProps> = ({
             aria-label={button_aria_label}
             onClick={() => {
               setTimeout(() => {
-                // this is necessary to workaround a known issue in Voiceover, which moves the focus to the full window
                 inputRef.current?.focus();
               }, 10);
               setInputValue("");
               setIsEditing(true);
             }}
           >
-            Update
+            {t('settings.updateButton')}
           </button>
         </>
       ) : (
@@ -145,7 +146,7 @@ const SettingsField: React.FC<FieldProps> = ({
             type={type}
             ref={inputRef}
             value={inputValue}
-            placeholder={`New ${label}`}
+            placeholder={t('settings.newLabel', { label })}
             onChange={(e) => setInputValue(e.target.value)}
           />
           <br />
@@ -153,7 +154,7 @@ const SettingsField: React.FC<FieldProps> = ({
             type={type}
             ref={confirmRef}
             value={confirmInput}
-            placeholder={`Confirm ${label}`}
+            placeholder={t('settings.confirmLabel', { label })}
             onChange={(e) => setConfirmInput(e.target.value)}
           />
           <br />
@@ -161,7 +162,7 @@ const SettingsField: React.FC<FieldProps> = ({
             type="password"
             ref={currentPasswordRef}
             value={currentPassword}
-            placeholder="Current password"
+            placeholder={t('settings.currentPassword')}
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <div>
@@ -169,10 +170,10 @@ const SettingsField: React.FC<FieldProps> = ({
               className={buttonStyles}
               onClick={handleSave}
             >
-              Save
+              {t('settings.save')}
             </button>{" "}
             <button className={buttonStyles} onClick={handleCancel}>
-              Cancel
+              {t('settings.cancel')}
             </button>
           </div>
           {error && (

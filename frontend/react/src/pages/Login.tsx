@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../auth/AuthProvider';
+import i18n from '../i18n';
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
@@ -82,6 +83,13 @@ const Login: React.FC = () => {
 				navigate('/mfa');
 				return;	
 			}
+			const userLang = response.data.language ?? 'en';
+
+    		// Change language immediately
+    		if (i18n.language !== userLang) {
+      			i18n.changeLanguage(userLang);
+      			localStorage.setItem('language', userLang);
+    		}
 			console.log('Login successful: ', response.data);
 			await refreshSession();
 			setAttempts(0);
