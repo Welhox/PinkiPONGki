@@ -77,6 +77,7 @@
 	"editProfilePic": {
    		"onlyImages": "Endast JPG- och PNG-bilder är tillåtna.",
     	"fileTooLarge": "Filstorleken får vara högst 2 MB.",
+		"notValidImage": "Filen är inte en giltig bild.",
     	"saved": "Bilden har sparats!",
     	"save": "Spara"
   	},

@@ -99,14 +99,14 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
     }
 
 	if (!isValidSize) {
-		setError("File size must be less than 2MB.");
+		setError(t("editProfilePic.fileTooLarge"));
 		setNewPic(null);
 		resetInput();
 		return;
 	}
 
 	if (!isValidContent) {
-		setError("The file is not a valid image.");
+		setError(t("editProfilePic.notValidImage"));
 		setNewPic(null);
 		resetInput();
 		return;

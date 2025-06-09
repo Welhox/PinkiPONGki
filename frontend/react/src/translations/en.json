@@ -77,6 +77,7 @@
 	"editProfilePic": {
     	"onlyImages": "Only JPG and PNG images are allowed.",
     	"fileTooLarge": "File size must be less than 2MB.",
+		"notValidImage": "The file is not a valid image.",
     	"saved": "Picture saved!",
     	"save": "Save"
   	},
