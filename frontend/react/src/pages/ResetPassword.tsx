@@ -62,7 +62,6 @@ const ResetPassword: React.FC = () => {
       setError(t('resetPassword.fillBothFields'));
       return;
     }
-
     if (newPassword !== confirmPassword) {
       setError(t('resetPassword.passwordsDontMatch'));
       return;
