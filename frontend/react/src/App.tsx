@@ -15,8 +15,8 @@ import NavigationHeader from "./components/NavigationHeader";
 import { useAuth } from "./auth/AuthProvider";
 import { GameSettingsProvider } from "./contexts/GameSettingsContext";
 import api from "./api/axios";
-import Mfa from "./pages/Mfa";
-import i18n from "./i18n";
+import Mfa from './pages/Mfa';
+import i18n from './i18n';
 
 const App: React.FC = () => {
   const logout = async () => {
