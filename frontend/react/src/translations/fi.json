@@ -205,5 +205,22 @@
 		"resendError": "Virhe OTP:n uudelleenlähetyksessä. Yritä myöhemmin uudelleen.",
 		"waitTime": "Odota {{count}} sekuntia ennen uuden OTP:n pyytämistä.",
 		"loading": "Ladataan..."
-  	}	
+  	},
+	"resetPassword": {
+		"title": "Vaihda salasanasi",
+		"newPasswordLabel": "Uusi salasana",
+		"confirmPasswordLabel": "Vahvista salasana",
+		"fillBothFields": "Täytä molemmat salasanakentät",
+		"passwordsDontMatch": "Salasanat eivät täsmää",
+		"invalidOrMissingToken": "Virheellinen tai puuttuva linkki",
+		"failed": "Salasanan vaihtaminen epäonnistui",
+		"submitting": "Vaihdetaan...",
+		"submitButton": "Vaihda salasana",
+		"successTitle": "Salasana vaihdettu onnistuneesti!",
+		"goToLogin": "Siirry kirjautumiseen",
+		"invalidOrExpiredToken": "Tämä salasanan palautuslinkki on virheellinen tai vanhentunut.",
+		"requestNew": "Ole hyvä ja pyydä uusi palautuslinkki.",
+		"requestNewLink": "Pyydä uusi linkki",
+		"validatingToken": "Tarkistetaan palautuslinkkiä..."
+	}
 }

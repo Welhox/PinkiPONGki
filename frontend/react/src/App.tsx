@@ -18,6 +18,8 @@ import api from "./api/axios";
 import Mfa from "./pages/Mfa";
 import i18n from "./i18n";
 
+
+
 const App: React.FC = () => {
   const logout = async () => {
     try {
@@ -48,7 +50,6 @@ const App: React.FC = () => {
         <Route path="/verifyemail" element={<VerifyEmail />} />
         <Route path="/pongpals" element={<PongPals />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/reset-password" element={<ResetPassword/>} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/mfa" element={<Mfa />} />
         <Route path="/tournament/:id" element={<TournamentPage />} />
