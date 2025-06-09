@@ -4,7 +4,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import PongPals from "./pages/PongPals";
-import ResetPassword from './pages/ResetPassword';
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import Stats from "./pages/Stats";

@@ -218,5 +218,22 @@
 		"resendError": "Ett fel uppstod vid återutsändning av OTP. Försök igen senare.",
 		"waitTime": "Vänligen vänta {{count}} sekunder innan du begär en ny OTP.",
 		"loading": "Laddar..."
-  }
+	},
+	"resetPassword": {
+		"title": "Återställ ditt lösenord",
+		"newPasswordLabel": "Nytt lösenord",
+		"confirmPasswordLabel": "Bekräfta lösenord",
+		"fillBothFields": "Fyll i båda lösenordsfälten",
+		"passwordsDontMatch": "Lösenorden matchar inte",
+		"invalidOrMissingToken": "Ogiltig eller saknad länk",
+		"failed": "Det gick inte att återställa lösenordet",
+		"submitting": "Återställer...",
+		"submitButton": "Återställ lösenord",
+		"successTitle": "Lösenordet har återställts!",
+		"goToLogin": "Gå till inloggningen",
+		"invalidOrExpiredToken": "Denna återställningslänk är ogiltig eller har gått ut.",
+		"requestNew": "Vänligen begär en ny återställningslänk.",
+		"requestNewLink": "Begär ny länk",
+		"validatingToken": "Verifierar återställningslänk..."
+	}
 }
