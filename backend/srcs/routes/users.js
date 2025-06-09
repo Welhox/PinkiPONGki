@@ -139,8 +139,7 @@ const emailRateLimitConfig = {
 
 //####################################################################################################################################
 
-  
-	// 1) Request password reset and send reset link to email
+// 1) Request password reset and send reset link to email
 	fastify.post('/users/request-password-reset', { schema: userSchemas.requestPasswordResetSchema, ...emailRateLimitConfig }, async (req, reply) => {
 		const { email } = req.body;
 
