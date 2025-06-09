@@ -16,7 +16,7 @@ const deleteUserSchema = {
   },
 };
 
-// This schema is used to validate the id and password for deleteing a user
+  // This schema is used to validate the id and password for deleteing a user
 const deleteUserSchemaPost = {
   params: {
     type: "object",
