@@ -19,7 +19,8 @@
 		"submitButton": "Skicka återställningslänk",
 		"successMessage": "Om den e-postadressen är registrerad får du snart instruktioner för att återställa lösenordet.",
 		"returnButton": "Tillbaka",
-		"genericError": "Något gick fel. Försök igen."
+		"genericError": "Något gick fel. Försök igen.",
+		"submitting": "Skickar..."
 	},
 	"pongPals": {
 		"title": "Pong Vänner",

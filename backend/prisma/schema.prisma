@@ -47,6 +47,9 @@ model User {
   tournamentMatchesAsPlayer1 TournamentMatch[] @relation("TM_Player1")
   tournamentMatchesAsPlayer2 TournamentMatch[] @relation("TM_Player2")
   tournamentMatchesAsWinner  TournamentMatch[] @relation("TM_Winner")
+  
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
 }
 
 model Otp {
