@@ -216,8 +216,9 @@ export async function userRoutes(fastify, _options) {
 		}
 	});
 
-//####################################################################################################################################
- fastify.post(
+ //####################################################################################################################################
+
+  fastify.post(
     "/users/logout",
     { schema: userSchemas.logoutSchema, preHandler: authenticate },
     async (req, reply) => {
@@ -237,8 +238,7 @@ export async function userRoutes(fastify, _options) {
         return reply.code(500).send({ error: "Internal server error" });
       }
     }
-);
-
+  );
 
   //####################################################################################################################################
 
