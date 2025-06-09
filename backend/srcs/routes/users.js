@@ -3,7 +3,7 @@ import prisma from '../prisma.js'
 //import the hashing functions
 import bcryptjs from 'bcryptjs'
 //import the schema for the user
-import { deleteUserSchema, getUserByEmailSchema, getUserByUsernameSchema, getUserByIdSchema, registerUserSchema, loginUserSchema } from '../schemas/userSchemas.js'
+import { deleteUserSchema, deleteUserSchemaPost, getUserByEmailSchema, getUserByUsernameSchema, getUserByIdSchema, registerUserSchema, loginUserSchema } from '../schemas/userSchemas.js'
 import { authenticate } from '../middleware/authenticate.js'
 import { handleOtp } from '../handleOtp.js';
 
@@ -233,7 +233,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	})
 
 	// axios doesnt support sending a body in delete request in all browsers, hence post:
-	fastify.post('/users/delete/:id', { preHandler: authenticate }, async (req, reply) => {
+	fastify.post('/users/delete/:id', { schema: deleteUserSchemaPost, preHandler: authenticate }, async (req, reply) => {
 		const { id } = req.params
 		const { password } = req.body
 		const user = req.user

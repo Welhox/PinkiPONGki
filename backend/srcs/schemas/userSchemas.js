@@ -16,8 +16,31 @@ export const deleteUserSchema = {
 	  404: { type: 'object', properties: { error: { type: 'string' } } },
 	},
   };
-  
-  
+
+
+  // This schema is used to validate the id and password for deleteing a user
+export const deleteUserSchemaPost = {
+	params: {
+	  type: 'object',
+	  properties: {
+		id: { type: 'integer', minimum: 1 },
+	  },
+	  required: ['id'],
+	},
+	body: {
+		type: 'object',
+		properties: {
+			password: { type: 'string', minLength: 6, maxLength: 30}
+		},
+		required: ['password']
+	},
+	response: {
+	  200: { type: 'object', properties: { message: { type: 'string' } } },
+	  400: { type: 'object', properties: { error: { type: 'string' } } },
+	  404: { type: 'object', properties: { error: { type: 'string' } } },
+	  500: { type: 'object', properties: { error: { type: 'string' } } },
+	},
+  };
 
 export const getUserByEmailSchema = {
 	querystring: {
