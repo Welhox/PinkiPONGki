@@ -3,7 +3,8 @@ import prisma from '../prisma.js'
 //import the hashing functions
 import bcryptjs from 'bcryptjs'
 //import the schema for the user
-import { deleteUserSchema, deleteUserSchemaPost, getUserByEmailSchema, getUserByUsernameSchema, getUserByIdSchema, registerUserSchema, loginUserSchema } from '../schemas/userSchemas.js'
+import { deleteUserSchema, deleteUserSchemaPost, getUserByEmailSchema, getUserByUsernameSchema, 
+		getUserByIdSchema, registerUserSchema, loginUserSchema, getEmailStatusSchema, getUserFriendsByIdSchema } from '../schemas/userSchemas.js'
 import { authenticate } from '../middleware/authenticate.js'
 import { handleOtp } from '../handleOtp.js';
 
@@ -298,7 +299,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	  })
 
 	  	// get user email verification information from JWT (username, id, email, emailVerified)
-	fastify.get('/users/emailStatus', { preHandler: authenticate }, async (req, reply) => {
+	fastify.get('/users/emailStatus', { schema: getEmailStatusSchema, preHandler: authenticate }, async (req, reply) => {
 		const userId = req.user?.id; 
 		console.log('User ID from JWT:', userId);
 		// if (typeof userId !== 'number') {
@@ -368,7 +369,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		return users;
 	});
 
-	fastify.get('/users/:id/friends', { preHandler: authenticate } , async (request, reply) => {
+	fastify.get('/users/:id/friends', { schema: getUserFriendsByIdSchema , preHandler: authenticate } , async (request, reply) => {
 		const userId = parseInt(request.params.id, 10);
 		if (isNaN(userId)) {
 			return reply.code(400).send({ error: 'Invalid user ID' });
