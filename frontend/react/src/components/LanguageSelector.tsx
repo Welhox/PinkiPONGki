@@ -13,6 +13,9 @@ const languages = [
 	{ code: "se", flag: "🇸🇪"},
 ];
 
+const buttonStyles =
+  "px-5 mx-3 my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800";
+
 /*
 Displays three radio buttons for language options displaying the current setting selected by default.
 Detects changes if user selects a new language and offers a save button if previously saved language
@@ -57,7 +60,7 @@ const LanguageSelector: React.FC<SelectorProps> = ({ value, onChange }) => {
 				</div>
 				{hasChanges && (
 					<div>
-						<button onClick={handleSave}>{t('settings.save')}</button>
+						<button className={buttonStyles} onClick={handleSave}>{t('settings.save')}</button>
 					</div>
 				)}
 			</div>

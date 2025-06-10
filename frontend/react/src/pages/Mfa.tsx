@@ -74,39 +74,44 @@ const Mfa: React.FC = () => {
 			setIsLoading(false);
 		}
 	};
+	const inputStyles =
+    	"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 m-1 w-xs dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+
+	const buttonStyles =
+  		`my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-xs sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`;
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-			<h1 className="text-2xl font-bold mb-4">Multi-Factor Authentication</h1>
-			<form onSubmit={handleMfaSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-				<div className="mb-4">
-					<label htmlFor="code" className="block text-sm font-medium text-gray-700">OTP</label>
+		<div className="flex flex-col items-center justify-center my-5 max-w-2xl bg-white text-center dark:bg-black mx-auto rounded-lg">
+			<h1 className="text-6xl m-4 text-teal-800 dark:text-teal-300">Multi-Factor Authentication</h1>
+			<form onSubmit={handleMfaSubmit} className="flex flex-col bg-white dark:bg-gray-800 p-6 mb-10 rounded shadow-md w-full max-w-sm">
+				<div className="mb-4 text-center font-semibold">
+					<label htmlFor="code" className="text-md text-center text-teal-800 dark:text-teal-300 m-3">OTP</label>
 					<input
 						type="text"
 						id="code"
 						value={code}
 						onChange={(e) => setCode(e.target.value)}
-						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+						className="mt-1 w-full border text-black dark:text-white border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
 						required
 					/>
 				</div>
 				{error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 				<button
 					type="submit"
-					className={`w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+					className={buttonStyles}
 					disabled={isLoading}
 				>
 					{isLoading ? 'Verifying...' : 'Verify'}
 				</button>
-			</form>
 				<button
 					onClick={handleResendOtp}
 					type="submit"
-					className={`w-full shadow-md max-w-sm bg-blue-600 text-white font-semibold py-2 px-4 rounded ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+					className={buttonStyles}
 					disabled={isLoading}
 				>
-					{isLoading ? 'Resend OTP' : 'Resend OTP'}
+				Resend OTP
 				</button>
+			</form>
 		</div>
 	);
 }

@@ -8,7 +8,7 @@ interface ToggleSwitchProps {
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, enabled, onToggle }) => {
 	return (
-		<div className="flex justify-between items-center max-w-sm mx-auto my-4">
+		<div className="flex justify-between items-center max-w-xs mx-auto my-4">
 			<label htmlFor='toggleSwitch' className='font-bold'>{label}:</label>
 			<button id='toggleSwitch'
 				onClick={() => onToggle(!enabled)}
