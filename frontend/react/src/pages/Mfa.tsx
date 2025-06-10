@@ -1,118 +1,169 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../auth/AuthProvider';
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../auth/AuthProvider";
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
+const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 const Mfa: React.FC = () => {
-	const [code, setCode] = useState('');
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
-	const navigate = useNavigate();
-	const { status, refreshSession } = useAuth();
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { status, refreshSession } = useAuth();
+  const liveRegionRef = useRef<HTMLDivElement>(null);
+  const [liveMessage, setLiveMessage] = useState<string | null>(null); // for screen reader aria announcements
 
-	useEffect(() => {
-		if (status === 'authorized') {
-			navigate('/');
-		}
-	}, [status]);
+  useEffect(() => {
+    if (status === "authorized") {
+      navigate("/");
+    }
+  }, [status]);
 
-	if (status === 'loading') return <p>Loading...</p>
+  // This is a workaround for an issue with voiceover moving focus to the wrong place
+  // (to the entire website window) after exiting a native file upload dialog.
+  useEffect(() => {
+    if (error) {
+      setLiveMessage(null); // force remount
+      setTimeout(() => {
+        setLiveMessage(error);
+        // Give React time to render it
+        setTimeout(() => {
+          liveRegionRef.current?.focus();
+        }, 10);
+      }, 100); // wait for file input focus shift to complete
+    }
+  }, [error]);
 
-	// sends post request to server for credential validation
-	const handleMfaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		setError(null);
-		setIsLoading(true);
+  if (status === "loading") return <p>Loading...</p>;
 
-		try {
-			const response = await axios.post(apiUrl + '/auth/verify-otp', { code }, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-				withCredentials: true,
-			});
-			if (response.status === 200) {
-				await refreshSession();
-				navigate('/');
-			}
-		} catch (error) {
-			if (axios.isAxiosError(error) && error.response) {
-				if (error.response.status === 401) {
-					setError('Invalid OTP. Please try again.');
-				} else if (error.response.status === 403) {
-					setError('OTP expired. Please request a new one.');
-				} else {
-					setError('An error occurred. Please try again later.');
-				}
-			} else {
-				setError('An error occurred');
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	};
+  // sends post request to server for credential validation
+  const handleMfaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-	const handleResendOtp = async () => {
-		setError(null);
-		setIsLoading(true);
-		try {
-			const response = await axios.get(apiUrl + '/auth/otp-wait-time',  { withCredentials: true})
-			const waitTime = response.data.secondsLeft
+    try {
+      const response = await axios.post(
+        apiUrl + "/auth/verify-otp",
+        { code },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.status === 200) {
+        await refreshSession();
+        navigate("/");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 401) {
+          setError("Invalid OTP. Please try again.");
+        } else if (error.response.status === 403) {
+          setError("OTP expired. Please request a new one.");
+        } else {
+          setError("An error occurred. Please try again later.");
+        }
+      } else {
+        setError("An error occurred");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-			if (waitTime > 0) {
-				setError(`Please wait ${waitTime} seconds before requesting a new OTP.`);
-			} else {
-				await axios.post(apiUrl + '/auth/resend-otp', {}, { withCredentials: true });
-				setError('OTP has been resent. Please check your email.');
-			}
-		} catch (error) {
-			console.error('Error resending OTP:', error);
-			setError('An error occurred while resending the OTP. Please try again later.');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-	const inputStyles =
-    	"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 m-1 w-xs dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+  const handleResendOtp = async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const response = await axios.get(apiUrl + "/auth/otp-wait-time", {
+        withCredentials: true,
+      });
+      const waitTime = response.data.secondsLeft;
 
-	const buttonStyles =
-  		`my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-xs sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`;
+      if (waitTime > 0) {
+        setError(
+          `Please wait ${waitTime} seconds before requesting a new OTP.`
+        );
+      } else {
+        await axios.post(
+          apiUrl + "/auth/resend-otp",
+          {},
+          { withCredentials: true }
+        );
+        setError("OTP has been resent. Please check your email.");
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      setError(
+        "An error occurred while resending the OTP. Please try again later."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const inputStyles =
+    "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 m-1 w-xs dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
 
-	return (
-		<div className="flex flex-col items-center justify-center my-5 max-w-2xl bg-white text-center dark:bg-black mx-auto rounded-lg">
-			<h1 className="text-6xl m-4 text-teal-800 dark:text-teal-300">Multi-Factor Authentication</h1>
-			<form onSubmit={handleMfaSubmit} className="flex flex-col bg-white dark:bg-gray-800 p-6 mb-10 rounded shadow-md w-full max-w-sm">
-				<div className="mb-4 text-center font-semibold">
-					<label htmlFor="code" className="text-md text-center text-teal-800 dark:text-teal-300 m-3">OTP</label>
-					<input
-						type="text"
-						id="code"
-						value={code}
-						onChange={(e) => setCode(e.target.value)}
-						className="mt-1 w-full border text-black dark:text-white border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-						required
-					/>
-				</div>
-				{error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-				<button
-					type="submit"
-					className={buttonStyles}
-					disabled={isLoading}
-				>
-					{isLoading ? 'Verifying...' : 'Verify'}
-				</button>
-				<button
-					onClick={handleResendOtp}
-					type="submit"
-					className={buttonStyles}
-					disabled={isLoading}
-				>
-				Resend OTP
-				</button>
-			</form>
-		</div>
-	);
-}
+  const buttonStyles = `my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-xs sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 ${
+    isLoading ? "opacity-50 cursor-not-allowed" : ""
+  }`;
+
+  return (
+    <div className="flex flex-col items-center justify-center my-5 max-w-2xl bg-white text-center dark:bg-black mx-auto rounded-lg">
+      <h1 className="text-6xl m-4 text-teal-800 dark:text-teal-300">
+        Multi-Factor Authentication
+      </h1>
+      <form
+        onSubmit={handleMfaSubmit}
+        className="flex flex-col bg-white dark:bg-gray-800 p-6 mb-10 rounded shadow-md w-full max-w-sm"
+      >
+        <div className="mb-4 text-center font-semibold">
+          <label
+            htmlFor="code"
+            className="text-md text-center text-teal-800 dark:text-teal-300 m-3"
+          >
+            OTP
+          </label>
+          <input
+            type="text"
+            id="code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="mt-1 w-full border text-black dark:text-white border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+        {/* This next part is a secret div, visible only to screen readers, which ensures that the error
+	  or success messages get announced using aria. */}
+        {liveMessage && (
+          <div
+            ref={liveRegionRef}
+            tabIndex={-1}
+            aria-live="assertive"
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {liveMessage}
+          </div>
+        )}
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <button type="submit" className={buttonStyles} disabled={isLoading}>
+          {isLoading ? "Verifying..." : "Verify"}
+        </button>
+        <button
+          onClick={handleResendOtp}
+          type="submit"
+          className={buttonStyles}
+          disabled={isLoading}
+        >
+          Resend OTP
+        </button>
+      </form>
+    </div>
+  );
+};
 export default Mfa;
