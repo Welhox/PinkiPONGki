@@ -4,11 +4,13 @@ import bcryptjs from 'bcryptjs';
 import { handleOtp } from '../handleOtp.js';
 import { authenticate } from '../middleware/authenticate.js'
 import { authenticateOptional } from '../middleware/authenticateOptional.js';
-
+import { otpSchemas } from '../schemas/otpSchemas.js';
 export async function otpRoutes(fastify, options) {
 
+//####################################################################################################################################
+
 // a rout for verifing the OTP witout making a cookie
-fastify.post('/auth/otp/verify', { preHandler: authenticate }, async (request, reply) => {
+  fastify.post('/auth/otp/verify', { schema: otpSchemas.otpVerifyNoCoockieSchema, preHandler: authenticate }, async (request, reply) => {
   
   const userId = request.user?.id;
   try {
@@ -20,7 +22,6 @@ fastify.post('/auth/otp/verify', { preHandler: authenticate }, async (request, r
   console.log('Verifying OTP for user ID:', userId, 'with code:', code);
 
   await new Promise(resolve => setTimeout(resolve, 1000))
-  // const userId = user.id;
     const otp = await prisma.otp.findFirst({
       where: {
         userId,
@@ -52,9 +53,10 @@ fastify.post('/auth/otp/verify', { preHandler: authenticate }, async (request, r
   } 
   });
 
+//####################################################################################################################################
 
   // check if the OTP is valid and not expired
-fastify.post('/auth/verify-otp', async (request, reply) => {
+fastify.post('/auth/verify-otp', {schema: otpSchemas.otpVerifyWithCoockieSchema }, async (request, reply) => {
   
   const temp = request.cookies.otpToken
   if (!temp) {
@@ -137,10 +139,10 @@ fastify.post('/auth/verify-otp', async (request, reply) => {
   } 
   });
 
+//####################################################################################################################################
 
-
- // check if there is a Otp and how long beofre a new one can be generated
-fastify.get('/auth/otp-wait-time', { preHandler: authenticateOptional },async (req, reply) => {
+  // check if there is a Otp and how long beofre a new one can be generated
+  fastify.get('/auth/otp-wait-time', { schema: otpSchemas.otpWaitSchema, preHandler: authenticateOptional },async (req, reply) => {
   const temp = req.cookies.otpToken
   const userId = req.user?.id;
 
@@ -177,8 +179,10 @@ fastify.get('/auth/otp-wait-time', { preHandler: authenticateOptional },async (r
   return reply.send({ secondsLeft })
   });
 
+//####################################################################################################################################
+
     // a route for sending a new otp
-  fastify.post('/auth/resend-otp', async (req, reply) => {
+  fastify.post('/auth/resend-otp', {schema: otpSchemas.otpResendSchema }, async (req, reply) => {
 
   const temp = req.cookies.otpToken
   if (!temp) {
@@ -204,9 +208,10 @@ fastify.get('/auth/otp-wait-time', { preHandler: authenticateOptional },async (r
   return reply.code(200).send({message: 'new code sent'})
   })
 
+//####################################################################################################################################
 
 // a route for sending a new otp
-fastify.post('/auth/otp/send-otp', { preHandler: authenticate }, async (request, reply) => {
+fastify.post('/auth/otp/send-otp', { schema: otpSchemas.otpSendSchema, preHandler: authenticate }, async (request, reply) => {
   
   const userId = request.user?.id;
 	
@@ -233,4 +238,7 @@ fastify.post('/auth/otp/send-otp', { preHandler: authenticate }, async (request,
       reply.code(400).send({ error: 'unable to send OTP catch'});    
   }
 })
+
+//####################################################################################################################################
+
 }
