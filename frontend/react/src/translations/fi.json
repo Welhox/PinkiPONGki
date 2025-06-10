@@ -60,6 +60,7 @@
 	"editProfilePic": {
     	"onlyImages": "Vain JPG- ja PNG-kuvatiedostot ovat sallittuja.",
     	"fileTooLarge": "Tiedoston koko saa olla enintään 2 Mt.",
+		"notValidImage": "Tämä ei ole kuva.",
     	"saved": "Kuva tallennettu!",
     	"save": "Tallenna"
   	},

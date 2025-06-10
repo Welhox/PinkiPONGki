@@ -7,6 +7,25 @@ interface ProfilePicProps {
 	onSave?: (file: File | null) => void;
 }
 
+function validateImageMagicBytes(file: File): Promise<boolean> {
+	return new Promise((resolve) => {
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			const arr = new Uint8Array(reader.result as ArrayBuffer).subarray(0, 4);
+			const header = Array.from(arr).map(byte => byte.toString(16)).join('');
+
+			// JPEG: ff d8 ff e0 || ff d8 ff e1
+			if (header.startsWith("ffd8ffe0") || header.startsWith("ffd8ffe1")) return resolve(true);
+
+			// PNG: 89 50 4e 47
+			if (header === "89504e47") return resolve(true);
+
+			return resolve(false);
+		};
+		reader.readAsArrayBuffer(file.slice(0, 4));
+	});
+}
+
 /*
 Component for updating the profile picture in Settings. Displays saved profile pic
 by default. If invalid picture is submitted, displays an error and clears up /
@@ -64,12 +83,13 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
 
   }, [pic, newPic]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const isValidType = allowedTypes.includes(file.type);
     const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
+	const isValidContent = await validateImageMagicBytes(file);
 
     if (!isValidType) {
       setError(t("editProfilePic.onlyImages"));
@@ -78,15 +98,23 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
       return;
     }
 
-		if (!isValidSize) {
-			setError(t("editProfilePic.fileTooLarge"));
-			setNewPic(null);
-			resetInput();
-			return;
-		}
-		setError(null);
-		setNewPic(file);
-		console.log(file);
+	if (!isValidSize) {
+		setError(t("editProfilePic.fileTooLarge"));
+		setNewPic(null);
+		resetInput();
+		return;
+	}
+
+	if (!isValidContent) {
+		setError(t("editProfilePic.notValidImage"));
+		setNewPic(null);
+		resetInput();
+		return;
+	}
+
+	setError(null);
+	setNewPic(file);
+	console.log(file);
 	};
 
   const resetInput = () => {
@@ -95,14 +123,19 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
     }
   };
 
-	const handleSave = () => {
-		if (newPic) {
+	const handleSave = async () => {
+		if (!newPic) return;
+		
+		try {
 			onChange(newPic); // updates parent state
-			onSave?.(newPic); // triggers the actual upload
+			await onSave?.(newPic); // triggers the actual upload
 			setNewPic(null);
 			setSuccess(true);
 			resetInput();
 			setTimeout(() => setSuccess(false), 2000); // clears after 2s
+		} catch (error) {
+			console.error("Failed to save profile picture:", error);
+			setError("Upload failed. Please try again.");
 		}
 	};
 
