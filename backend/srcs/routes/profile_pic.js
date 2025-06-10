@@ -6,6 +6,7 @@ import { authenticate } from '../middleware/authenticate.js'
 import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
 import { fileTypeFromBuffer } from 'file-type'
+import { uploadProfilePicSchema } from '../schemas/profilePicSchemas.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -16,7 +17,7 @@ export async function profilePicRoute(fastify, opts) {
 	// ensure the uploads dir exists
 	if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-	fastify.post('/user/profile-pic', { preHandler: authenticate } , async (req, reply) => {
+	fastify.post('/user/profile-pic', { schema: uploadProfilePicSchema, preHandler: authenticate } , async (req, reply) => {
 		const userId = req.user?.id;
 		if (!userId) return reply.status(401).send({ error: 'Unauthorized' });
 

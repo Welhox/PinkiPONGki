@@ -7,6 +7,8 @@ export async function friendRoutes(fastify, options) {
 		console.log('📥 Request received:', request.raw.url);
 	  });	 */
 
+//####################################################################################################################################
+
 	fastify.get('/friend-status', { preHandler: authenticate }, async (req, reply) => {
 		const { userId1, userId2 } = req.query;
 
@@ -50,6 +52,8 @@ export async function friendRoutes(fastify, options) {
 			reply.code(500).send({ error: 'Failed to fetch friend status' });
 		}
 	});
+
+//####################################################################################################################################
 
 	fastify.post('/friend-request', { preHandler: authenticate }, async (req, reply) => {
 		const { receiverId } = req.body;
@@ -108,6 +112,8 @@ export async function friendRoutes(fastify, options) {
 		}
 	});
 
+//####################################################################################################################################
+
 	fastify.post('/friends/accept', { preHandler: authenticate } , async (request, reply) => {
 		const { requestId } = request.body;
 
@@ -152,6 +158,8 @@ export async function friendRoutes(fastify, options) {
 
 		return { success: true }
 	});
+
+//####################################################################################################################################
 
 	fastify.post('/unfriend', { preHandler: authenticate } , async (request, reply) => {
 		const { userId1, userId2 } = request.body;
