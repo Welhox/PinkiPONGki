@@ -1,6 +1,7 @@
 import prisma from '../prisma.js'
 import bcrypt from 'bcryptjs'
 import { authenticate } from '../middleware/authenticate.js'
+import { settingsSchemas } from '../schemas/settingsSchema.js';
 
 export async function settingsRoutes(fastify, options) {
 
@@ -18,6 +19,7 @@ export async function settingsRoutes(fastify, options) {
 	fastify.route({
 		method: 'PUT',
 		url: '/user/email',
+		schema: settingsSchemas.changeEmailSchema,
 		preHandler: authenticate,
 		...rateLimitConfig,
 		handler: async (request, reply) => {
@@ -55,6 +57,7 @@ export async function settingsRoutes(fastify, options) {
 	fastify.route({
 		method: 'PUT',
 		url: '/user/password',
+		schema: settingsSchemas.changePasswordSchema,
 		preHandler: authenticate,
 		...rateLimitConfig,
 		handler: async (request, reply) => {
@@ -81,7 +84,7 @@ export async function settingsRoutes(fastify, options) {
 	}
 	});
 
-	fastify.post('/user/language', { preHandler: authenticate }, async (request, reply) => {
+	fastify.post('/user/language', { schema: settingsSchemas.changeLanguageSchema, preHandler: authenticate }, async (request, reply) => {
 		const { language } = request.body;
 		const userId = request.user?.id;
 
@@ -89,9 +92,9 @@ export async function settingsRoutes(fastify, options) {
 			return reply.status(401).send({ error: 'Unauthorized' });
 		}
 
-		if (!language || !['en', 'fi', 'se'].includes(language)) {
-			return reply.status(400).send({ error: 'Invalid language code' });
-		}
+		// if (!language || !['en', 'fi', 'se'].includes(language)) {
+		// 	return reply.status(400).send({ error: 'Invalid language code' });
+		// }
 
 		try {
 			const updatedUser = await prisma.user.update({
