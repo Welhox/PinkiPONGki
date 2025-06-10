@@ -2,6 +2,7 @@
 
 // This schema is used to validate the id for deleting a user
 const deleteUserSchema = {
+<<<<<<< HEAD
   params: {
     type: "object",
     properties: {
@@ -15,6 +16,21 @@ const deleteUserSchema = {
     404: { type: "object", properties: { error: { type: "string" } } },
   },
 };
+=======
+	params: {
+	  type: 'object',
+	  properties: {
+		id: { type: 'integer', minimum: 1 },
+	  },
+	  required: ['id'],
+	},
+	response: {
+	  200: { type: 'object', properties: { message: { type: 'string' } } },
+	  400: { type: 'object', properties: { error: { type: 'string' } } },
+	  404: { type: 'object', properties: { error: { type: 'string' } } },
+	},
+  };
+>>>>>>> a16f332 (finished users and otp schemas)
 
 // This schema is used to validate the id and password for deleteing a user
 const deleteUserSchemaPost = {
