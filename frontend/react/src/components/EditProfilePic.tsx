@@ -140,7 +140,7 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
 	};
 
   return (
-    <div className="max-w-sm mx-auto block">
+    <div className="max-w-sm flex flex-col justify-center items-center mx-auto">
       {previewUrl ? (
         <img
           className="mx-auto my-3"
@@ -168,7 +168,7 @@ const EditProfilePic: React.FC<ProfilePicProps> = ({ pic, onChange, onSave }) =>
       )}
       <div>
         <input
-          className="block w-full m-5 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          className="flex flex-col m-5 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           ref={fileInputRef}
           type="file"
           accept="image/png, image/jpeg"
