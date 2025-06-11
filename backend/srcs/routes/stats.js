@@ -1,10 +1,11 @@
 //import the prisma database
 import prisma from '../prisma.js'
 import { authenticate } from '../middleware/authenticate.js'
+import { statsSchema } from '../schemas/statsSchema.js'
 
 export async function statsRoute(fastify, options) {  
 
-	fastify.get('/stats/:userId', { preHandler: authenticate } , async (request, reply) => {
+	fastify.get('/stats/:userId', { schema: statsSchema, preHandler: authenticate } , async (request, reply) => {
 		const { userId } = request.params;
 
 		const numericUserId = parseInt(userId, 10);
