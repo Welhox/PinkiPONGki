@@ -1,4 +1,3 @@
-// backend/.eslintrc.cjs
 module.exports = {
   root: true,
   env: {
@@ -9,11 +8,8 @@ module.exports = {
     ecmaVersion: 2022,
     sourceType: 'module',
   },
-  extends: [
-    'eslint:recommended',
-  ],
+  extends: ['eslint:recommended'],
   rules: {
-    // You can tweak these
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-console': 'off',
   },
