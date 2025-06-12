@@ -25,10 +25,12 @@ jobs:
       run: sleep 10
 
     - name: Check frontend TypeScript build
-      run: docker exec frontend npm run build
+      run: docker exec --workdir /var/www/html frontend npm run build
+
 
     - name: Run backend ESLint
-      run: docker exec backend npx eslint ./srcs --ext .js --ignore-pattern node_modules
+      run: docker exec --workdir /backend backend npx eslint ./srcs --ext .js --ignore-pattern node_modules
+
 
     - name: Shutdown containers
       if: always()
