@@ -1,7 +1,8 @@
 import prisma from '../prisma.js';
+import { matchResultSchema } from '../schemas/matchesSchemas.js'; 
 
 export async function matchesRoute(fastify, options) {
-  fastify.post('/matches', async (req, reply) => {
+  fastify.post('/matches', { schema: matchResultSchema }, async (req, reply) => {
     const { player, opponent, winner, loser, leftScore, rightScore } = req.body;
 
     // Only store matches for registered users

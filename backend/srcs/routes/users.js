@@ -1,18 +1,10 @@
-//import the prisma database
 import prisma from '../prisma.js'
-//import the hashing functions
 import bcryptjs from 'bcryptjs'
-//import the schema for the user
-import { deleteUserSchema, getUserByEmailSchema, getUserByUsernameSchema, getUserByIdSchema, registerUserSchema, loginUserSchema } from '../schemas/userSchemas.js'
+import { userSchemas } from '../schemas/userSchemas.js'
 import { authenticate } from '../middleware/authenticate.js'
 import { handleOtp } from '../handleOtp.js';
 
 export async function userRoutes(fastify, options) {
-
-	// for API url checking:
-	/* fastify.addHook('onRequest', async (request, reply) => {
-		console.log('📥 Request received:', request.raw.url);
-	  }); */
 
 	const rateLimitConfig = {
 		config: {
@@ -24,38 +16,29 @@ export async function userRoutes(fastify, options) {
 		}
 	};
 
+//####################################################################################################################################
+
 	// login user
-	fastify.post('/users/login', { schema:loginUserSchema, ...rateLimitConfig }, async (req, reply) => {
+	fastify.post('/users/login', { schema: userSchemas.loginUserSchema, ...rateLimitConfig }, async (req, reply) => {
 		try {
 		const { username, password } = req.body
-	  
-		// Check if username and password are provided
-		if (!username || !password) {
-		  return reply.code(400).send({ error: 'Username and password are required' })
-		}
 
 		// Find user by username
 		const user = await prisma.user.findUnique({
 		  where: { username },
 		})
-		// if user not found then return  error
+		// if user not found then wait for a small time and then return error
 		if (!user) {
-			//add a small wait to mitigate timed attacks
 			await new Promise(resolve => setTimeout(resolve, 100));
-			// return 401 for invalid credentials
-		  return reply.code(401).send({ error: 'Invalid username or password' }) 
+		  	return reply.code(401).send({ error: 'Invalid username or password' }) 
 		}
-	  
-		// Compare plain password with hashed one
+		// Compare plain password with hashed one, if invalid password, then return same error
+		// again with a small wait to mitigate timed attacks
 		const isPasswordValid = await bcryptjs.compare(password, user.password)
-		//if invalid password, then return same error
 		if (!isPasswordValid) {
-			//add a small wait to mitigate timed attacks
 			await new Promise(resolve => setTimeout(resolve, 100));
-			// return 401 for invalid credentials
-		  return reply.code(401).send({ error: 'Invalid username or password' })
+		  	return reply.code(401).send({ error: 'Invalid username or password' })
 		}
-
 		//if mfa is activated for the user, then generate and send a otp to be validated
 		//also send a token, which dose not give access, but in order to validate later that
 		//login had been successfull.
@@ -64,16 +47,10 @@ export async function userRoutes(fastify, options) {
 			{
 				//make and send OTP to the matchin email
 				await handleOtp(user.email)
-				
-				const otpToken = fastify.jwt.sign(
-					{
+				const otpToken = fastify.jwt.sign({
 						id: user.id,
 						email: user.email,
-					},
-					{
-						expiresIn: '5min',
-					}
-				)
+					},{expiresIn: '5min',})
 				//set a otp token to the user and reply so that frontend knows to redirect to OTP page.
 				reply.setCookie('otpToken', otpToken, {
 					httpOnly: true,
@@ -82,31 +59,18 @@ export async function userRoutes(fastify, options) {
 					path: '/',
 					maxAge: 5 * 60,
 				})
-				console.log('MFA activated')
 				return reply.code(200).send({ message: 'MFA still required', mfaRequired: true })
-			} catch(error) {
-				console.log('MFA catch activated:', error)
-				return reply.code(401).send({ error: 'Invalid email for mfa' }) 
-			}
-
+			} catch(error) {return reply.code(401).send({ error: 'Invalid email for mfa' })}
 		}
-
 		//credentials are valid, so we can create a JWT token
-		const token = fastify.jwt.sign(
-			{
+		const token = fastify.jwt.sign({
 			id: user.id,
 			username: user.username,
-			},
-			{
-				expiresIn: '1h', // token expiration time
-			}
-		);
-
+			},{expiresIn: '1h',  /* token expiration time */ });
 		await prisma.user.update({
 			where: { id: user.id },
 			data: { isOnline: true },
 		});
-
 		// store JWT in cookie (httpOnly)
 		// httpOnly means the cookie cannot be accessed via JavaScript, which helps mitigate XSS attacks
 		// secure means the cookie will only be sent over HTTPS connections
@@ -119,15 +83,13 @@ export async function userRoutes(fastify, options) {
 		})
 		// send response with without token (token is in the cookie)
 		return reply.code(200).send({message: 'Login successful'});
-		} catch (error) {
-			console.error('Error during login:', error);
-			return reply.code(500).send({ error: 'Internal server error' });
-		}
+		} catch (error) {return reply.code(500).send({ error: 'Internal server error' });}
 	});
 
-	fastify.post('/users/logout', { preHandler: authenticate } , async (req, reply) => {
-		const userId = req.user.id;
+//####################################################################################################################################
 
+	fastify.post('/users/logout', { schema: userSchemas.logoutSchema,  preHandler: authenticate } , async (req, reply) => {
+		const userId = req.user.id;
 		try {
 			const updatedUser = await prisma.user.update({
 				where: { id: userId },
@@ -145,16 +107,20 @@ export async function userRoutes(fastify, options) {
 		}		
 	});
 
+//####################################################################################################################################
+
 	//route to fetch all users - passwords
-	fastify.get('/users/all', async (req, reply) => {
+	fastify.get('/users/all', { schema: userSchemas.usersBaseInfoSchema }, async (req, reply) => {
 	  const users = await prisma.user.findMany({
 		select: { id: true, username: true, email: true },
 	  })
 	  reply.send(users)
 	})
   
-//REMOVE FOR PRODUCTION!!
-fastify.get('/users/allInfo', async (req, reply) => {
+//####################################################################################################################################
+
+	//REMOVE FOR PRODUCTION!!
+	fastify.get('/users/allInfo', async (req, reply) => {
 	try {
 	  // Get users along with associated OTP information
 	  const users = await prisma.user.findMany({
@@ -171,10 +137,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	}
   });
 
-	
+//####################################################################################################################################	
 
 	// route to insert a user into the database
-	fastify.post('/users/register', { schema: registerUserSchema, ...rateLimitConfig }, async (req, reply) => {
+	fastify.post('/users/register', { schema: userSchemas.registerUserSchema, ...rateLimitConfig }, async (req, reply) => {
 	  const { username, email, password } = req.body
 	  const hashedPassword = await bcryptjs.hash(password, 10)
   
@@ -192,8 +158,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	  }
 	})
 
+//####################################################################################################################################
+
 	// route to delete a user from the database
-	fastify.delete('/users/delete/:id', { schema: deleteUserSchema, preHandler: authenticate }, async (req, reply) => {
+	fastify.delete('/users/delete/:id', { schema: userSchemas.deleteUserSchema, preHandler: authenticate }, async (req, reply) => {
 	  const { id } = req.params
 	  const user = req.user
 
@@ -232,8 +200,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	  }
 	})
 
+//####################################################################################################################################
+
 	// axios doesnt support sending a body in delete request in all browsers, hence post:
-	fastify.post('/users/delete/:id', { preHandler: authenticate }, async (req, reply) => {
+	fastify.post('/users/delete/:id', { schema: userSchemas.deleteUserSchemaPost, preHandler: authenticate }, async (req, reply) => {
 		const { id } = req.params
 		const { password } = req.body
 		const user = req.user
@@ -284,8 +254,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		}
 	  })
 
+//####################################################################################################################################
+
 	// get user information with id (username, id, email)
-	fastify.get('/users/id', { schema: getUserByIdSchema, preHandler: authenticate }, async (req, reply) => {
+	fastify.get('/users/id', { schema: userSchemas.getUserByIdSchema, preHandler: authenticate }, async (req, reply) => {
 		const { id } = req.query
 		const user = await prisma.user.findUnique({
 		  where: { id: Number(id) },
@@ -297,8 +269,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		reply.send(user)
 	  })
 
+//####################################################################################################################################
+
 	  	// get user email verification information from JWT (username, id, email, emailVerified)
-	fastify.get('/users/emailStatus', { preHandler: authenticate }, async (req, reply) => {
+	fastify.get('/users/emailStatus', { schema: userSchemas.getEmailStatusSchema, preHandler: authenticate }, async (req, reply) => {
 		const userId = req.user?.id; 
 		console.log('User ID from JWT:', userId);
 		// if (typeof userId !== 'number') {
@@ -314,8 +288,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		reply.send(user)
 	  })
 
+//####################################################################################################################################
+
 	// get user information with username (username, id, email)
-	fastify.get('/users/username', { schema: getUserByUsernameSchema, preHandler: authenticate }, async (req, reply) => {
+	fastify.get('/users/username', { schema: userSchemas.getUserByUsernameSchema, preHandler: authenticate }, async (req, reply) => {
 		const { username } = req.query
 		const user = await prisma.user.findUnique({
 		  where: { username: username },
@@ -328,8 +304,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		reply.send(user)
 	  })
 
+//####################################################################################################################################
+
 	// get user information with email (username, id, email)
-	fastify.get('/users/email', { schema: getUserByEmailSchema, preHandler: authenticate }, async (req, reply) => {
+	fastify.get('/users/email', { schema: userSchemas.getUserByEmailSchema, preHandler: authenticate }, async (req, reply) => {
 		const { email } = req.query
 		const user = await prisma.user.findUnique({
 		  where: { email: email },
@@ -347,9 +325,11 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	  });
 	  const data = await response.json(); */
 
+//####################################################################################################################################
+
 	// change isActivated = true once MFA is ready
 	// is using queryRaw because Prisma 6 doesn't support the cleaner version I originally went for (requires Prisma < 5)
-	fastify.get('/users/search', { preHandler: authenticate } , async (request, reply) => {
+	fastify.get('/users/search', { schema: userSchemas.searchUsersSchema, preHandler: authenticate } , async (request, reply) => {
 		const { query, excludeUserId } = request.query;
 
 		if (!query || !/^[a-zA-Z0-9]+$/.test(query)) {
@@ -368,7 +348,9 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		return users;
 	});
 
-	fastify.get('/users/:id/friends', { preHandler: authenticate } , async (request, reply) => {
+//####################################################################################################################################
+
+	fastify.get('/users/:id/friends', { schema: userSchemas.getUserFriendsByIdSchema , preHandler: authenticate } , async (request, reply) => {
 		const userId = parseInt(request.params.id, 10);
 		if (isNaN(userId)) {
 			return reply.code(400).send({ error: 'Invalid user ID' });
@@ -407,7 +389,9 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		}
 	});
 
-	fastify.get('/users/:id/requests', { preHandler: authenticate } , async (request, reply) => {
+//####################################################################################################################################
+
+	fastify.get('/users/:id/requests', { schema: userSchemas.getFriendRequestByIdSchema, preHandler: authenticate } , async (request, reply) => {
 		const userId = parseInt(request.params.id, 10);
 		const requests = await prisma.friendRequest.findMany({
 			where: {
@@ -428,9 +412,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 		);
 	});
 
+//####################################################################################################################################
 
   //Route to get the settings of the users using JWT token
-  fastify.get('/users/settings', { preHandler: authenticate }, async (request, reply) => {
+  fastify.get('/users/settings', { schema: userSchemas.getUserSettingsSchema, preHandler: authenticate }, async (request, reply) => {
 	const userId = request.user?.id;
   
 	if (typeof userId !== 'number') {
@@ -440,7 +425,7 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	try {
 	  const user = await prisma.user.findUnique({
 		where: { id: userId },
-		select: { mfaInUse: true, email: true, language: true /* and the profile picture */ }
+		select: { mfaInUse: true, email: true, language: true}
 	  });
   
 	  if (!user) {
@@ -454,9 +439,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	}
   });
   
+//####################################################################################################################################
 
   //to update the mfaInUse boolean, using the JWT TOKEN
-  fastify.post('/auth/mfa', { preHandler: authenticate }, async (request, reply) => {
+  fastify.post('/auth/mfa', { schema: userSchemas.updateMfaSchema, preHandler: authenticate }, async (request, reply) => {
 	const { mfaInUse } = request.body;
   
 	// This should get the information from the JWT token
@@ -479,8 +465,10 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	}
   });
 
+//####################################################################################################################################
+
     //to update the email activation status, using the JWT TOKEN
-  fastify.post('/users/emailActivation', { preHandler: authenticate }, async (request, reply) => {
+  fastify.post('/users/emailActivation', { schema: userSchemas.updateEmailActivationSchema, preHandler: authenticate }, async (request, reply) => {
 	const { emailVerified } = request.body;
   
 	// This should get the information from the JWT token
@@ -503,3 +491,5 @@ fastify.get('/users/allInfo', async (req, reply) => {
 	}
   });
 }
+
+//####################################################################################################################################
