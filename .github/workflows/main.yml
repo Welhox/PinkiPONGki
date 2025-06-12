@@ -27,11 +27,8 @@ jobs:
     - name: Check frontend TypeScript build
       run: docker exec --workdir /var/www/html frontend npm run build
 
-
-    - name: Run backend ESLint
-      run: docker exec --workdir /backend backend npx eslint ./srcs --ext .js --ignore-pattern node_modules
-
-
+    - name: Run backend ESLint (ESLint 9 flat config)
+      run: docker exec --workdir /backend backend npx eslint ./srcs
 
     - name: Shutdown containers
       if: always()
