@@ -35,14 +35,6 @@ const emailRateLimitConfig = {
 	};
   //####################################################################################################################################
 
- // login user
-  fastify.post(
-    "/users/login",
-    { schema: userSchemas.loginUserSchema, ...rateLimitConfig },
-    async (req, reply) => {
-      try {
-        const { username, password } = req.body;
-
   // login user
   fastify.post(
     "/users/login",
