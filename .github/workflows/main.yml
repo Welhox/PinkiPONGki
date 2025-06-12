@@ -24,30 +24,36 @@ jobs:
     - name: Wait for services to start
       run: sleep 10
 
-    - name: Run frontend build and save result
+    - name: Check frontend build
       id: frontend
       run: |
+        set +e
         docker exec --workdir /var/www/html frontend npm run build
-      continue-on-error: true
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+        set -e
 
-    - name: Run backend ESLint and save result
+    - name: Run backend ESLint
       id: backend
       run: |
+        set +e
         docker exec --workdir /backend backend npx eslint ./srcs
-      continue-on-error: true
+        echo "exit_code=$?" >> $GITHUB_OUTPUT
+        set -e
 
-    # - name: Run backend tests
-    #   run: docker exec --workdir /backend backend npm run test
-    #   continue-on-error: true # Allow failure for tests, so we can still check lint
-
-    - name: Fail job if frontend or backend failed
+    - name: ❌ Fail job if frontend or backend failed
       run: |
-        echo "Frontend status: ${{ steps.frontend.outcome }}"
-        echo "Backend status: ${{ steps.backend.outcome }}"
-        if [[ "${{ steps.frontend.outcome }}" != "success" || "${{ steps.backend.outcome }}" != "success" ]]; then
-          echo "❌ One or more steps failed"
+        FRONTEND_CODE=${{ steps.frontend.outputs.exit_code }}
+        BACKEND_CODE=${{ steps.backend.outputs.exit_code }}
+        echo "Frontend exit code: $FRONTEND_CODE"
+        echo "Backend exit code: $BACKEND_CODE"
+
+        if [ "$FRONTEND_CODE" -ne 0 ] || [ "$BACKEND_CODE" -ne 0 ]; then
+          echo "❌ One or more checks failed."
           exit 1
+        else
+          echo "✅ All checks passed."
         fi
+
 
     - name: Shutdown containers
       if: always()
