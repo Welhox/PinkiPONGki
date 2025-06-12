@@ -9,7 +9,7 @@ import './i18n';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
 	<AuthProvider>
-		<App />
+		<Ap />
 	</AuthProvider>
   </StrictMode>
 )
