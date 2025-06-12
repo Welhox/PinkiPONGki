@@ -15,7 +15,17 @@ export async function userRoutes(fastify, _options) {
     },
   };
 
-  //####################################################################################################################################
+const emailRateLimitConfig = {
+  		config: {
+    		rateLimit: {
+      			max: 1,
+      			timeWindow: '1 minute',
+      			keyGenerator: (request) => request.body?.email || request.ip,
+    		},
+  		},
+	};
+
+//####################################################################################################################################
 
   // login user
   fastify.post(
@@ -24,7 +34,7 @@ export async function userRoutes(fastify, _options) {
     async (req, reply) => {
       try {
         const { username, password } = req.body;
-
+	
         // Find user by username
         const user = await prisma.user.findUnique({
           where: { username },
@@ -111,16 +121,11 @@ export async function userRoutes(fastify, _options) {
     }
   );
 
-  //####################################################################################################################################
+//####################################################################################################################################
 
- 
-	// 1) Request password reset - send reset link to email
-	fastify.post('/users/request-password-reset', async (req, reply) => {
+	// 1) Request password reset and send reset link to email
+	fastify.post('/users/request-password-reset', { schema: userSchemas.requestPasswordResetSchema, ...emailRateLimitConfig }, async (req, reply) => {
 		const { email } = req.body;
-
-		if (!email) {
-			return reply.code(400).send({ error: 'Email is required' });
-		}
 
 		const user = await prisma.user.findUnique({ where: { email } });
 		if (!user) {
@@ -130,24 +135,16 @@ export async function userRoutes(fastify, _options) {
 
 		const resetToken = fastify.jwt.sign(
 			{ userId: user.id },
-			{ expiresIn: '1h' }
+			{ expiresIn: '15m' }
 		);
 
 		await prisma.user.update({
 			where: { id: user.id },
 			data: {
 			resetPasswordToken: resetToken,
-			resetPasswordExpires: new Date(Date.now() + 3600000),
+			resetPasswordExpires: new Date(Date.now() + 15 * 60 * 1000),
 			},
 		});
-
-		reply.setCookie('token', resetToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'strict', // means the cookie won’t be sent if someone embeds your site in an iframe or from another domain 
-				path: '/',
-				maxAge: 60 * 60, // 1 hour in seconds, same as JWT expiration
-		})
 
 		await sendResetPasswordEmail(email, resetToken);
 
@@ -157,12 +154,8 @@ export async function userRoutes(fastify, _options) {
 //####################################################################################################################################
 
 	// 2) Reset password - verify token and update password
-	fastify.post('/users/reset-password', async (req, reply) => {
+	fastify.post('/users/reset-password', {schema: userSchemas.resetPasswordSchema }, async (req, reply) => {
 		const { token, newPassword } = req.body;
-
-		if (!token || !newPassword) {
-			return reply.code(400).send({ error: 'Token and new password are required' });
-		}
 
 		try {
 			// Verify token (throws if invalid or expired)
@@ -171,13 +164,8 @@ export async function userRoutes(fastify, _options) {
 			// Find user by id and check token expiration
 			const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
-			if (
-			!user ||
-			user.resetPasswordToken !== token ||
-			!user.resetPasswordExpires ||
-			user.resetPasswordExpires < new Date()
-			) {
-			return reply.code(400).send({ error: 'Invalid or expired token' });
+			if (!user || user.resetPasswordToken !== token || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+				return reply.code(400).send({ error: 'Invalid or expired token' });
 			}
 
 			// Hash the new password
@@ -185,12 +173,12 @@ export async function userRoutes(fastify, _options) {
 
 			// Update password and clear reset token/expiration
 			await prisma.user.update({
-			where: { id: user.id },
-			data: {
-				password: hashedPassword,
-				resetPasswordToken: null,
-				resetPasswordExpires: null,
-			},
+				where: { id: user.id },
+				data: {
+					password: hashedPassword,
+					resetPasswordToken: null,
+					resetPasswordExpires: null,
+				},
 			});
 
 			return reply.code(200).send({ message: 'Password reset successfully' });
@@ -202,24 +190,15 @@ export async function userRoutes(fastify, _options) {
 
 //####################################################################################################################################
 
-	fastify.post('/users/validate-reset-token', async (req, reply) => {
+	fastify.post('/users/validate-reset-token', {schema: userSchemas.validateResetTokenSchema }, async (req, reply) => {
 		const { token } = req.body;
-
-		if (!token) {
-			return reply.code(400).send({ error: 'Token is required' });
-		}
 
 		try {
 			const payload = fastify.jwt.verify(token);
 			const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
-			if (
-			!user ||
-			user.resetPasswordToken !== token ||
-			!user.resetPasswordExpires ||
-			user.resetPasswordExpires < new Date()
-			) {
-			return reply.code(400).send({ error: 'Invalid or expired token' });
+			if (!user || user.resetPasswordToken !== token || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+				return reply.code(400).send({ error: 'Invalid or expired token' });
 			}
 
 			return reply.send({ valid: true });

@@ -23,7 +23,6 @@ const ResetPassword: React.FC = () => {
   const [invalidToken, setInvalidToken] = useState(false);
   const [validating, setValidating] = useState(true);
 
-  // Validate token on load
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
@@ -31,17 +30,15 @@ const ResetPassword: React.FC = () => {
         setValidating(false);
         return;
       }
-
       try {
-        await axios.post(`${apiUrl}/users/validate-reset-token`, { token }); // you'll need this endpoint
+        await axios.post(`${apiUrl}/users/validate-reset-token`, { token });
         setInvalidToken(false);
-      } catch (err) {
+      } catch {
         setInvalidToken(true);
       } finally {
         setValidating(false);
       }
     };
-
     validateToken();
   }, [token]);
 
@@ -49,10 +46,16 @@ const ResetPassword: React.FC = () => {
     e.preventDefault();
     setError(null);
 
+    if (!token) {
+      setInvalidToken(true);
+      return;
+    }
+
     if (!newPassword || !confirmPassword) {
       setError(t('resetPassword.fillBothFields'));
       return;
     }
+
     if (newPassword !== confirmPassword) {
       setError(t('resetPassword.passwordsDontMatch'));
       return;
@@ -81,7 +84,7 @@ const ResetPassword: React.FC = () => {
   if (validating) {
     return <p className="text-center mt-10">{t('resetPassword.validatingToken')}</p>;
   }
-
+  
   if (invalidToken) {
     return (
       <div className="text-center max-w-md mx-auto bg-white dark:bg-black p-6 rounded-lg shadow-md mt-10">
