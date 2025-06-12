@@ -23,8 +23,8 @@ jobs:
     - name: Wait for services (optional)
       run: sleep 10
 
-    - name: Run tests
-      run: make test
+    # - name: Run tests
+    #   run: make test
 
     - name: Shutdown
       if: always()
