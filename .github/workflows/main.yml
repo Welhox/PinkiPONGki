@@ -24,22 +24,31 @@ jobs:
     - name: Wait for services to start
       run: sleep 10
 
-    - name: Check frontend TypeScript build
-      run: docker exec --workdir /var/www/html frontend npm run build
-      continue-on-error: true # Allow failure for frontend build, so backend can still run
+    - name: Run frontend build and save result
+      id: frontend
+      run: |
+        docker exec --workdir /var/www/html frontend npm run build
+      continue-on-error: true
 
-    - name: Run backend ESLint (ESLint 9 flat config)
-      run: docker exec --workdir /backend backend npx eslint ./srcs
-      continue-on-error: true # Allow failure for ESLint, so we can still run tests
+    - name: Run backend ESLint and save result
+      id: backend
+      run: |
+        docker exec --workdir /backend backend npx eslint ./srcs
+      continue-on-error: true
 
     # - name: Run backend tests
     #   run: docker exec --workdir /backend backend npm run test
     #   continue-on-error: true # Allow failure for tests, so we can still check lint
 
-    - name: Fail if previous steps had errors
-      run: exit 1
-      if: ${{ failure() }}
-      
+    - name: Fail job if frontend or backend failed
+      run: |
+        echo "Frontend status: ${{ steps.frontend.outcome }}"
+        echo "Backend status: ${{ steps.backend.outcome }}"
+        if [[ "${{ steps.frontend.outcome }}" != "success" || "${{ steps.backend.outcome }}" != "success" ]]; then
+          echo "❌ One or more steps failed"
+          exit 1
+        fi
+
     - name: Shutdown containers
       if: always()
       run: make down
