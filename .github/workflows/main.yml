@@ -1,0 +1,32 @@
+name: CI Build & Test
+
+on:
+  push:            # Run on all branches
+  pull_request:    # Optional: also run on PRs
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Compose and Make
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose make
+
+    - name: Build and start containers
+      run: make up
+
+    - name: Wait for services (optional)
+      run: sleep 10
+
+    - name: Run tests
+      run: make test
+
+    - name: Shutdown
+      if: always()
+      run: make fclean
+
