@@ -1,32 +1,35 @@
-name: CI Build & Test
+name: Docker Compile Check + Lint
 
 on:
-  push:            # Run on all branches
-  pull_request:    # Optional: also run on PRs
+  push:     # All branches
+  pull_request:
 
 jobs:
-  ci:
+  compile:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Docker Compose and Make
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose make
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y make docker-compose openssl
 
-    - name: Build and start containers
-      run: make up
+    - name: Generate SSL and JWT Secret
+      run: make ssl jwt-secret
 
-    - name: Wait for services (optional)
+    - name: Build Docker containers
+      run: make all
+
+    - name: Wait for services to start
       run: sleep 10
 
-    # - name: Run tests
-    #   run: make test
+    - name: Check frontend TypeScript build
+      run: docker exec -T frontend npm run build
 
-    - name: Shutdown
+    - name: Run backend ESLint
+      run: docker exec -T backend npx eslint ./srcs --ext .js --ignore-pattern node_modules
+
+    - name: Shutdown containers
       if: always()
-      run: make fclean
-
+      run: make down
