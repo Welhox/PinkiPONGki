@@ -141,10 +141,20 @@ export async function userRoutes(fastify, _options) {
 			},
 		});
 
+		reply.setCookie('token', resetToken, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'strict', // means the cookie won’t be sent if someone embeds your site in an iframe or from another domain 
+				path: '/',
+				maxAge: 60 * 60, // 1 hour in seconds, same as JWT expiration
+		})
+
 		await sendResetPasswordEmail(email, resetToken);
 
 		return reply.code(200).send({ message: 'If this email exists, a reset link has been sent' });
 	});
+
+//####################################################################################################################################
 
 	// 2) Reset password - verify token and update password
 	fastify.post('/users/reset-password', async (req, reply) => {
@@ -189,6 +199,8 @@ export async function userRoutes(fastify, _options) {
 			return reply.code(400).send({ error: 'Invalid or expired token' });
 		}
 	});
+
+//####################################################################################################################################
 
 	fastify.post('/users/validate-reset-token', async (req, reply) => {
 		const { token } = req.body;
