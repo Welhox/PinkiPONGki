@@ -171,58 +171,5 @@
 		"resendError": "Virhe OTP:n uudelleenlähetyksessä. Yritä myöhemmin uudelleen.",
 		"waitTime": "Odota {{count}} sekuntia ennen uuden OTP:n pyytämistä.",
 		"loading": "Ladataan..."
-  	},	
-	"resetPassword": {
-		"title": "Vaihda salasanasi",
-		"newPasswordLabel": "Uusi salasana",
-		"confirmPasswordLabel": "Vahvista salasana",
-		"fillBothFields": "Täytä molemmat salasanakentät",
-		"passwordsDontMatch": "Salasanat eivät täsmää",
-		"invalidOrMissingToken": "Virheellinen tai puuttuva linkki",
-		"failed": "Salasanan vaihtaminen epäonnistui",
-		"submitting": "Vaihdetaan...",
-		"submitButton": "Vaihda salasana",
-		"successTitle": "Salasana vaihdettu onnistuneesti!",
-		"goToLogin": "Siirry kirjautumiseen",
-		"invalidOrExpiredToken": "Tämä salasanan palautuslinkki on virheellinen tai vanhentunut.",
-		"requestNew": "Ole hyvä ja pyydä uusi palautuslinkki.",
-		"requestNewLink": "Pyydä uusi linkki",
-		"validatingToken": "Tarkistetaan palautuslinkkiä...",
-		"invalidPassword": "Salasanan on oltava 8–42 merkkiä pitkä ja siinä tulee olla vähintään yksi iso kirjain, yksi pieni kirjain, yksi numero ja yksi erikoismerkki."
-
-	},
-	"mfa": {
-		"heading": "Monivaiheinen todennus",
-		"otpLabel": "Kertakäyttökoodi (OTP)",
-		"verify": "Vahvista",
-		"verifying": "Vahvistetaan...",
-		"resend": "Lähetä uusi OTP",
-		"invalidOtp": "Virheellinen OTP. Yritä uudelleen.",
-		"otpExpired": "OTP on vanhentunut. Pyydä uusi koodi.",
-		"tryAgainError": "Tapahtui virhe. Yritä myöhemmin uudelleen.",
-		"generalError": "Tapahtui virhe",
-		"otpResent": "OTP on lähetetty uudelleen. Tarkista sähköpostisi.",
-		"resendError": "Virhe OTP:n uudelleenlähetyksessä. Yritä myöhemmin uudelleen.",
-		"waitTime": "Odota {{count}} sekuntia ennen uuden OTP:n pyytämistä.",
-		"loading": "Ladataan..."
-  	},
-	"resetPassword": {
-		"title": "Vaihda salasanasi",
-		"newPasswordLabel": "Uusi salasana",
-		"confirmPasswordLabel": "Vahvista salasana",
-		"fillBothFields": "Täytä molemmat salasanakentät",
-		"passwordsDontMatch": "Salasanat eivät täsmää",
-		"invalidOrMissingToken": "Virheellinen tai puuttuva linkki",
-		"failed": "Salasanan vaihtaminen epäonnistui",
-		"submitting": "Vaihdetaan...",
-		"submitButton": "Vaihda salasana",
-		"successTitle": "Salasana vaihdettu onnistuneesti!",
-		"goToLogin": "Siirry kirjautumiseen",
-		"invalidOrExpiredToken": "Tämä salasanan palautuslinkki on virheellinen tai vanhentunut.",
-		"requestNew": "Ole hyvä ja pyydä uusi palautuslinkki.",
-		"requestNewLink": "Pyydä uusi linkki",
-		"validatingToken": "Tarkistetaan palautuslinkkiä...",
-		"invalidPassword": "Salasanan on oltava 8–42 merkkiä pitkä ja siinä tulee olla vähintään yksi iso kirjain, yksi pieni kirjain, yksi numero ja yksi erikoismerkki."
-
-	}
+  	}	
 }
