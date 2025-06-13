@@ -170,5 +170,20 @@
 		"requestNewLink": "Begär ny länk",
 		"validatingToken": "Verifierar återställningslänk...",
 		"invalidPassword": "Lösenordet måste vara 8–42 tecken långt och innehålla minst en versal, en gemen, en siffra och ett specialtecken."
-	}
+	},
+	"mfa": {
+		"heading": "Tvåfaktorsautentisering",
+		"otpLabel": "Engångskod (OTP)",
+		"verify": "Verifiera",
+		"verifying": "Verifierar...",
+		"resend": "Skicka ny OTP",
+		"invalidOtp": "Ogiltig OTP. Försök igen.",
+		"otpExpired": "OTP har gått ut. Vänligen begär en ny.",
+		"tryAgainError": "Ett fel inträffade. Försök igen senare.",
+		"generalError": "Ett fel inträffade",
+		"otpResent": "OTP har skickats igen. Kontrollera din e-post.",
+		"resendError": "Ett fel uppstod vid återutsändning av OTP. Försök igen senare.",
+		"waitTime": "Vänligen vänta {{count}} sekunder innan du begär en ny OTP.",
+		"loading": "Laddar..."
+  }
 }
