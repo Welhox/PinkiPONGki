@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import api from '../api/axios';
 import { isAxiosError } from "axios";
 import { useAuth } from "../auth/AuthProvider";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import i18n from "../i18n"; // make sure this is imported
+
+
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 const Mfa: React.FC = () => {
   const [code, setCode] = useState("");
@@ -62,11 +66,11 @@ const Mfa: React.FC = () => {
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
-        setError(t("mfa.invalidOtp"));
+          setError(t("mfa.invalidOtp"));
         } else if (error.response.status === 403) {
-        setError(t("mfa.otpExpired"));
+          setError(t("mfa.otpExpired"));
         } else {
-        setError(t("mfa.invalidOtp"));
+          setError(t("mfa.tryAgainError"));
         }
       } else {
         setError(t("mfa.generalError"));
@@ -84,7 +88,9 @@ const Mfa: React.FC = () => {
       const waitTime = response.data.secondsLeft;
 
       if (waitTime > 0) {
-        setError(t("mfa.waitTime", { count: waitTime }));
+        setError(
+          (t("mfa.waitTime", { count: waitTime }))
+        );
       } else {
         await api.post("/auth/resend-otp",
           {},
@@ -93,7 +99,9 @@ const Mfa: React.FC = () => {
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      setError(t("mfa.resendError"));
+      setError(
+        t("mfa.resendError")
+      );
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +162,7 @@ const Mfa: React.FC = () => {
           className={buttonStyles}
           disabled={isLoading}
         >
-          {t("mfa.resend")}
+           {t("mfa.resend")}
         </button>
       </form>
     </div>
