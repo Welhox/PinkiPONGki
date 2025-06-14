@@ -73,5 +73,3 @@ const App: React.FC = () => {
     </GameSettingsProvider>
   );
 };
-
-export default App;
