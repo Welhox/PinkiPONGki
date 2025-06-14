@@ -187,6 +187,8 @@
 		"invalidOrExpiredToken": "Tämä salasanan palautuslinkki on virheellinen tai vanhentunut.",
 		"requestNew": "Ole hyvä ja pyydä uusi palautuslinkki.",
 		"requestNewLink": "Pyydä uusi linkki",
-		"validatingToken": "Tarkistetaan palautuslinkkiä..."
+		"validatingToken": "Tarkistetaan palautuslinkkiä...",
+		"invalidPassword": "Salasanan on oltava 8–42 merkkiä pitkä ja siinä tulee olla vähintään yksi iso kirjain, yksi pieni kirjain, yksi numero ja yksi erikoismerkki."
+
 	}
 }
