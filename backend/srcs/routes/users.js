@@ -1,8 +1,17 @@
-import prisma from "../prisma.js";
-import bcryptjs from "bcryptjs";
-import { userSchemas } from "../schemas/userSchemas.js";
-import { authenticate } from "../middleware/authenticate.js";
-import { handleOtp } from "../handleOtp.js";
+import prisma from '../prisma.js'
+import bcryptjs from 'bcryptjs'
+import { userSchemas } from '../schemas/userSchemas.js'
+import { authenticate } from '../middleware/authenticate.js'
+import { handleOtp } from '../handleOtp.js';
+import { sendResetPasswordEmail } from '../utils/mailer.js';
+import crypto from 'crypto';
+
+function isValidPassword(password) {
+  const pwdValidationRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const lengthOK = password.length >= 8 && password.length <= 42;
+  const matchesSpecs = pwdValidationRegex.test(password);
+  return lengthOK && matchesSpecs;
+}
 
 export async function userRoutes(fastify, _options) {
   const rateLimitConfig = {
@@ -127,28 +136,38 @@ const emailRateLimitConfig = {
 	fastify.post('/users/request-password-reset', { schema: userSchemas.requestPasswordResetSchema, ...emailRateLimitConfig }, async (req, reply) => {
 		const { email } = req.body;
 
-		const user = await prisma.user.findUnique({ where: { email } });
-		if (!user) {
-			// Don't reveal whether email exists
+		try {
+			const user = await prisma.user.findUnique({ where: { email } });
+
+			// Always return generic response
+			if (!user) {
+				return reply.code(200).send({ message: 'If this email exists, a reset link has been sent' });
+			}
+
+			const resetToken = fastify.jwt.sign(
+				{ userId: user.id },
+				{ expiresIn: '15m' }
+			);
+
+			const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+			await prisma.user.update({
+				where: { id: user.id },
+				data: {
+					resetPasswordToken: hashedToken,
+					resetPasswordExpires: new Date(Date.now() + 15 * 60 * 1000),
+				},
+			});
+
+			await sendResetPasswordEmail(email, resetToken);
+
 			return reply.code(200).send({ message: 'If this email exists, a reset link has been sent' });
+
+		} catch (err) {
+			console.error('Password reset error:', err);
+			return reply.code(500).send({ error: 'Internal server error' });
 		}
-
-		const resetToken = fastify.jwt.sign(
-			{ userId: user.id },
-			{ expiresIn: '15m' }
-		);
-
-		await prisma.user.update({
-			where: { id: user.id },
-			data: {
-			resetPasswordToken: resetToken,
-			resetPasswordExpires: new Date(Date.now() + 15 * 60 * 1000),
-			},
-		});
-
-		await sendResetPasswordEmail(email, resetToken);
-
-		return reply.code(200).send({ message: 'If this email exists, a reset link has been sent' });
+		
 	});
 
 //####################################################################################################################################
@@ -161,12 +180,18 @@ const emailRateLimitConfig = {
 			// Verify token (throws if invalid or expired)
 			const payload = fastify.jwt.verify(token);
 
+			const hashedInputToken = crypto.createHash('sha256').update(token).digest('hex');
+
 			// Find user by id and check token expiration
 			const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
-			if (!user || user.resetPasswordToken !== token || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+			if (!user || user.resetPasswordToken != hashedInputToken || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
 				return reply.code(400).send({ error: 'Invalid or expired token' });
 			}
+
+			if (!isValidPassword(newPassword)) {
+    			return reply.code(400).send({ error: 'Password must be 8–42 characters long and include uppercase, lowercase, number, and special character.' });
+  			}
 
 			// Hash the new password
 			const hashedPassword = await bcryptjs.hash(newPassword, 10);
@@ -195,16 +220,18 @@ const emailRateLimitConfig = {
 
 		try {
 			const payload = fastify.jwt.verify(token);
+			const hashedInputToken = crypto.createHash('sha256').update(token).digest('hex');
+
 			const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
-			if (!user || user.resetPasswordToken !== token || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
+			if (!user || user.resetPasswordToken !== hashedInputToken || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
 				return reply.code(400).send({ error: 'Invalid or expired token' });
 			}
 
 			return reply.send({ valid: true });
-		} catch {
-			return reply.code(400).send({ error: 'Invalid or expired token' });
-		}
+	} catch {
+		return reply.code(400).send({ error: 'Invalid or expired token' });
+	}
 	});
 
  //####################################################################################################################################

@@ -9,6 +9,13 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
+const isValidPassword = (password: string) => {
+  const pwdValidationRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const lengthOK = password.length >= 8 && password.length <= 42;
+  const matchesSpecs = pwdValidationRegex.test(password);
+  return lengthOK && matchesSpecs;
+};
+
 const ResetPassword: React.FC = () => {
   const query = useQuery();
   const token = query.get('token');
@@ -58,6 +65,11 @@ const ResetPassword: React.FC = () => {
 
     if (newPassword !== confirmPassword) {
       setError(t('resetPassword.passwordsDontMatch'));
+      return;
+    }
+
+    if (!isValidPassword(newPassword)) {
+      setError(t('resetPassword.invalidPassword'));
       return;
     }
 
