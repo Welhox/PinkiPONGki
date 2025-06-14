@@ -234,6 +234,7 @@
 		"invalidOrExpiredToken": "Denna återställningslänk är ogiltig eller har gått ut.",
 		"requestNew": "Vänligen begär en ny återställningslänk.",
 		"requestNewLink": "Begär ny länk",
-		"validatingToken": "Verifierar återställningslänk..."
+		"validatingToken": "Verifierar återställningslänk...",
+		"invalidPassword": "Lösenordet måste vara 8–42 tecken långt och innehålla minst en versal, en gemen, en siffra och ett specialtecken."
 	}
 }
