@@ -88,7 +88,6 @@ const Login: React.FC = () => {
 			});
 
 			const data = response.data;
-			console.log('Login response: ', data);
 			const userLang = response.data.language ?? 'en';
 
     		// Change language immediately
@@ -101,13 +100,7 @@ const Login: React.FC = () => {
 				navigate('/mfa');
 				return;	
 			}
-			
-			console.log("Language: ", userLang);
-			console.log("Language from backend:", response.data.language);
-			
 			console.log('Login successful: ', response.data);
-			console.log("Full response:", response);
-			console.log("Data response:", response.data);
 
 			await refreshSession();
 			setAttempts(0);
