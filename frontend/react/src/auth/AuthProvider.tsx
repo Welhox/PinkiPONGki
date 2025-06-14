@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import i18n from '../i18n';
 
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [status, setStatus] = useState<'loading' | 'authorized' | 'unauthorized'>('loading');
 	const [user, setUser] = useState<User | null>(null);
+	const navigate = useNavigate();
 
 	const refreshSession = async () => {
 		try {
@@ -47,7 +49,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 				await i18n.changeLanguage('en');
 				localStorage.removeItem('language');
 			}
-		} catch {
+		} catch (error: any) {
+			if (error.response?.status === 419) {
+				alert('Your session has expired. Please log in.');
+				setUser(null);
+				setStatus('unauthorized');
+				await i18n.changeLanguage('en');
+				localStorage.removeItem('language');
+				navigate('/login', { replace: true });
+			}
 			setUser(null);
 			setStatus('unauthorized');
 			await i18n.changeLanguage('en');
@@ -58,6 +68,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	useEffect(() => {
 		refreshSession();
 	}, []);
+
+	useEffect(() => {
+		if (status === 'authorized') {
+			const interval = setInterval(() => {
+				refreshSession();
+			}, 10 * 60 * 1000);
+
+			return () => clearInterval(interval);
+		}
+	}, [status]);
 
 	if (status === 'loading') {
 		return null;

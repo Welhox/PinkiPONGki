@@ -15,29 +15,36 @@ export async function authenticate(request, reply) {
 
     console.log("Authenticated user:", request.user);
 
-    const now = Math.floor(Date.now() / 1000); // Get the current time in seconds
-    const timeLeft = currentToken.exp - now; // Calculate the time left until expiration
-    // If the token is about to expire (less than 15 minutes left), refresh it
-    if (timeLeft < 15 * 60) {
-      // Create a new token with the same payload and a new expiration time
-      const newToken = await request.jwtSign(
-        {
-          id: currentToken.id,
-          username: currentToken.username,
-        },
-        {
-          expiresIn: "1h", // New expiration time
-        }
-      );
-      // Set the new token in the cookie
-      reply.setCookie("token", newToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60, // 1 hour in seconds
-      });
-    }
+		const now = Math.floor(Date.now() / 1000); // Get the current time in seconds
+		const timeLeft = currentToken.exp - now; // Calculate the time left until expiration
+
+		if (timeLeft <= 0) {
+			return reply.code(419).send({ error: 'Session expired' });
+		}
+		// If the token is about to expire (less than 15 minutes left), refresh it
+		//if (timeLeft < 15 * 60) {
+		if (timeLeft < 2 * 60) {
+		// Create a new token with the same payload and a new expiration time
+		const newToken = await request.jwtSign(
+			{
+			id: currentToken.id,
+			username: currentToken.username,
+			},
+			{
+			//expiresIn: '1h', // New expiration time
+			expiresIn: '5m',
+			}
+		);
+		// Set the new token in the cookie
+		reply.setCookie('token', newToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'strict',
+			path: '/',
+			maxAge: 5 * 60,
+			//maxAge: 60 * 60, // 1 hour in seconds
+		});
+		}
   } catch (err) {
     // If the token is invalid, return a 401 Unauthorized response
     return reply.code(401).send({ error: "Unauthorized" });
