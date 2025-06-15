@@ -6,8 +6,6 @@ import { useAuth } from "../auth/AuthProvider";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n"; // make sure this is imported
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
-
 const Mfa: React.FC = () => {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -64,11 +62,11 @@ const Mfa: React.FC = () => {
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
-          setError(t("mfa.invalidOtp"));
+        setError(t("mfa.invalidOtp"));
         } else if (error.response.status === 403) {
-          setError(t("mfa.otpExpired"));
+        setError(t("mfa.otpExpired"));
         } else {
-          setError(t("mfa.tryAgainError"));
+        setError(t("mfa.tryAgainError"));
         }
       } else {
         setError(t("mfa.generalError"));
