@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Friend } from "../types/friend";
-import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
+import api from '../api/axios';
+import { Friend } from '../types/friend';
+import { useTranslation } from 'react-i18next';
 
 type Request = {
   id: number;
@@ -24,41 +22,32 @@ export const PendingRequests: React.FC<Props> = ({ userId, onFriendAdded }) => {
   const [message, setMessage] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await axios.get(apiUrl + `/users/${userId}/requests`, {
-          headers: {
-            "Content-Type": "application/json", // optional but safe
-          },
-          withCredentials: true,
-        });
-        setRequests(response.data);
-      } catch (error) {
-        console.error("Failed to fetch requests:", error);
-      }
-    };
+	useEffect(() => {
+		const fetchRequests = async () => {
+			try {
+				const response = await api.get(`/users/${userId}/requests`, {
+					headers: { "Content-Type": "application/json" },
+				});
+				setRequests(response.data);
+			} catch (error) {
+				console.error('Failed to fetch requests:', error);
+			}
+		};
 
     fetchRequests();
   }, [userId]);
 
-  const handleAction = async (
-    requestId: number,
-    username: string,
-    senderId: string,
-    action: "accept" | "decline"
-  ) => {
-    try {
-      await axios.post(
-        apiUrl + `/friends/${action}`,
-        { requestId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+	const handleAction = async (
+		requestId: number,
+		username: string,
+		senderId: string,
+		action: "accept" | "decline"
+	) => {
+		try {
+			await api.post(`/friends/${action}`,
+				{ requestId },
+				{ headers: { "Content-Type": "application/json" } },
+			);
 
       setRequests((prev) => prev.filter((r) => r.id !== requestId));
       if (action === "accept") {

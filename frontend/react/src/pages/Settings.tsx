@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthProvider";
-import DeleteAccountButton from "../components/DeleteAccount";
-import EditProfilePic from "../components/EditProfilePic";
-import SettingsField from "../components/SettingsField";
-import LanguageSelector from "../components/LanguageSelector";
-import ToggleSwitch from "../components/ToggleSwitch";
-import axios from "axios";
-import ConfirmOtpField from "../components/ConfirmOtpField";
-import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
+import React, { useState, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthProvider';
+import DeleteAccountButton from '../components/DeleteAccount';
+import EditProfilePic from '../components/EditProfilePic';
+import SettingsField from '../components/SettingsField';
+import LanguageSelector from '../components/LanguageSelector';
+import ToggleSwitch from '../components/ToggleSwitch';
+import api from '../api/axios';
+import ConfirmOtpField from '../components/ConfirmOtpField';
+import { useTranslation } from 'react-i18next';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -31,9 +29,7 @@ const Settings: React.FC = () => {
     // Fetch user settings from the backend
     const fetchUserSettings = async () => {
       try {
-        const response = await axios.get(apiUrl + "/users/settings", {
-          withCredentials: true,
-        });
+        const response = await api.get("/users/settings", {});
         console.log("RESPONSE:", response.data);
         setEmail(response.data.email);
         setLanguage(response.data.language);
@@ -58,10 +54,9 @@ const Settings: React.FC = () => {
     if (!user?.id) throw new Error("No user ID available");
 
     try {
-      await axios.post(
-        `${apiUrl}/users/delete/${user?.id}`,
+      await api.post(
+        `/users/delete/${user?.id}`,
         { password },
-        { withCredentials: true }
       );
       localStorage.clear();
       sessionStorage.clear();
@@ -82,32 +77,26 @@ const Settings: React.FC = () => {
     try {
       // send request to backend to update 2FA status
       if (is2FAEnabled === true) {
-        const response = await axios.post(
-          apiUrl + "/auth/mfa",
+        const response = await api.post(
+          "/auth/mfa",
           { mfaInUse: !is2FAEnabled },
-          { withCredentials: true }
         );
         setIs2FAEnabled(response.data.mfaInUse);
         console.log("2FA toggled!");
       } //check if email is already validated and show the Otp field to validate email if not
       else {
-        const user = await axios.get(apiUrl + "/users/emailStatus", {
-          withCredentials: true,
-        });
+        const user = await api.get("/users/emailStatus", {});
         if (user.data.emailVerified === true) {
-          const response = await axios.post(
-            apiUrl + "/auth/mfa",
+          const response = await api.post(
+            "/auth/mfa",
             { mfaInUse: !is2FAEnabled },
-            { withCredentials: true }
           );
           setIs2FAEnabled(response.data.mfaInUse);
           console.log("2FA toggled!");
         } else {
           // send otp to email
           try {
-            const response = await axios.get(apiUrl + "/auth/otp-wait-time", {
-              withCredentials: true,
-            });
+            const response = await api.get("/auth/otp-wait-time", {});
             const waitTime = response.data.secondsLeft;
             setShowOtpField(true);
 
@@ -116,11 +105,8 @@ const Settings: React.FC = () => {
                 `Please wait ${waitTime} seconds before requesting a new OTP.`
               );
             } else {
-              await axios.post(
-                apiUrl + "/auth/otp/send-otp",
-                {},
-                { withCredentials: true }
-              );
+              await api.post(
+                "/auth/otp/send-otp", {});
             }
           } catch (error) {
             console.error("Error sending OTP:", error);
@@ -140,9 +126,7 @@ const Settings: React.FC = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post(apiUrl + "/user/profile-pic", formData, {
-        withCredentials: true,
-      });
+      const res = await api.post("/user/profile-pic", formData);
 
       await refreshSession();
       console.log(user);
@@ -154,10 +138,9 @@ const Settings: React.FC = () => {
 
   const handleLanguageChange = async (newLang: string) => {
     try {
-      const response = await axios.post(
-        apiUrl + "/user/language",
+      const response = await api.post(
+        "/user/language",
         { language: newLang },
-        { withCredentials: true }
       );
 
       setLanguage(response.data.language);
@@ -177,8 +160,8 @@ const Settings: React.FC = () => {
       <EditProfilePic
         pic={
           user?.profilePic
-            ? `${apiUrl}${user.profilePic}`
-            : `${apiUrl}/assets/default_avatar.png`
+            ? `${user.profilePic}`
+            : `/assets/default_avatar.png`
         }
         onChange={() => {}}
         onSave={uploadProfilePic}
@@ -204,7 +187,6 @@ const Settings: React.FC = () => {
         <ConfirmOtpField
           setIs2FAEnabled={setIs2FAEnabled}
           setShowOtpField={setShowOtpField}
-          apiUrl={apiUrl}
           otp={otp}
           setOtp={setOtp}
         />

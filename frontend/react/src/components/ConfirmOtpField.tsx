@@ -1,10 +1,9 @@
-import react from "react";
-import axios from "axios";
+import api from '../api/axios';
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface Props {
-  apiUrl: string;
+  apiUrl: string; // clean this up
   otp: string;
   setOtp: (otp: string) => void;
   setIs2FAEnabled: (isEnabled: boolean) => void;
@@ -12,7 +11,7 @@ interface Props {
 }
 
 const ConfirmOtpField: React.FC<Props> = ({
-  apiUrl,
+  apiUrl, // clean this up
   otp,
   setOtp,
   setIs2FAEnabled,
@@ -31,19 +30,15 @@ const ConfirmOtpField: React.FC<Props> = ({
     try {
       // send request to backend to verify OTP
       console.log("Verifying OTP:", otp);
-      const response = await axios.post(
-        apiUrl + "/auth/otp/verify",
+      const response = await api.post("/auth/otp/verify",
         { code: otp },
-        { withCredentials: true }
       );
       if (response.status === 200) {
         // OTP verified successfully, enable 2FA
         setIs2FAEnabled(true);
         setOtp("");
-        axios.post(
-          apiUrl + "/users/emailActivation",
+        api.post("/users/emailActivation",
           { emailVerified: true },
-          { withCredentials: true }
         );
         axios.post(
           apiUrl + "/auth/mfa",

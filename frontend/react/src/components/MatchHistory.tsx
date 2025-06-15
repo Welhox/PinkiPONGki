@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "/api";
+import React, { useEffect, useState } from 'react';
+import api from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 interface MatchHistoryItem {
   date: string;
@@ -28,31 +26,26 @@ const MatchHistory: React.FC<MatchHistoryProps> = ({ userId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await axios.get(apiUrl + `/stats/${userId}`, {
-          headers: {
-            "Content-Type": "application/json", // optional but safe
-          },
-          withCredentials: true,
-        });
-        const data = response.data;
-        setStats({
-          totalWins: data.totalWins || 0,
-          totalLosses: data.totalLosses || 0,
-          totalTournamentsWon: data.totalTournamentsWon || 0,
-          matchHistory: Array.isArray(data.matchHistory)
-            ? data.matchHistory
-            : [],
-        });
-      } catch (error) {
-        console.error(error);
-        setError(t("matchHistory.errorFetching"));
-      } finally {
-        setLoading(false);
-      }
-    };
+	useEffect(() => {
+		const fetchStats = async () => {
+			try {
+				const response = await api.get(`/stats/${userId}`, {
+					headers: { "Content-Type": "application/json" },
+				});
+				const data = response.data;
+				setStats({
+					totalWins: data.totalWins || 0,
+					totalLosses: data.totalLosses || 0,
+					totalTournamentsWon: data.totalTournamentsWon || 0,
+					matchHistory: Array.isArray(data.matchHistory) ? data.matchHistory : [], 
+				});
+			} catch (error) {
+				console.error(error);
+				setError(t('matchHistory.errorFetching'));
+			} finally {
+				setLoading(false);
+			}
+		};
 
     if (userId) fetchStats();
   }, [userId, t]);

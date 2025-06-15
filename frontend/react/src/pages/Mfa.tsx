@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from '../api/axios';
+import { isAxiosError } from "axios";
 import { useAuth } from "../auth/AuthProvider";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n"; // make sure this is imported
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 const Mfa: React.FC = () => {
   const [code, setCode] = useState("");
@@ -47,28 +46,22 @@ const Mfa: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        apiUrl + "/auth/verify-otp",
+      const response = await api.post("/auth/verify-otp",
         { code },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
+        { headers: { "Content-Type": "application/json" } },
       );
       if (response.status === 200) {
         await refreshSession();
         navigate("/");
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
-          setError(t("mfa.invalidOtp"));
+        setError(t("mfa.invalidOtp"));
         } else if (error.response.status === 403) {
-          setError(t("mfa.otpExpired"));
+        setError(t("mfa.otpExpired"));
         } else {
-          setError(t("mfa.tryAgainError"));
+        setError(t("mfa.tryAgainError"));
         }
       } else {
         setError(t("mfa.generalError"));
@@ -82,18 +75,14 @@ const Mfa: React.FC = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const response = await axios.get(apiUrl + "/auth/otp-wait-time", {
-        withCredentials: true,
-      });
+      const response = await api.get("/auth/otp-wait-time");
       const waitTime = response.data.secondsLeft;
 
       if (waitTime > 0) {
         setError(t("mfa.waitTime", { count: waitTime }));
       } else {
-        await axios.post(
-          apiUrl + "/auth/resend-otp",
+        await api.post("/auth/resend-otp",
           {},
-          { withCredentials: true }
         );
         setError(t("mfa.otpResent"));
       }

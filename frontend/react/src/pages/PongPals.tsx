@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
-import SearchPals from "../components/SearchPals";
-import { FriendList } from "../components/FriendList";
-import { PendingRequests } from "../components/PendingRequests";
-import { useAuth } from "../auth/AuthProvider";
-import { Friend } from "../types/friend";
-import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
+import React, { useState, useEffect } from 'react';
+import api from '../api/axios';
+import { Navigate, useNavigate } from 'react-router-dom';
+import SearchPals from '../components/SearchPals';
+import { FriendList } from '../components/FriendList';
+import { PendingRequests } from '../components/PendingRequests';
+import { useAuth } from '../auth/AuthProvider';
+import { Friend } from '../types/friend';
+import { useTranslation } from 'react-i18next';
 
 const PongPals: React.FC = () => {
   const navigate = useNavigate();
@@ -18,23 +16,16 @@ const PongPals: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      const fetchFriends = async () => {
-        try {
-          const response = await axios.get(
-            apiUrl + `/users/${user.id}/friends`,
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "application/json", // optional but safe
-              },
-            }
-          );
-          setFriends(response.data);
-        } catch (error) {
-          console.error("Failed to fetch friends:", error);
-        }
-      };
-
+			const fetchFriends = async () => {
+				try {
+					const response = await api.get(`/users/${user.id}/friends`, {
+						headers: { "Content-Type": "application/json" },
+					});
+					setFriends(response.data);
+				} catch (error) {
+					console.error('Failed to fetch friends:', error);
+				}
+			};
       fetchFriends();
     }
   }, [user]);
@@ -49,9 +40,9 @@ const PongPals: React.FC = () => {
 
   const inputStyles =
     "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
-
-  if (status === "loading") return <p>Loading...</p>;
-  if (status === "unauthorized") return <Navigate to="/" replace />;
+	
+	if (status === 'loading') return <p>Loading...</p>
+	if (status === 'unauthorized') return <Navigate to="/login" replace />;
 
   // add friend request header to component
   return (

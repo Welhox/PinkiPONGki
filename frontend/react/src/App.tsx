@@ -1,47 +1,36 @@
-import React from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Home from "./pages/Home";
-import PongPals from "./pages/PongPals";
-import Settings from "./pages/Settings";
-import ForgotPassword from "./pages/ForgotPassword";
-import Stats from "./pages/Stats";
-import VerifyEmail from "./pages/VerifyEmail";
-import showDatabase from "./components/showDatabase";
-import NavigationHeader from "./components/NavigationHeader";
-import { useAuth } from "./auth/AuthProvider";
-import axios from "axios";
-import Mfa from "./pages/Mfa";
-import i18n from "./i18n";
+import React from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Home from './pages/Home';
+import PongPals from './pages/PongPals';
+import Settings from './pages/Settings';
+import ForgotPassword from './pages/ForgotPassword';
+import Stats from './pages/Stats';
+import VerifyEmail from './pages/VerifyEmail';
+import showDatabase from './components/showDatabase';
+import NavigationHeader from './components/NavigationHeader';
+import { useAuth } from './auth/AuthProvider';
+import api from './api/axios';
+import Mfa from './pages/Mfa';
+import i18n from './i18n';
 
 const App: React.FC = () => {
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || "/api";
 
-  const logout = async () => {
-    try {
-      await axios.post(
-        apiUrl + "/users/logout",
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      i18n.changeLanguage("en");
-      localStorage.removeItem("language");
-      await refreshSession();
-    } catch (error) {
-      console.error("Error logging out: ", error);
-    }
-  };
-  const { status, user, refreshSession } = useAuth();
+	const logout = async () => {
+		try {
+			await api.post('/users/logout', {}, {
+				headers: { "Content-Type": "application/json" },
+			});
+			i18n.changeLanguage('en');
+    		localStorage.removeItem('language')
+			await refreshSession();
+			
+		} catch (error) {
+			console.error("Error logging out: ", error);
+		}
+	}
+	const { status, user, refreshSession } = useAuth();
   return (
 	<>
 		<NavigationHeader handleLogout={logout} status={status} user={user}/>

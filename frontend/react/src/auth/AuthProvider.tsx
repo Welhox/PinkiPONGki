@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { setupInterceptors } from '../api/setupInterceptors';
+import api from '../api/axios';
 import i18n from '../i18n';
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
 
 export interface User {
 	id: string;
@@ -21,18 +20,27 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export let logoutFromInterceptor: (() => void) | null = null; // export a hook
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [status, setStatus] = useState<'loading' | 'authorized' | 'unauthorized'>('loading');
 	const [user, setUser] = useState<User | null>(null);
+	const [sessionExpired, setSessionExpired] = useState(false);
+	const [initialCheckComplete, setInitialCheckComplete] = useState(false);
 	const navigate = useNavigate();
+
+	logoutFromInterceptor = () => {
+		setUser(null);
+		setStatus('unauthorized');
+		setSessionExpired(true);
+	};
 
 	const refreshSession = async () => {
 		try {
-			const response = await axios.get<User>(apiUrl + '/session/user', {
+			const response = await api.get<User>('/session/user', {
 				headers: {
 					"Content-Type": "application/json", // optional but safe
 				},
-				withCredentials: true,
 			});
 			const data = response.data;
 			
@@ -43,25 +51,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         		setUser(data);
         		setStatus('authorized');
+				setSessionExpired(false);
       		} else {
 				setUser(null);
 				setStatus('unauthorized');
 				await i18n.changeLanguage('en');
 				localStorage.removeItem('language');
 			}
-		} catch (error: any) {
-			if (error.response?.status === 419) {
-				alert('Your session has expired. Please log in.');
-				setUser(null);
-				setStatus('unauthorized');
-				await i18n.changeLanguage('en');
-				localStorage.removeItem('language');
-				navigate('/login', { replace: true });
+		} catch (error) {
+			if (status === 'authorized') {
+				setSessionExpired(true);
 			}
 			setUser(null);
 			setStatus('unauthorized');
 			await i18n.changeLanguage('en');
 			localStorage.removeItem('language');
+		} finally {
+			setInitialCheckComplete(true);
 		}
 	};
 
@@ -73,11 +79,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		if (status === 'authorized') {
 			const interval = setInterval(() => {
 				refreshSession();
-			}, 10 * 60 * 1000);
+			}, /*10*/1 * 60 * 1000);
 
 			return () => clearInterval(interval);
 		}
 	}, [status]);
+
+	useEffect(() => {
+		if (initialCheckComplete && sessionExpired) {
+			alert('Your session has expired. Please log in again.');
+			setSessionExpired(false);
+		}
+	}, [initialCheckComplete, sessionExpired]);
+
+	useEffect(() => {
+		setupInterceptors({ api, navigate });
+	}, [refreshSession, navigate]);
 
 	if (status === 'loading') {
 		return null;

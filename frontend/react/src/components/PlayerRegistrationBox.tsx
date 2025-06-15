@@ -1,46 +1,40 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useTranslation } from "react-i18next";
+import React, { useState } from 'react';
+import api from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 interface PlayerBoxProps {
   label: string;
   onRegister: (player: { username: string; isGuest: boolean }) => void;
 }
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "/api";
-
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
-  onRegister,
+  onRegister
 }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const { t } = useTranslation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username) {
-      setError(t("playerBox.usernameRequired"));
-      return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!username) {
+    setError(t('playerBox.usernameRequired'));
+    return;
+  }
+  if (!password) {
+    // Guest registration: allow any alias, no backend check
+    onRegister({ username, isGuest: true });
+  } else {
+    // Registered user login
+    try {
+      await api.post('/auth/login', { username, password });
+      onRegister({ username, isGuest: false });
+    } catch {
+      setError(t('playerBox.loginFailed'));
     }
-    if (!password) {
-      // Guest registration: allow any alias, no backend check
-      onRegister({ username, isGuest: true });
-    } else {
-      // Registered user login
-      try {
-        await axios.post(
-          apiUrl + "/auth/login",
-          { username, password },
-          { withCredentials: true }
-        );
-        onRegister({ username, isGuest: false });
-      } catch {
-        setError(t("playerBox.loginFailed"));
-      }
-    }
-  };
+  }
+};
 
   return (
     <form

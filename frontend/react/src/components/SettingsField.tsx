@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from '../api/axios';
 import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 interface FieldProps {
   label: string;
@@ -93,17 +91,12 @@ const SettingsField: React.FC<FieldProps> = ({
       return;
     }
 
-    try {
-      const endpoint =
-        type === "email" ? apiUrl + "/user/email" : apiUrl + "/user/password";
-      await axios.put(
-        endpoint,
-        {
-          newValue: inputValue.trim(),
-          currentPassword: currentPassword.trim(),
-        },
-        { withCredentials: true }
-      );
+		try {
+			const endpoint = type === "email" ? "/user/email" : "/user/password";
+			await api.put(endpoint, {
+				newValue: inputValue.trim(),
+				currentPassword: currentPassword.trim(),
+			});
 
       setSuccess(t("settings.updateSuccess", { label }));
       setError(null);
