@@ -153,8 +153,8 @@ const Settings: React.FC = () => {
       <EditProfilePic
         pic={
           user?.profilePic
-            ? `${apiUrl}${user.profilePic}`
-            : `${apiUrl}/assets/default_avatar.png`
+            ? `${user.profilePic}`
+            : `/assets/default_avatar.png`
         }
         onChange={() => {}}
         onSave={uploadProfilePic}
