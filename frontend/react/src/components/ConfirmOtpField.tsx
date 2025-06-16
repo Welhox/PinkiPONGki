@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface Props {
-  apiUrl: string; // clean this up
   otp: string;
   setOtp: (otp: string) => void;
   setIs2FAEnabled: (isEnabled: boolean) => void;
@@ -11,7 +10,6 @@ interface Props {
 }
 
 const ConfirmOtpField: React.FC<Props> = ({
-  apiUrl, // clean this up
   otp,
   setOtp,
   setIs2FAEnabled,
