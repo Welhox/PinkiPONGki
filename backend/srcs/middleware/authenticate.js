@@ -17,10 +17,6 @@ export async function authenticate(request, reply) {
 
     const now = Math.floor(Date.now() / 1000); // Get the current time in seconds
     const timeLeft = currentToken.exp - now; // Calculate the time left until expiration
-
-    if (timeLeft <= 0) {
-      return reply.code(419).send({ error: "Session expired" });
-    }
     // If the token is about to expire (less than 15 minutes left), refresh it
     if (timeLeft < 15 * 60) {
       // Create a new token with the same payload and a new expiration time
