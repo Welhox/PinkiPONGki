@@ -61,7 +61,7 @@ const Mfa: React.FC = () => {
         } else if (error.response.status === 403) {
         setError(t("mfa.otpExpired"));
         } else {
-        setError(t("mfa.tryAgainError"));
+        setError(t("mfa.invalidOtp"));
         }
       } else {
         setError(t("mfa.generalError"));

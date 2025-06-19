@@ -22,8 +22,7 @@ export async function authenticate(request, reply) {
 			return reply.code(419).send({ error: 'Session expired' });
 		}
 		// If the token is about to expire (less than 15 minutes left), refresh it
-		//if (timeLeft < 15 * 60) {
-		if (timeLeft < 2 * 60) {
+		if (timeLeft < 15 * 60) {
 		// Create a new token with the same payload and a new expiration time
 		const newToken = await request.jwtSign(
 			{
@@ -31,8 +30,7 @@ export async function authenticate(request, reply) {
 			username: currentToken.username,
 			},
 			{
-			//expiresIn: '1h', // New expiration time
-			expiresIn: '5m',
+			expiresIn: '1h', // New expiration time
 			}
 		);
 		// Set the new token in the cookie
@@ -41,8 +39,7 @@ export async function authenticate(request, reply) {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'strict',
 			path: '/',
-			maxAge: 5 * 60,
-			//maxAge: 60 * 60, // 1 hour in seconds
+			maxAge: 60 * 60, // 1 hour in seconds
 		});
 		}
   } catch (err) {

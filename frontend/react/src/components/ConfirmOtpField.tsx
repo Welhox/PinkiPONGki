@@ -38,10 +38,9 @@ const ConfirmOtpField: React.FC<Props> = ({
         api.post("/users/emailActivation",
           { emailVerified: true },
         );
-        axios.post(
-          apiUrl + "/auth/mfa",
+        api.post(
+          "/auth/mfa",
           { mfaInUse: true },
-          { withCredentials: true }
         );
         setIsError(false);
         setMessage(t("confirmOtp.email_verified_success"));

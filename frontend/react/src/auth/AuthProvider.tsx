@@ -75,26 +75,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		refreshSession();
 	}, []);
 
+	/* Performs a session validity check for logged in users every 10 mins */
 	useEffect(() => {
 		if (status === 'authorized') {
 			const interval = setInterval(() => {
 				refreshSession();
-			}, /*10*/1 * 60 * 1000);
+			}, 10 * 60 * 1000);
 
 			return () => clearInterval(interval);
 		}
 	}, [status]);
 
+	/* Handles alerting user and redirect after session expiry */
 	useEffect(() => {
 		if (initialCheckComplete && sessionExpired) {
 			alert('Your session has expired. Please log in again.');
 			setSessionExpired(false);
+			navigate('/login', { replace: true });
 		}
-	}, [initialCheckComplete, sessionExpired]);
+	}, [initialCheckComplete, sessionExpired, navigate]);
 
+	/* After users session validity is checked for the first time, sets up interceptor for session validity handling */
 	useEffect(() => {
-		setupInterceptors({ api, navigate });
-	}, [refreshSession, navigate]);
+		if (initialCheckComplete) {
+			setupInterceptors({ api });
+		}
+	}, [initialCheckComplete, navigate]);
 
 	if (status === 'loading') {
 		return null;
