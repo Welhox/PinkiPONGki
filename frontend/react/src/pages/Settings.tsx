@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthProvider';
-import DeleteAccountButton from '../components/DeleteAccount';
-import EditProfilePic from '../components/EditProfilePic';
-import SettingsField from '../components/SettingsField';
-import LanguageSelector from '../components/LanguageSelector';
-import ToggleSwitch from '../components/ToggleSwitch';
-import api from '../api/axios';
-import ConfirmOtpField from '../components/ConfirmOtpField';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
+import DeleteAccountButton from "../components/DeleteAccount";
+import EditProfilePic from "../components/EditProfilePic";
+import SettingsField from "../components/SettingsField";
+import LanguageSelector from "../components/LanguageSelector";
+import ToggleSwitch from "../components/ToggleSwitch";
+import api from "../api/axios";
+import ConfirmOtpField from "../components/ConfirmOtpField";
+import { useTranslation } from "react-i18next";
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'api';
+const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -56,10 +56,7 @@ const Settings: React.FC = () => {
     if (!user?.id) throw new Error("No user ID available");
 
     try {
-      await api.post(
-        `/users/delete/${user?.id}`,
-        { password },
-      );
+      await api.post(`/users/delete/${user?.id}`, { password });
       localStorage.clear();
       sessionStorage.clear();
       await refreshSession();
@@ -79,20 +76,18 @@ const Settings: React.FC = () => {
     try {
       // send request to backend to update 2FA status
       if (is2FAEnabled === true) {
-        const response = await api.post(
-          "/auth/mfa",
-          { mfaInUse: !is2FAEnabled },
-        );
+        const response = await api.post("/auth/mfa", {
+          mfaInUse: !is2FAEnabled,
+        });
         setIs2FAEnabled(response.data.mfaInUse);
         console.log("2FA toggled!");
       } //check if email is already validated and show the Otp field to validate email if not
       else {
         const user = await api.get("/users/emailStatus", {});
         if (user.data.emailVerified === true) {
-          const response = await api.post(
-            "/auth/mfa",
-            { mfaInUse: !is2FAEnabled },
-          );
+          const response = await api.post("/auth/mfa", {
+            mfaInUse: !is2FAEnabled,
+          });
           setIs2FAEnabled(response.data.mfaInUse);
           console.log("2FA toggled!");
         } else {
@@ -107,8 +102,7 @@ const Settings: React.FC = () => {
                 `Please wait ${waitTime} seconds before requesting a new OTP.`
               );
             } else {
-              await api.post(
-                "/auth/otp/send-otp", {});
+              await api.post("/auth/otp/send-otp", {});
             }
           } catch (error) {
             console.error("Error sending OTP:", error);
@@ -140,10 +134,7 @@ const Settings: React.FC = () => {
 
   const handleLanguageChange = async (newLang: string) => {
     try {
-      const response = await api.post(
-        "/user/language",
-        { language: newLang },
-      );
+      const response = await api.post("/user/language", { language: newLang });
 
       setLanguage(response.data.language);
       i18n.changeLanguage(response.data.language);

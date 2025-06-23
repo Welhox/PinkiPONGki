@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../auth/AuthProvider';
-import api from '../api/axios';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useState } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
+import api from "../api/axios";
+import { useTranslation } from "react-i18next";
 
 import StatsHeader from "../components/StatsHeader";
 import MatchHistory from "../components/MatchHistory";
 import BefriendButton from "../components/BefriendButton";
 
-const Stats: React.FC= () => {
+const Stats: React.FC = () => {
   const { status, user } = useAuth();
   const { state } = useLocation();
   const [viewedUserUsername, setViewedUserUsername] = useState<string | null>(
@@ -24,7 +24,7 @@ const Stats: React.FC= () => {
       if (!viewedUserId || usernameFromState) return;
 
       try {
-        const res = await api.get('/users/id', {
+        const res = await api.get("/users/id", {
           params: { id: viewedUserId },
           headers: { "Content-Type": "application/json" },
         });
@@ -38,8 +38,9 @@ const Stats: React.FC= () => {
     if (status === "authorized") fetchUsername();
   }, [status, viewedUserId, usernameFromState, t]);
 
-  if (status === 'loading') return <p>{t('stats.loading')}</p>;
-  if (status === 'unauthorized' || !user) return <Navigate to="/login" replace/>;
+  if (status === "loading") return <p>{t("stats.loading")}</p>;
+  if (status === "unauthorized" || !user)
+    return <Navigate to="/login" replace />;
 
   return (
     <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg">

@@ -1,45 +1,37 @@
-import { AxiosInstance } from 'axios';
-import { logoutFromInterceptor } from '../auth/AuthProvider';
+import { AxiosInstance } from "axios";
+import { logoutFromInterceptor } from "../auth/AuthProvider";
 
 let isHandlingSessionExpiry = false;
 
-const isSessionAuthFailure = (
-	status: number,
-  url: string,
-) : boolean => {
-    return (
-      (status === 401 || status === 419) &&
-      (
-        url.includes('/session') ||
-        url.includes('/users')
-      )
-    );
+const isSessionAuthFailure = (status: number, url: string): boolean => {
+  return (
+    (status === 401 || status === 419) &&
+    (url.includes("/session") || url.includes("/users"))
+  );
 };
 
-export function setupInterceptors({
-	api,
-}: {
-	api: AxiosInstance
-}) {
-	api.interceptors.response.use(
-		response => response,
-		async error => {
-			const status = error.response?.status;
-      const url = error.config?.url || '';
+export function setupInterceptors({ api }: { api: AxiosInstance }) {
+  api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const status = error.response?.status;
+      const url = error.config?.url || "";
 
-			if (!isHandlingSessionExpiry && isSessionAuthFailure(status, url)) {
-				isHandlingSessionExpiry = true;
-				console.warn(`Session expired (status: ${status}) on ${url} — refreshing session and redirecting`);
+      if (!isHandlingSessionExpiry && isSessionAuthFailure(status, url)) {
+        isHandlingSessionExpiry = true;
+        console.warn(
+          `Session expired (status: ${status}) on ${url} — refreshing session and redirecting`
+        );
 
-				logoutFromInterceptor?.(); // update context immediately
-				localStorage.removeItem('language');
+        logoutFromInterceptor?.(); // update context immediately
+        localStorage.removeItem("language");
 
-				// reset lock after short delay
-				setTimeout(() => {
-					isHandlingSessionExpiry = false;
-				}, 2000);
-			}
-			return Promise.reject(error);
-		}
-	);
+        // reset lock after short delay
+        setTimeout(() => {
+          isHandlingSessionExpiry = false;
+        }, 2000);
+      }
+      return Promise.reject(error);
+    }
+  );
 }

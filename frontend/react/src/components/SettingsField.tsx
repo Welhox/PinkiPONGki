@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import api from '../api/axios';
+import api from "../api/axios";
 import { useTranslation } from "react-i18next";
 
 interface FieldProps {
@@ -91,12 +91,12 @@ const SettingsField: React.FC<FieldProps> = ({
       return;
     }
 
-		try {
-			const endpoint = type === "email" ? "/user/email" : "/user/password";
-			await api.put(endpoint, {
-				newValue: inputValue.trim(),
-				currentPassword: currentPassword.trim(),
-			});
+    try {
+      const endpoint = type === "email" ? "/user/email" : "/user/password";
+      await api.put(endpoint, {
+        newValue: inputValue.trim(),
+        currentPassword: currentPassword.trim(),
+      });
 
       setSuccess(t("settings.updateSuccess", { label }));
       setError(null);
