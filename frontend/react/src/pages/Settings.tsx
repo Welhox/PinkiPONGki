@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthProvider';
-import DeleteAccountButton from '../components/DeleteAccount';
-import EditProfilePic from '../components/EditProfilePic';
-import SettingsField from '../components/SettingsField';
-import LanguageSelector from '../components/LanguageSelector';
-import ToggleSwitch from '../components/ToggleSwitch';
-import api from '../api/axios';
-import ConfirmOtpField from '../components/ConfirmOtpField';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
+import DeleteAccountButton from "../components/DeleteAccount";
+import EditProfilePic from "../components/EditProfilePic";
+import SettingsField from "../components/SettingsField";
+import LanguageSelector from "../components/LanguageSelector";
+import ToggleSwitch from "../components/ToggleSwitch";
+import api from "../api/axios";
+import ConfirmOtpField from "../components/ConfirmOtpField";
+import { useTranslation } from "react-i18next";
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
