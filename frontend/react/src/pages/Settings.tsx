@@ -6,7 +6,7 @@ import EditProfilePic from "../components/EditProfilePic";
 import SettingsField from "../components/SettingsField";
 import LanguageSelector from "../components/LanguageSelector";
 import ToggleSwitch from "../components/ToggleSwitch";
-import axios from "axios";
+import api from "../api/axios";
 import ConfirmOtpField from "../components/ConfirmOtpField";
 import { useTranslation } from "react-i18next";
 
@@ -31,9 +31,7 @@ const Settings: React.FC = () => {
     // Fetch user settings from the backend
     const fetchUserSettings = async () => {
       try {
-        const response = await axios.get(apiUrl + "/users/settings", {
-          withCredentials: true,
-        });
+        const response = await api.get("/users/settings", {});
         console.log("RESPONSE:", response.data);
         setEmail(response.data.email);
         setLanguage(response.data.language);
@@ -58,11 +56,7 @@ const Settings: React.FC = () => {
     if (!user?.id) throw new Error("No user ID available");
 
     try {
-      await axios.post(
-        `${apiUrl}/users/delete/${user?.id}`,
-        { password },
-        { withCredentials: true }
-      );
+      await api.post(`/users/delete/${user?.id}`, { password });
       localStorage.clear();
       sessionStorage.clear();
       await refreshSession();
@@ -82,32 +76,24 @@ const Settings: React.FC = () => {
     try {
       // send request to backend to update 2FA status
       if (is2FAEnabled === true) {
-        const response = await axios.post(
-          apiUrl + "/auth/mfa",
-          { mfaInUse: !is2FAEnabled },
-          { withCredentials: true }
-        );
+        const response = await api.post("/auth/mfa", {
+          mfaInUse: !is2FAEnabled,
+        });
         setIs2FAEnabled(response.data.mfaInUse);
         console.log("2FA toggled!");
       } //check if email is already validated and show the Otp field to validate email if not
       else {
-        const user = await axios.get(apiUrl + "/users/emailStatus", {
-          withCredentials: true,
-        });
+        const user = await api.get("/users/emailStatus", {});
         if (user.data.emailVerified === true) {
-          const response = await axios.post(
-            apiUrl + "/auth/mfa",
-            { mfaInUse: !is2FAEnabled },
-            { withCredentials: true }
-          );
+          const response = await api.post("/auth/mfa", {
+            mfaInUse: !is2FAEnabled,
+          });
           setIs2FAEnabled(response.data.mfaInUse);
           console.log("2FA toggled!");
         } else {
           // send otp to email
           try {
-            const response = await axios.get(apiUrl + "/auth/otp-wait-time", {
-              withCredentials: true,
-            });
+            const response = await api.get("/auth/otp-wait-time", {});
             const waitTime = response.data.secondsLeft;
             setShowOtpField(true);
 
@@ -116,11 +102,7 @@ const Settings: React.FC = () => {
                 `Please wait ${waitTime} seconds before requesting a new OTP.`
               );
             } else {
-              await axios.post(
-                apiUrl + "/auth/otp/send-otp",
-                {},
-                { withCredentials: true }
-              );
+              await api.post("/auth/otp/send-otp", {});
             }
           } catch (error) {
             console.error("Error sending OTP:", error);
@@ -140,9 +122,7 @@ const Settings: React.FC = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post(apiUrl + "/user/profile-pic", formData, {
-        withCredentials: true,
-      });
+      await api.post("/user/profile-pic", formData);
 
       await refreshSession();
       console.log(user);
@@ -154,11 +134,7 @@ const Settings: React.FC = () => {
 
   const handleLanguageChange = async (newLang: string) => {
     try {
-      const response = await axios.post(
-        apiUrl + "/user/language",
-        { language: newLang },
-        { withCredentials: true }
-      );
+      const response = await api.post("/user/language", { language: newLang });
 
       setLanguage(response.data.language);
       i18n.changeLanguage(response.data.language);
@@ -204,7 +180,6 @@ const Settings: React.FC = () => {
         <ConfirmOtpField
           setIs2FAEnabled={setIs2FAEnabled}
           setShowOtpField={setShowOtpField}
-          apiUrl={apiUrl}
           otp={otp}
           setOtp={setOtp}
         />

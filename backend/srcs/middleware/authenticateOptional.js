@@ -5,6 +5,7 @@ export async function authenticateOptional(request, reply) {
     const currentToken = await request.jwtVerify();
 
     if (!currentToken?.id || !currentToken?.username) {
+      request.user = undefined;
       return;
     }
 
@@ -15,6 +16,11 @@ export async function authenticateOptional(request, reply) {
 
     const now = Math.floor(Date.now() / 1000); // Get the current time in seconds
     const timeLeft = currentToken.exp - now; // Calculate the time left until expiration
+
+    if (timeLeft <= 0) {
+      request.user = undefined;
+      return reply.code(419).send({ error: "Session expired" });
+    }
     // If the token is about to expire (less than 15 minutes left), refresh it
     if (timeLeft < 15 * 60) {
       // Create a new token with the same payload and a new expiration time
@@ -33,6 +39,6 @@ export async function authenticateOptional(request, reply) {
     }
   } catch (err) {
     // invalid or no token - no need to throw
-    return;
+    request.user = undefined;
   }
 }

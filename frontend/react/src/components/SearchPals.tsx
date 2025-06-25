@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthProvider";
-import axios from "axios";
-import { useTranslation } from "react-i18next";
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../auth/AuthProvider';
+import api from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 interface User {
   id: number;
@@ -40,27 +38,26 @@ const SearchPals: React.FC = () => {
 
       setError(null);
 
-      const searchUsers = async () => {
-        try {
-          const response = await axios.get(apiUrl + "/users/search", {
-            params: {
-              query: trimmed,
-              excludeUserId: user?.id,
-            },
-            headers: {
-              "Content-Type": "application/json", // optional but safe
-            },
-            withCredentials: true,
-          });
-          const data = response.data;
-          setResults(Array.isArray(data) ? data : []);
-          setHasSearched(true);
-        } catch (error) {
-          console.error("Search failed:", error);
-          setError(t("searchPals.errorSearchFailed"));
-          setHasSearched(false);
-        }
-      };
+			const searchUsers = async () => {
+				try {
+					const response = await api.get('/users/search',
+						{
+							params: {
+								query: trimmed,
+								excludeUserId: user?.id,
+							},
+							headers: { "Content-Type": "application/json" },
+						}
+					);
+					const data = response.data;
+					setResults(Array.isArray(data) ? data : []);
+					setHasSearched(true);
+				} catch (error) {
+					console.error('Search failed:', error);
+					setError(t('searchPals.errorSearchFailed'));
+					setHasSearched(false);
+				}
+			};
 
       searchUsers();
     }, 300); // debounce for smoother UX
