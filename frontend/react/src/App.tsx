@@ -8,6 +8,7 @@ import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
 import Stats from "./pages/Stats";
 import VerifyEmail from "./pages/VerifyEmail";
+import TournamentPage from "./pages/TournamentPage";
 import showDatabase from "./components/showDatabase";
 import NavigationHeader from "./components/NavigationHeader";
 import { useAuth } from "./auth/AuthProvider";
@@ -46,6 +47,7 @@ const App: React.FC = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/mfa" element={<Mfa />} />
+        <Route path="/tournament/:id" element={<TournamentPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route
           path="/stats/:anything"
