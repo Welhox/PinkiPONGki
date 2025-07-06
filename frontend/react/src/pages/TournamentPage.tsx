@@ -42,7 +42,7 @@ const TournamentPage = () => {
       ]); */
       console.log("Missing API call for tournament participants and matches");
 
-      const playersData = participantsRes.data.map((p: any) => ({
+      /* const playersData = participantsRes.data.map((p: any) => ({
         id: p.userId ?? null,
         name: p.user?.username ?? p.alias,
       }));
@@ -66,7 +66,7 @@ const TournamentPage = () => {
       setMatchesFromBackend(backendMatches);
       if (backendMatches.length === 0) {
         generateInitialMatches(playersData);
-      }
+      } */
     } catch (error) {
       console.error("Failed to fetch tournament data", error);
     } finally {

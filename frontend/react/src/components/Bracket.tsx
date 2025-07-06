@@ -1,10 +1,10 @@
 import React from "react";
 import Round from "./Round";
-import { Match } from "../types/game";
+import { Match, Player } from "../types/game";
 
 interface BracketProps {
   matches: Match[];
-  onPlay: (match: Match, winner: { id: number; name: string }) => void;
+  onPlay: (match: Match, winner: Player) => void;
 }
 
 const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {

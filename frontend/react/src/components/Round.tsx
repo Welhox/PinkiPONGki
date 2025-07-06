@@ -1,11 +1,11 @@
 import React from "react";
 import MatchCard from "./MatchCard";
-import { Match } from "../types/game";
+import { Match, Player } from "../types/game";
 
 interface RoundProps {
   round: number;
   matches: Match[];
-  onPlay: (match: Match, winner: { id: number; name: string }) => void;
+  onPlay: (match: Match, winner: Player) => void;
 }
 
 const Round: React.FC<RoundProps> = ({ round, matches, onPlay }) => {
