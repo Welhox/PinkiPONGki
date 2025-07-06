@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
@@ -38,9 +38,10 @@ const Register: React.FC = () => {
     }
   }, [errorMessage]);
 
-  const usernameRegex = /^[a-zA-Z0-9]+$/;
+  const usernameRegex = /^[a-zA-Z0-9]{2,20}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const pwdValidationRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,42}$/;
   const navigate = useNavigate();
 
   // saves data to the object
@@ -55,13 +56,20 @@ const Register: React.FC = () => {
     e.preventDefault();
 
     if (!usernameRegex.test(signupData.username)) {
-      setErrorMsg("Username must contain only letters and numbers.");
+      setErrorMsg(
+        "Username must contain only letters and numbers and be between 2 and 20 characters long."
+      );
+      return;
+    }
+
+    if (!emailRegex.test(signupData.email)) {
+      setErrorMsg("Email must be a valid email address.");
       return;
     }
 
     if (!pwdValidationRegex.test(signupData.password)) {
       setErrorMsg(
-        "Password must be at least 8 characters, including uppercase, lowercase, number and special character."
+        "Password must be at least 8 and no more than 42 characters, including at least one uppercase, lowercase, number and special character."
       );
       return;
     }
@@ -90,6 +98,13 @@ const Register: React.FC = () => {
       return;
     } catch (error) {
       console.log(error);
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.status === 409) {
+          setErrorMsg(error.response.data.error);
+        } else {
+          setErrorMsg("An error occurred. Please try again.");
+        }
+      }
     }
   };
   const labelStyles =
@@ -102,7 +117,7 @@ const Register: React.FC = () => {
         Create an account
       </h1>
       <div>
-        <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+        <form className="max-w-sm mx-auto" onSubmit={handleSubmit} noValidate>
           <div className="mb-5">
             <label className={labelStyles} htmlFor="username">
               Username:{" "}
@@ -116,8 +131,8 @@ const Register: React.FC = () => {
               onChange={handleChange}
               value={signupData.username}
               required
-              maxLength={20}
-              minLength={2}
+              maxLength={20} // no longer enforced by browser for accessibility reasons
+              minLength={2} // no longer enforced by browser for accessibility reasons
             />
           </div>
           <div className="mb-5">
@@ -133,7 +148,7 @@ const Register: React.FC = () => {
               onChange={handleChange}
               value={signupData.email}
               required
-              maxLength={42}
+              maxLength={42} // no longer enforced by browser for accessibility reasons
             />
           </div>
           <div className="mb-5">
@@ -149,8 +164,8 @@ const Register: React.FC = () => {
               onChange={handleChange}
               value={signupData.password}
               required
-              maxLength={42}
-              minLength={8}
+              maxLength={42} // no longer enforced by browser for accessibility reasons
+              minLength={8} // no longer enforced by browser for accessibility reasons
             />
           </div>
           <div className="mb-5">
@@ -172,7 +187,7 @@ const Register: React.FC = () => {
           </div>
 
           {errorMessage && (
-            <p style={{ color: "red", marginTop: "8px" }}>{errorMessage}</p>
+            <p className="m-5 text-red-600 dark:text-red-500">{errorMessage}</p>
           )}
           {/* This next part is a secret div, visible only to screen readers, which ensures that the error
 	  or success messages get announced using aria. */}
