@@ -3,7 +3,7 @@ import prisma from "../prisma.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { statsSchema } from "../schemas/statsSchema.js";
 
-export async function statsRoute(fastify, options) {
+export async function statsRoute(fastify, _options) {
   fastify.get(
     "/stats/:userId",
     { schema: statsSchema, preHandler: authenticate },

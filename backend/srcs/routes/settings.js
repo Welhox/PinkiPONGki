@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { authenticate } from "../middleware/authenticate.js";
 import { settingsSchemas } from "../schemas/settingsSchema.js";
 
-export async function settingsRoutes(fastify, options) {
+export async function settingsRoutes(fastify, _options) {
   const rateLimitConfig = {
     config: {
       rateLimit: {
@@ -48,6 +48,7 @@ export async function settingsRoutes(fastify, options) {
 
         reply.send({ message: "Email updated" });
       } catch (error) {
+        console.error("Email update error:", error);
         reply.status(400).send({ message: "Email already in use or invalid" });
       }
     },
@@ -107,7 +108,8 @@ export async function settingsRoutes(fastify, options) {
 
         reply.send({ language: updatedUser.language });
       } catch (error) {
-        request.log.error();
+        // console.error("Error updating language:", error);
+        request.log.error(error);
         reply.status(500).send({ error: "Failed to update language" });
       }
     }

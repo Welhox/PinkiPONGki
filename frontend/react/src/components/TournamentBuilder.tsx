@@ -97,27 +97,26 @@ const TournamentBuilder = () => {
 
     try {
       // create a tournament
-      /*const res = await api.post("/tournaments", {
+        const res = await api.post("/tournaments/create", {
         name: "Pong Tournament",
         size: playerCount,
-        createdById: user?.id,
+        createdById: user?.id, // use user ID if logged in, otherwise 0
         status: "waiting",
-      });*/
-      console.log("Missing tournament saving API");
+      });
+      // console.log("Missing tournament saving API");
 
-      //const tournamentId = res.data.id;
-      const tournamentId = 0; // for testing without backend
+      const tournamentId = res.data.id;
+      // const tournamentId = 0; // for testing without backend
 
       // add participants
-      /*await Promise.all(
+      await Promise.all(
         players.map((player, index) =>
-          api.post("/tournament-participants", {
-            tournamentId,
+          api.post(`/tournaments/${tournamentId}/register`, {
             userId: player.isGuest ? null : (user?.username === player.username ? user.id : null),
             alias: player.isGuest ? player.username : "",
           })
         )
-      );*/
+      );
       console.log("Missing tournament players init API");
       //navigate(`/tournament/${tournamentId}`); production
       navigate(`/tournament/${tournamentId}`, { state: { players } }); // for testing without backend

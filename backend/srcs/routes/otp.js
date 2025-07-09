@@ -1,11 +1,10 @@
-import nodemailer from "nodemailer";
 import prisma from "../prisma.js";
 import bcryptjs from "bcryptjs";
 import { handleOtp } from "../handleOtp.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { authenticateOptional } from "../middleware/authenticateOptional.js";
 import { otpSchemas } from "../schemas/otpSchemas.js";
-export async function otpRoutes(fastify, options) {
+export async function otpRoutes(fastify, _options) {
   //####################################################################################################################################
 
   // a rout for verifing the OTP witout making a cookie

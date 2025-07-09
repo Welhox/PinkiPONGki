@@ -42,7 +42,8 @@ export async function authenticate(request, reply) {
         maxAge: 60 * 60, // 1 hour in seconds
       });
     }
-  } catch (err) {
+  } catch (error) {
+    console.error("Authentication error:", error);
     // If the token is invalid, return a 401 Unauthorized response
     return reply.code(401).send({ error: "Unauthorized" });
   }

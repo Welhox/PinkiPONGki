@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const UPLOAD_DIR = resolve(__dirname, "../../assets"); // absolute path
 
-export async function profilePicRoute(fastify, opts) {
+export async function profilePicRoute(fastify, _options) {
   // ensure the uploads dir exists
   if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 

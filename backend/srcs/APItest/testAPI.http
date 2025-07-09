@@ -61,6 +61,17 @@ DELETE http://localhost:3000/users/delete/9 HTTP/1.1
 
 ###
 
+//ADD user to tournament
+POST http://localhost:3000/tournaments/1/register HTTP/1.1
+content-type: application/json
+
+{
+    "userId": "0",
+    "alias": "sample"
+}
+
+###
+
 
 
 

@@ -87,16 +87,14 @@ export async function handleOtp(email) {
         console.log("wait before requesting a new OTP");
         return { success: false };
       }
-    } catch {}
-    console.log("STEP 1");
+    } catch (error) {
+      console.error("Error checking previous OTP:", error);
+    }
     const code = await makeOTP(userId);
-    console.log("STEP 2");
-
     await sendOTP(email, code);
-    console.log("STEP 3");
-
     return { success: true };
-  } catch (err) {
+  } catch (error) {
+    console.error("Error handling OTP:", error);
     throw new Error("Failed to send OTP");
   }
 }
