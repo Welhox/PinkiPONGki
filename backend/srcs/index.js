@@ -80,8 +80,8 @@ const start = async () => {
       console.warn("⚠️ Seeding skipped or failed gracefully:", err.message);
     }
 
-    fastify.get("/", async (request, reply) => {
-      return { hello: "world" };
+    fastify.get("/ping", async () => {
+      return { message: "pong" };
     });
 
     await fastify.listen({ port: 3000, host: "0.0.0.0" });

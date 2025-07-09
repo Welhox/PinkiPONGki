@@ -1,7 +1,7 @@
 import prisma from "../prisma.js";
 import { authenticate } from "../middleware/authenticate.js";
 
-export async function friendRoutes(fastify, options) {
+export async function friendRoutes(fastify, _options) {
   /* 	fastify.addHook('onRequest', async (request, reply) => {
 		console.log('📥 Request received:', request.raw.url);
 	  });	 */
@@ -126,7 +126,7 @@ export async function friendRoutes(fastify, options) {
   fastify.post(
     "/friends/accept",
     { preHandler: authenticate },
-    async (request, reply) => {
+    async (request, _reply) => {
       const { requestId } = request.body;
 
       const requestRecord = await prisma.friendRequest.update({
@@ -164,7 +164,7 @@ export async function friendRoutes(fastify, options) {
   fastify.post(
     "/friends/decline",
     { preHandler: authenticate },
-    async (request, reply) => {
+    async (request, _reply) => {
       const { requestId } = request.body;
 
       await prisma.friendRequest.update({

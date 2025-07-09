@@ -5,7 +5,7 @@ import path from "path";
 
 const UPLOAD_DIR = path.resolve("assets");
 
-export async function sessionRoute(fastify, options) {
+export async function sessionRoute(fastify, _options) {
   // for session verification; returns username and user ID
   fastify.get("/session/user", {
     config: {

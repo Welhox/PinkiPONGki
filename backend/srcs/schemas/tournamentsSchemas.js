@@ -8,10 +8,9 @@ const participantSchema = {
     tournamentId: { type: "integer" },
     userId: { type: ["integer", "null"] },
     alias: { type: ["string", "null"] },
-    createdAt: { type: "string", format: "date-time" },
-    updatedAt: { type: "string", format: "date-time" },
+    joinedAt: { type: "string", format: "date-time" },
   },
-  required: ["id", "tournamentId", "userId", "alias", "createdAt", "updatedAt"],
+  required: ["id", "tournamentId", "userId", "alias", "joinedAt"],
 };
 
 // Schema for creating a tournament
@@ -22,9 +21,11 @@ const createTournamentSchema = {
     type: "object",
     properties: {
       name: { type: "string" },
-      size: { type: "integer", enum: [4, 8, 16, 32] },
+      size: { type: "integer", enum: [4, 8] },
+      createdById: { type: "integer" },
+      status: { type: "string", enum: ["waiting"] },
     },
-    required: ["name", "size"],
+    required: ["name", "size"/* , "createdById" */, "status"],
   },
   response: {
     200: {
@@ -35,17 +36,13 @@ const createTournamentSchema = {
         size: { type: "integer" },
         createdById: { type: "integer" },
         status: { type: "string", enum: ["waiting"] },
-        createdAt: { type: "string", format: "date-time" },
-        updatedAt: { type: "string", format: "date-time" },
       },
       required: [
         "id",
         "name",
         "size",
-        "createdById",
+        // "createdById",
         "status",
-        "createdAt",
-        "updatedAt",
       ],
     },
     400: {
@@ -86,6 +83,13 @@ const registerTournamentSchema = {
       type: "object",
       properties: {
         message: { type: "string", example: "Invalid tournament ID" },
+      },
+      required: ["message"],
+    },
+    404: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Tournament not found" },
       },
       required: ["message"],
     },

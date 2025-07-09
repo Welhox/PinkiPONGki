@@ -37,7 +37,8 @@ export async function authenticateOptional(request, reply) {
         maxAge: 60 * 60, // 1 hour in seconds
       });
     }
-  } catch (err) {
+  } catch (error) {
+    console.error("Optional authentication error:", error);
     // invalid or no token - no need to throw
     request.user = undefined;
   }

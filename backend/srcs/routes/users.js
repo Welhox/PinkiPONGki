@@ -4,7 +4,7 @@ import { userSchemas } from "../schemas/userSchemas.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { handleOtp } from "../handleOtp.js";
 
-export async function userRoutes(fastify, options) {
+export async function userRoutes(fastify, _options) {
   const rateLimitConfig = {
     config: {
       rateLimit: {
@@ -73,6 +73,7 @@ export async function userRoutes(fastify, options) {
               language: user.language || "en",
             });
           } catch (error) {
+            console.error("Error handling OTP:", error);
             return reply.code(401).send({ error: "Invalid email for mfa" });
           }
         }
@@ -104,6 +105,7 @@ export async function userRoutes(fastify, options) {
           language: user.language || "en",
         });
       } catch (error) {
+        console.error("Login error:", error);
         return reply.code(500).send({ error: "Internal server error" });
       }
     }
@@ -117,7 +119,7 @@ export async function userRoutes(fastify, options) {
     async (req, reply) => {
       const userId = req.user.id;
       try {
-        const updatedUser = await prisma.user.update({
+        /* const updatedUser = */ await prisma.user.update({
           where: { id: userId },
           data: { isOnline: false },
         });
@@ -126,7 +128,7 @@ export async function userRoutes(fastify, options) {
           .clearCookie("token", { path: "/" }) // tells the browser to delete the cookie, path should match the path used in .setCookie
           .send({ message: "Logged out" });
       } catch (error) {
-        if (err.code === "P2025")
+        if (error.code === "P2025")
           return reply.code(404).send({ error: "User not found" });
         return reply.code(500).send({ error: "Internal server error" });
       }
@@ -178,7 +180,7 @@ export async function userRoutes(fastify, options) {
       const hashedPassword = await bcryptjs.hash(password, 10);
 
       try {
-        const user = await prisma.user.create({
+        /* const user =  */await prisma.user.create({
           data: { username, email, password: hashedPassword },
         });
         reply.code(200).send({ message: "User added successfully" }); //should be 201
