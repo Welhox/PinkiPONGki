@@ -17,8 +17,8 @@ const TournamentPage = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [matchesFromBackend, setMatchesFromBackend] = useState<Match[]>([]);
   const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { settings } = useGameSettings();
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     if (state?.players && state.players.length > 0) {
@@ -137,8 +137,15 @@ const TournamentPage = () => {
       const winners: Player[] = currentRoundMatches.map((m) =>
         m.result === "win" ? m.player1 : m.player2
       );
-      const nextRoundMatches: Match[] = [];
 
+      if (winners.length === 1) {
+        // tournament over!
+        setFinalStandings([...winners]);
+        setIsTournamentOver(true);
+        return;
+      }
+
+      const nextRoundMatches: Match[] = [];
       for (let i = 0; i < winners.length; i += 2) {
         const p1 = winners[i];
         const p2 = winners[i + 1];
