@@ -21,13 +21,16 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  
   if (!username) {
     setError(t('playerBox.usernameRequired'));
     return;
   }
+
   if (!password) {
     // Guest registration: allow any alias, no backend check
     onRegister({ username, isGuest: true });
+
   } else {
     // Registered user login
     try {
@@ -107,6 +110,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       {error && <div className="text-red-500 mt-2">{error}</div>}
     </form>
   );
+};
 };
 
 export default PlayerRegistrationBox;
