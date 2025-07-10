@@ -37,12 +37,34 @@ const TournamentBuilder = () => {
       }
 
       setPlayers(initialPlayers);
-      // initialize registeredPlayers: first player is registered if logged in, otherwise false
-      setRegisteredPlayers(
-        initialPlayers.map((_, idx) => (user && idx === 0 ? true : false))
-      );
+      setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
     }
-  }, [playerCount, user]);
+  }, [playerCount]);
+
+  useEffect(() => {
+    if (user && players.length > 0) {
+      const alreadyInSlot = players.some(
+        (p) => !p.isGuest && p.username === user.username
+      );
+      if (alreadyInSlot) return; // prevent duplicates
+
+      const firstGuestIndex = players.findIndex(
+        (p) => p.isGuest && !p.username
+      );
+      if (firstGuestIndex !== -1) {
+        const updated = [...players];
+        updated[firstGuestIndex] = {
+          username: user.username,
+          isGuest: false,
+        };
+        setPlayers(updated);
+
+        const updatedRegistered = [...registeredPlayers];
+        updatedRegistered[firstGuestIndex] = true;
+        setRegisteredPlayers(updatedRegistered);
+      }
+    }
+  }, [user, players]);
 
   const updatePlayer = (index: number, player: RegisteredPlayer) => {
     // check for duplicate usernames
@@ -80,14 +102,6 @@ const TournamentBuilder = () => {
   const handleCreateTournament = async (e: React.FormEvent) => {
     console.log(t("tournament.consoleCreating"));
     e.preventDefault();
-
-    // ensure logged in user is counted in all checks
-    if (user) {
-      players[0] = {
-        username: user.username,
-        isGuest: false,
-      };
-    }
 
     // basic validation
     if (
@@ -212,7 +226,7 @@ const TournamentBuilder = () => {
         <div className="flex flex-col">
           {players.map((player, index) => (
             <div key={index} className="my-2">
-              {user && index === 0 ? (
+              {user && player.username === user.username && !player.isGuest ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-bold">
                   {t("tournament.playerYou", { username: user.username })}
                 </div>
