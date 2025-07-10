@@ -16,6 +16,7 @@ export async function tournamentsRoute(fastify, _options) {
     },
     async (req, reply) => {
       const { name, size, createdById, status } = req.body;
+      console.log("Creating tournament with data:", req.body);
       //the schema already validates and returns 400 if not the right size
       // if (![4, 8, 16, 32].includes(size)) return reply.code(400).send({ error: 'Invalid size' });
       try {
@@ -42,6 +43,7 @@ export async function tournamentsRoute(fastify, _options) {
       try {
       const { id } = req.params;
       const { userId, alias } = req.body;
+      console.log("Registering for tournament with ID:", id, "User ID:", userId, "Alias:", alias);
       const tournament = await prisma.tournament.findUnique({
         where: { id: Number(id) },
         include: {
@@ -54,6 +56,10 @@ export async function tournamentsRoute(fastify, _options) {
       if (tournament.participants.length >= tournament.size) {
         return reply.code(400).send({ message: "Tournament is full" });
       }
+      if (!userId && !alias) {
+        return reply.code(400).send({ message: "Either userId or alias is required" });
+      }
+
       const participant = await prisma.tournamentParticipant.create({
         data: {
           tournamentId: Number(id),
@@ -66,7 +72,7 @@ export async function tournamentsRoute(fastify, _options) {
       console.error("Error registering for tournament:", error);
       reply.code(500).send({ message: "Server error" });
     }
-}
+    }
   );
 
   // Get all tournaments
@@ -75,7 +81,7 @@ export async function tournamentsRoute(fastify, _options) {
     { schema: tournamentsSchemas.getAllTournamentsSchema },
     async (req, reply) => {
       const tournaments = await prisma.tournament.findMany({
-        include: { participants: true },
+        include: { participants: true, tournamentMatches: true },
         orderBy: { createdAt: "desc" },
       });
       reply.send(tournaments);
@@ -99,5 +105,65 @@ export async function tournamentsRoute(fastify, _options) {
     }
   );
 
-  // TODO: Add endpoint to start tournament (randomize bracket, create matches)
+//###############################################################
+
+  // Start a tournament
+  fastify.post(
+    "/tournaments/:id/start",
+    { /* schema: tournamentsSchemas.startTournamentSchema */ },
+    async (req, reply) => {
+      const { id } = req.params;
+      console.log("Starting tournament with ID:", id);
+      try {
+        const tournament = await prisma.tournament.findUnique({
+          where: { id: Number(id) },
+          include: { participants: true },
+        });
+        if (!tournament) {
+          return reply.code(404).send({ message: "Tournament not found" });
+        }
+        if (tournament.status !== "waiting") {
+          return reply.code(400).send({ message: "Tournament cannot be started" });
+        }
+        if (tournament.participants.length < tournament.size) {
+          return reply.code(400).send({ message: "Not enough participants to start the tournament" });
+        }
+        //generate matches based on participants
+        const participants = [...tournament.participants].sort(() => Math.random() - 0.5); // Shuffle participants
+        const matches = [];
+
+        for (let i = 0; i < participants.length; i += 2) {
+            const p1 = participants[i];
+            const p2 = participants[i + 1];
+            if ((!p1.userId && !p1.alias) || (!p2.userId && !p2.alias)) {
+              return reply.code(400).send({ message: "Participant must have a userId or alias" });
+            }
+              matches.push({
+              round: 1,
+              tournamentId: tournament.id,
+              participant1Id: p1.userId ?? null,
+              participant1Alias: p1.alias ?? null,
+              participant2Id: p2.userId ?? null,
+              participant2Alias: p2.alias ?? null,
+            });
+        }
+        // Create matches in the database
+        await prisma.TournamentMatch.createMany({
+          data: matches,
+        });
+        // Update tournament status to 'in_progress'
+        const updatedTournament = await prisma.tournament.update({
+          where: { id: Number(id) },
+          data: { status: "in_progress" },
+        });
+        console.log("Tournament started successfully:", updatedTournament);
+        reply.send(updatedTournament);
+
+      } catch (error) {
+        console.error("Error starting tournament:", error);
+        reply.code(500).send({ message: "Server error" });
+      }
+  });
 }
+
+//##############################################################
