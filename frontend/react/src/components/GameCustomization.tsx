@@ -99,6 +99,34 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
           </select>
         </div>
 
+        {/* Ball Speed Selection - Slider */}
+        <div>
+          <label className={labelStyles}>
+            Ball Speed: {settings.ballSpeed}/10
+          </label>
+          <input
+            type="range"
+            min="1"
+            max="10"
+            step="1"
+            value={settings.ballSpeed}
+            onChange={(e) => updateSettings({ ballSpeed: parseInt(e.target.value) })}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          />
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <span>Slow</span>
+            <span>Medium</span>
+            <span>Fast</span>
+            <span>Extreme</span>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            {settings.ballSpeed <= 3 ? "Beginner friendly - Plenty of time to react" :
+             settings.ballSpeed <= 6 ? "Balanced - Good for standard gameplay" :
+             settings.ballSpeed <= 8 ? "Challenging - Test your reflexes" :
+             "Extreme - For Pong masters only!"}
+          </p>
+        </div>
+
         {/* Power-ups Section */}
         <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
           <div className="flex items-center justify-between mb-4">
