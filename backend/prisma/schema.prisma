@@ -42,6 +42,11 @@ model User {
 
   tournamentsCreated       Tournament[]            @relation("CreatedTournaments")
   tournamentParticipations TournamentParticipant[]
+
+  //had to be added as relation to the tournament, might be redundant
+  tournamentMatchesAsPlayer1 TournamentMatch[] @relation("TM_Player1")
+  tournamentMatchesAsPlayer2 TournamentMatch[] @relation("TM_Player2")
+  tournamentMatchesAsWinner  TournamentMatch[] @relation("TM_Winner")
 }
 
 model Otp {
@@ -68,7 +73,7 @@ model Match {
   player   User @relation("PlayerMatches", fields: [playerId], references: [id], onDelete: Cascade)
   opponent User @relation("OpponentMatches", fields: [opponentId], references: [id], onDelete: Cascade)
 
-  tournament   Tournament? @relation(fields: [tournamentId], references: [id])
+  //tournament   Tournament? @relation(fields: [tournamentId], references: [id])
   tournamentId Int?
 }
 
@@ -84,42 +89,19 @@ model FriendRequest {
   createdAt  DateTime @default(now())
 }
 
-//model Post {
-//  id        Int      @id @default(autoincrement())
-//  title     String   @db.VarChar(255)
-//  createdAt DateTime @default(now()) @db.Timestamp(6)
-//  content   String?
-//  published Boolean  @default(false)
-//  authorId  Int
-//  author    User     @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-//}
-
-//model Profile {
-//  id     Int     @id @default(autoincrement())
-//  bio    String?
-//  userId Int     @unique
-//  user   User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-//}
-
-//model User {
-//  id      Int      @id @default(autoincrement())
-//  name    String?  @db.VarChar(255)
-//  email   String   @unique @db.VarChar(255)
-//  posts   Post[]
-//  profile Profile?
-//}
+//Tournament models
 
 model Tournament {
-  id           Int                     @id @default(autoincrement())
-  name         String
-  size         Int
-  createdById  Int?
-  createdBy    User?                    @relation("CreatedTournaments", fields: [createdById], references: [id])
-  createdAt    DateTime                @default(now())
-  updatedAt    DateTime @updatedAt
-  matches      Match[]
-  participants TournamentParticipant[]
-  status       String // "waiting" | "in_progress" | "finished"
+  id                Int                     @id @default(autoincrement())
+  name              String
+  size              Int
+  createdById       Int?
+  createdBy         User?                   @relation("CreatedTournaments", fields: [createdById], references: [id])
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  tournamentMatches TournamentMatch[]
+  participants      TournamentParticipant[]
+  status            String // "waiting" | "in_progress" | "finished"
 }
 
 model TournamentParticipant {
@@ -128,6 +110,30 @@ model TournamentParticipant {
   tournamentId Int
   user         User?      @relation(fields: [userId], references: [id])
   userId       Int?
-  alias        String // for guests
+  alias        String? // for guests
   joinedAt     DateTime   @default(now())
+}
+
+model TournamentMatch {
+  id           Int        @id @default(autoincrement())
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId Int
+
+  round Int
+
+  player1Id    Int?
+  player1      User?   @relation("TM_Player1", fields: [player1Id], references: [id])
+  player1Alias String? // <– For guests
+
+  player2Id    Int?
+  player2      User?   @relation("TM_Player2", fields: [player2Id], references: [id])
+  player2Alias String?
+
+  winnerId    Int?
+  winner      User?   @relation("TM_Winner", fields: [winnerId], references: [id])
+  winnerAlias String?
+
+  status    String    @default("pending")
+  startedAt DateTime?
+  endedAt   DateTime?
 }
