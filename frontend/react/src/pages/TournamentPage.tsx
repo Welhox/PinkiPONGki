@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import Bracket from "../components/Bracket";
+import Victory from "../components/Victory";
 import { Match, Player } from "../types/game";
 import { useGameSettings } from "../contexts/GameSettingsContext";
+import { getTop3FromMatches } from "../utils/getTop3FromMatches";
 
 const TournamentPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -140,8 +142,11 @@ const TournamentPage = () => {
 
       if (winners.length === 1) {
         // tournament over!
-        setFinalStandings([...winners]);
-        setIsTournamentOver(true);
+        const finalStandings = getTop3FromMatches(
+          currentRoundMatches,
+          updatedMatches
+        );
+        setFinalStandings(finalStandings);
         return;
       }
 
@@ -254,6 +259,8 @@ const TournamentPage = () => {
       
       {isLoading ? (
         <p>Loading...</p>
+      ) : finalStandings.length > 0 ? (
+        <Victory standings={finalStandings} />
       ) : (
         <Bracket matches={allMatches} onPlay={handleMatchPlayed} />
       )}

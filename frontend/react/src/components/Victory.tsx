@@ -5,7 +5,7 @@ interface VictoryProps {
   standings: Player[];
 }
 
-const Victory: React.FC<VictoryProps> = ({ standings }) => {
+const Victory: React.FC<VictoryProps> = ({ standings }: VictoryProps) => {
   return (
     <div className="text-center mt-10">
       <h2 className="text-3xl font-bold mb-6 text-green-600">
