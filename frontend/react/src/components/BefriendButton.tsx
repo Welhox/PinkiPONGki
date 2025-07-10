@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+import api from '../api/axios';
+import { useTranslation } from 'react-i18next';
 
 interface BefriendButtonProps {
 	currentUserId: string;
@@ -11,13 +10,14 @@ interface BefriendButtonProps {
 const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUserId }) => {
 	const [isFriend, setIsFriend] = useState(false);
 	const [friendRequestSent, setFriendRequestSent] = useState(false);
+	const { t } = useTranslation();
 
 	useEffect(() => {
 
 		const checkFriendStatus = async () => {
 			if (currentUserId === viewedUserId) return;
 			try {
-				const res = await axios.get(apiUrl + '/friend-status', {
+				const res = await api.get('/friend-status', {
 					params: {
 						userId1: currentUserId,
 						userId2: viewedUserId,
@@ -25,7 +25,6 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 					headers: {
 						"Content-Type": "application/json", // optional but safe
 					},
-					withCredentials: true,
 				});
 				setIsFriend(res.data.isFriend);
 				setFriendRequestSent(res.data.requestPending);
@@ -40,13 +39,9 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 
 	const handleSendFriendRequest = async () => {
 		try {
-			await axios.post(apiUrl + '/friend-request', {
+			await api.post('/friend-request', {
 				receiverId: viewedUserId,
-			}, { 
-				headers: {
-					"Content-Type": "application/json",
-				},
-				withCredentials: true,
+			}, { headers: { "Content-Type": "application/json" },
 			});
 			setFriendRequestSent(true);
 		} catch (error) {
@@ -56,14 +51,10 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 
 	const handleUnfriend = async () => {
 		try {
-			await axios.post(apiUrl + '/unfriend', {
+			await api.post('/unfriend', {
 				userId1: currentUserId,
 				userId2: viewedUserId,
-			}, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-				withCredentials: true,
+			}, { headers: { "Content-Type": "application/json" },
 			});
 			setIsFriend(false);
 		} catch (error) {
@@ -81,12 +72,12 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 				sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
 				dark:focus:ring-teal-800 m-5"
 				onClick={handleUnfriend}>
-					Unfriend
+					{t('befriendButton.unfriend')}
 			</button>
 		);
 	}
 		
-	if (friendRequestSent) return <p className="text-4xl text-center text-teal-800 dark:text-teal-300 m-3">Friend request pending...</p>;
+	if (friendRequestSent) return <p className="text-4xl text-center text-teal-800 dark:text-teal-300 m-3">{t('befriendButton.friend_request_pending')}</p>;
 
 	return (
 		<button 
@@ -95,7 +86,7 @@ const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUs
 			sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700
 			dark:focus:ring-teal-800 m-5"
 			onClick={handleSendFriendRequest}>
-				Befriend
+				{t('befriendButton.befriend')}
 		</button>
 	);
 };

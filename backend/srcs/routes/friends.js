@@ -1,190 +1,219 @@
-import prisma from '../prisma.js'
-import { authenticate } from '../middleware/authenticate.js'
+import prisma from "../prisma.js";
+import { authenticate } from "../middleware/authenticate.js";
 
-export async function friendRoutes(fastify, options) {
-
-/* 	fastify.addHook('onRequest', async (request, reply) => {
+export async function friendRoutes(fastify, _options) {
+  /* 	fastify.addHook('onRequest', async (request, reply) => {
 		console.log('📥 Request received:', request.raw.url);
 	  });	 */
 
-	fastify.get('/friend-status', { preHandler: authenticate }, async (req, reply) => {
-		const { userId1, userId2 } = req.query;
+  //####################################################################################################################################
 
-		if (!userId1 || !userId2) {
-			return reply.code(400).send({ error: 'Missing required user Id' });
-		}
+  fastify.get(
+    "/friend-status",
+    { preHandler: authenticate },
+    async (req, reply) => {
+      const { userId1, userId2 } = req.query;
 
-		const uid1 = Number(userId1);
-		const uid2 = Number(userId2);
+      if (!userId1 || !userId2) {
+        return reply.code(400).send({ error: "Missing required user Id" });
+      }
 
-		try {
-			// check if users are friends
-			const user = await prisma.user.findUnique({
-				where: { id: uid1 },
-				include: {
-					friends: {
-						where: { id: uid2 },
-					},
-				},
-			});
+      const uid1 = Number(userId1);
+      const uid2 = Number(userId2);
 
-			const isFriend = user?.friends?.length > 0;
+      try {
+        // check if users are friends
+        const user = await prisma.user.findUnique({
+          where: { id: uid1 },
+          include: {
+            friends: {
+              where: { id: uid2 },
+            },
+          },
+        });
 
-			// check if a friend request is pending (in either direction)
-			const pendingRequest = await prisma.friendRequest.findFirst({
-				where: {
-					OR: [
-						{ senderId: uid1, receiverId: uid2 },
-						{ senderId: uid2, receiverId: uid1 },
-					],
-					status: 'pending',
-				},
-			});
+        const isFriend = user?.friends?.length > 0;
 
-			return reply.send({
-				isFriend,
-				requestPending: !!pendingRequest,
-			});
-		} catch (error) {
-			console.error(error);
-			reply.code(500).send({ error: 'Failed to fetch friend status' });
-		}
-	});
+        // check if a friend request is pending (in either direction)
+        const pendingRequest = await prisma.friendRequest.findFirst({
+          where: {
+            OR: [
+              { senderId: uid1, receiverId: uid2 },
+              { senderId: uid2, receiverId: uid1 },
+            ],
+            status: "pending",
+          },
+        });
 
-	fastify.post('/friend-request', { preHandler: authenticate }, async (req, reply) => {
-		const { receiverId } = req.body;
-		const senderId = req.user.id;
+        return reply.send({
+          isFriend,
+          requestPending: !!pendingRequest,
+        });
+      } catch (error) {
+        console.error(error);
+        reply.code(500).send({ error: "Failed to fetch friend status" });
+      }
+    }
+  );
 
-		const receiverIdInt = Number(receiverId);
-		const senderIdInt = Number(senderId);
+  //####################################################################################################################################
 
-		if (isNaN(receiverIdInt) || receiverIdInt === senderIdInt) {
-			return reply.code(400).send({ error: 'Invalid receiver ID' });
-		}
+  fastify.post(
+    "/friend-request",
+    { preHandler: authenticate },
+    async (req, reply) => {
+      const { receiverId } = req.body;
+      const senderId = req.user.id;
 
-		try {
-			// check if users are already friends
-			const sender = await prisma.user.findUnique({
-				where: { id: senderIdInt },
-				include: {
-					friends: {
-						where: { id: receiverIdInt },
-					},
-				},
-			});
+      const receiverIdInt = Number(receiverId);
+      const senderIdInt = Number(senderId);
 
-			if (sender?.friends?.length > 0) {
-				return reply.code(409).send({ error: 'You are already friends' });
-			}
+      if (isNaN(receiverIdInt) || receiverIdInt === senderIdInt) {
+        return reply.code(400).send({ error: "Invalid receiver ID" });
+      }
 
-			// check if pending request already exists
-			const existingRequest = await prisma.friendRequest.findFirst({
-				where: {
-					OR: [
-						{ senderId: senderIdInt, receiverId: receiverIdInt },
-						{ senderId: receiverIdInt, receiverId: senderIdInt },
-					],
-					status: 'pending',
-				},
-			});
+      try {
+        // check if users are already friends
+        const sender = await prisma.user.findUnique({
+          where: { id: senderIdInt },
+          include: {
+            friends: {
+              where: { id: receiverIdInt },
+            },
+          },
+        });
 
-			if (existingRequest) {
-				return reply.code(409).send({ error: 'Friend request already pending' });
-			}
+        if (sender?.friends?.length > 0) {
+          return reply.code(409).send({ error: "You are already friends" });
+        }
 
-			// create new friend request
-			await prisma.friendRequest.create({
-				data: {
-					senderId: senderIdInt,
-					receiverId: receiverIdInt,
-					status: 'pending',
-				},
-			});
+        // check if pending request already exists
+        const existingRequest = await prisma.friendRequest.findFirst({
+          where: {
+            OR: [
+              { senderId: senderIdInt, receiverId: receiverIdInt },
+              { senderId: receiverIdInt, receiverId: senderIdInt },
+            ],
+            status: "pending",
+          },
+        });
 
-			return reply.code(201).send({ message: 'Friend request sent' });
-		} catch (error) {
-			console.error('Error sending friend request', error);
-			return reply.code(500).send({ error: 'Internal server error' });
-		}
-	});
+        if (existingRequest) {
+          return reply
+            .code(409)
+            .send({ error: "Friend request already pending" });
+        }
 
-	fastify.post('/friends/accept', { preHandler: authenticate } , async (request, reply) => {
-		const { requestId } = request.body;
+        // create new friend request
+        await prisma.friendRequest.create({
+          data: {
+            senderId: senderIdInt,
+            receiverId: receiverIdInt,
+            status: "pending",
+          },
+        });
 
-		const requestRecord = await prisma.friendRequest.update({
-			where: { id: requestId },
-			data: { status: 'accepted' },
-			include: {
-				sender: true,
-				receiver: true,
-			},
-		});
+        return reply.code(201).send({ message: "Friend request sent" });
+      } catch (error) {
+        console.error("Error sending friend request", error);
+        return reply.code(500).send({ error: "Internal server error" });
+      }
+    }
+  );
 
-		// add friendship both ways
-		await prisma.user.update({
-			where: { id: requestRecord. receiverId },
-			data: {
-				friends: {
-					connect: { id: requestRecord.senderId },
-				},
-			},
-		});
+  //####################################################################################################################################
 
-		await prisma.user.update({
-			where: { id: requestRecord.senderId },
-			data: {
-				friends: {
-					connect: { id: requestRecord.receiverId },
-				},
-			},
-		});
+  fastify.post(
+    "/friends/accept",
+    { preHandler: authenticate },
+    async (request, _reply) => {
+      const { requestId } = request.body;
 
-		return { success: true };
-	});
+      const requestRecord = await prisma.friendRequest.update({
+        where: { id: requestId },
+        data: { status: "accepted" },
+        include: {
+          sender: true,
+          receiver: true,
+        },
+      });
 
-	fastify.post('/friends/decline', { preHandler: authenticate } , async (request, reply) => {
-		const { requestId } = request.body;
+      // add friendship both ways
+      await prisma.user.update({
+        where: { id: requestRecord.receiverId },
+        data: {
+          friends: {
+            connect: { id: requestRecord.senderId },
+          },
+        },
+      });
 
-		await prisma.friendRequest.update({
-			where: { id: requestId },
-			data: { status: 'rejected' },
-		});
+      await prisma.user.update({
+        where: { id: requestRecord.senderId },
+        data: {
+          friends: {
+            connect: { id: requestRecord.receiverId },
+          },
+        },
+      });
 
-		return { success: true }
-	});
+      return { success: true };
+    }
+  );
 
-	fastify.post('/unfriend', { preHandler: authenticate } , async (request, reply) => {
-		const { userId1, userId2 } = request.body;
+  fastify.post(
+    "/friends/decline",
+    { preHandler: authenticate },
+    async (request, _reply) => {
+      const { requestId } = request.body;
 
-		if (!userId1 || !userId2 || userId1 === userId2) {
-			return reply.status(400).send({ error: 'Invalid user IDs' });
-		}
+      await prisma.friendRequest.update({
+        where: { id: requestId },
+        data: { status: "rejected" },
+      });
 
-		try {
-			// remove userId2 from userId1's friends
-			await prisma.user.update({
-				where: { id: userId1 },
-				data: {
-					friends: {
-						disconnect: { id: userId2 },
-					},
-				},
-			});
+      return { success: true };
+    }
+  );
 
-			// remove userId1 from userId2's friends
-			await prisma.user.update({
-				where: { id: userId2 },
-				data: {
-					friends: {
-						disconnect: { id: userId1 },
-					},
-				},
-			});
+  //####################################################################################################################################
 
-			reply.send({ success: true });
-		} catch (error) {
-			console.error('Error while unfriending:', error);
-			reply.status(500).send({ error: 'Internal server error' });
-		}
-	});
+  fastify.post(
+    "/unfriend",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const { userId1, userId2 } = request.body;
+
+      if (!userId1 || !userId2 || userId1 === userId2) {
+        return reply.status(400).send({ error: "Invalid user IDs" });
+      }
+
+      try {
+        // remove userId2 from userId1's friends
+        await prisma.user.update({
+          where: { id: userId1 },
+          data: {
+            friends: {
+              disconnect: { id: userId2 },
+            },
+          },
+        });
+
+        // remove userId1 from userId2's friends
+        await prisma.user.update({
+          where: { id: userId2 },
+          data: {
+            friends: {
+              disconnect: { id: userId1 },
+            },
+          },
+        });
+
+        reply.send({ success: true });
+      } catch (error) {
+        console.error("Error while unfriending:", error);
+        reply.status(500).send({ error: "Internal server error" });
+      }
+    }
+  );
 }

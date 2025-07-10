@@ -7,7 +7,9 @@
     "start": "node ./srcs/index.js",
     "dev": "npx prisma db push && NODE_ENV=development nodemon ./srcs/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "lint": "eslint ./srcs --ext .js",
+    "check": "node check-startup.js"
   },
   "prisma": {
     "seed": "node srcs/seed.js"
@@ -23,15 +25,21 @@
     "@fastify/multipart": "^9.0.3",
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/static": "^8.2.0",
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.11.1",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.5.0",
     "fastify": "^5.2.2",
+    "file-type": "^21.0.0",
     "nodemailer": "^6.10.1",
+    "sharp": "^0.34.2",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.2.0",
     "nodemon": "^3.1.9",
-    "prisma": "^6.9.0"
+    "prisma": "^6.11.1"
   }
 }

@@ -1,57 +1,103 @@
-import prisma from '../prisma.js';
-import { authenticate } from '../middleware/authenticate.js';
+import prisma from "../prisma.js";
+// import { authenticate } from "../middleware/authenticate.js";
+import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
 
-export async function tournamentsRoute(fastify, options) {
+/* TO-DO list for tournaments:
+  need to make sure that too many tournaments cannot be created (some function for cleaning up database of old tournaments)
+  same if the tournament creation is left undone */
+
+export async function tournamentsRoute(fastify, _options) {
   // Create a tournament
-  fastify.post('/tournaments', { preHandler: authenticate }, async (req, reply) => {
-    const { name, size } = req.body;
-    if (![4, 8, 16, 32].includes(size)) return reply.code(400).send({ error: 'Invalid size' });
-    const tournament = await prisma.tournament.create({
-      data: {
-        name,
-        size,
-        createdById: req.user.id,
-        status: 'waiting',
-      },
-    });
-    reply.send(tournament);
-  });
+  fastify.post("/tournaments/create",
+    {
+      schema: tournamentsSchemas.createTournamentSchema,
+      // commented out in order to allow unauthenticated users to create tournaments
+      // preHandler: authenticate,
+    },
+    async (req, reply) => {
+      const { name, size, createdById, status } = req.body;
+      //the schema already validates and returns 400 if not the right size
+      // if (![4, 8, 16, 32].includes(size)) return reply.code(400).send({ error: 'Invalid size' });
+      try {
+      const tournament = await prisma.tournament.create({
+        data: {
+          name,
+          size,
+          createdById,
+          status,
+        },
+      });
+      reply.send(tournament);
+    } catch (error) {
+      console.error("Error creating tournament:", error);
+      reply.code(500).send({ message: "Server error" });
+    }}
+  );
 
   // Register for a tournament
-  fastify.post('/tournaments/:id/register', async (req, reply) => {
-    const { id } = req.params;
-    const { userId, alias } = req.body;
-    const participant = await prisma.tournamentParticipant.create({
-      data: {
-        tournamentId: Number(id),
-        userId: userId || null,
-        alias: alias || null,
-      },
-    });
-    reply.send(participant);
-  });
+  fastify.post(
+    "/tournaments/:id/register",
+    { schema: tournamentsSchemas.registerTournamentSchema },
+    async (req, reply) => {
+      try {
+      const { id } = req.params;
+      const { userId, alias } = req.body;
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: Number(id) },
+        include: {
+          participants: true,
+        },
+      });
+      if (!tournament) {
+        return reply.code(404).send({ message: "Tournament not found" });
+      }
+      if (tournament.participants.length >= tournament.size) {
+        return reply.code(400).send({ message: "Tournament is full" });
+      }
+      const participant = await prisma.tournamentParticipant.create({
+        data: {
+          tournamentId: Number(id),
+          userId: userId || null,
+          alias: alias || null,
+        },
+      });
+      reply.send(participant);
+    } catch (error) {
+      console.error("Error registering for tournament:", error);
+      reply.code(500).send({ message: "Server error" });
+    }
+}
+  );
 
   // Get all tournaments
-  fastify.get('/tournaments', async (req, reply) => {
-    const tournaments = await prisma.tournament.findMany({
-      include: { participants: true },
-      orderBy: { createdAt: 'desc' },
-    });
-    reply.send(tournaments);
-  });
+  fastify.get(
+    "/tournaments/all",
+    { schema: tournamentsSchemas.getAllTournamentsSchema },
+    async (req, reply) => {
+      const tournaments = await prisma.tournament.findMany({
+        include: { participants: true },
+        orderBy: { createdAt: "desc" },
+      });
+      reply.send(tournaments);
+    }
+  );
 
   // Get tournament details (including participants and matches)
-  fastify.get('/tournaments/:id', async (req, reply) => {
-    const { id } = req.params;
-    const tournament = await prisma.tournament.findUnique({
-      where: { id: Number(id) },
-      include: {
-        participants: true,
-        matches: true,
-      },
-    });
-    reply.send(tournament);
-  });
+  fastify.get(
+    "/tournaments/:id",
+    { schema: tournamentsSchemas.getTournamentSchema },
+    async (req, reply) => {
+      const { id } = req.params;
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: Number(id) },
+        include: {
+          participants: true,
+          matches: true,
+        },
+      });
+      reply.send(tournament);
+    }
+  );
 
   // TODO: Add endpoint to start tournament (randomize bracket, create matches)
 }
