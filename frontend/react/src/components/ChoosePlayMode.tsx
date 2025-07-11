@@ -41,10 +41,10 @@ const ChoosePlayMode = () => {
 
   if (selectedMode === "two-player-single-game") {
     console.log("Rendering PongGameWithRegistration");
-    return <PongGameWithRegistration />;
+    return <PongGameWithRegistration onReturnToMenu={() => setSelectedMode(null)} />;
   } else if (selectedMode === "single-player") {
     console.log("Rendering PongGameAI");
-    return <PongGameAI />;
+    return <PongGameAI onReturnToMenu={() => setSelectedMode(null)} />;
   }  else if (selectedMode === "single-player-customize") {
     return <GameCustomization 
       isAIGame={true} // This is an AI game, show difficulty settings
