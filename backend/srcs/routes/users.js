@@ -3,6 +3,16 @@ import bcryptjs from "bcryptjs";
 import { userSchemas } from "../schemas/userSchemas.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { handleOtp } from "../handleOtp.js";
+import { sendResetPasswordEmail } from "../utils/mailer.js";
+import crypto from "crypto";
+
+function isValidPassword(password) {
+  const pwdValidationRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const lengthOK = password.length >= 8 && password.length <= 42;
+  const matchesSpecs = pwdValidationRegex.test(password);
+  return lengthOK && matchesSpecs;
+}
 
 export async function userRoutes(fastify, _options) {
   const rateLimitConfig = {
@@ -15,6 +25,15 @@ export async function userRoutes(fastify, _options) {
     },
   };
 
+  const emailRateLimitConfig = {
+    config: {
+      rateLimit: {
+        max: 1,
+        timeWindow: "1 minute",
+        keyGenerator: (request) => request.body?.email || request.ip,
+      },
+    },
+  };
   //####################################################################################################################################
 
   // login user
@@ -113,6 +132,149 @@ export async function userRoutes(fastify, _options) {
 
   //####################################################################################################################################
 
+  // 1) Request password reset and send reset link to email
+  fastify.post(
+    "/users/request-password-reset",
+    { schema: userSchemas.requestPasswordResetSchema, ...emailRateLimitConfig },
+    async (req, reply) => {
+      const { email } = req.body;
+
+      try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        // Always return generic response
+        if (!user) {
+          return reply.code(200).send({
+            message: "If this email exists, a reset link has been sent",
+          });
+        }
+
+        const resetToken = fastify.jwt.sign(
+          { userId: user.id },
+          { expiresIn: "15m" }
+        );
+
+        const hashedToken = crypto
+          .createHash("sha256")
+          .update(resetToken)
+          .digest("hex");
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: new Date(Date.now() + 15 * 60 * 1000),
+          },
+        });
+
+        await sendResetPasswordEmail(email, resetToken);
+
+        return reply.code(200).send({
+          message: "If this email exists, a reset link has been sent",
+        });
+      } catch (err) {
+        console.error("Password reset error:", err);
+        return reply.code(500).send({ error: "Internal server error" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
+  // 2) Reset password - verify token and update password
+  fastify.post(
+    "/users/reset-password",
+    { schema: userSchemas.resetPasswordSchema },
+    async (req, reply) => {
+      const { token, newPassword } = req.body;
+
+      try {
+        // Verify token (throws if invalid or expired)
+        const payload = fastify.jwt.verify(token);
+
+        const hashedInputToken = crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
+        // Find user by id and check token expiration
+        const user = await prisma.user.findUnique({
+          where: { id: payload.userId },
+        });
+
+        if (
+          !user ||
+          user.resetPasswordToken != hashedInputToken ||
+          !user.resetPasswordExpires ||
+          user.resetPasswordExpires < new Date()
+        ) {
+          return reply.code(400).send({ error: "Invalid or expired token" });
+        }
+
+        if (!isValidPassword(newPassword)) {
+          return reply.code(400).send({
+            error:
+              "Password must be 8–42 characters long and include uppercase, lowercase, number, and special character.",
+          });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+        // Update password and clear reset token/expiration
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            password: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          },
+        });
+
+        return reply.code(200).send({ message: "Password reset successfully" });
+      } catch (error) {
+        return reply.code(400).send({ error: "Invalid or expired token" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
+  fastify.post(
+    "/users/validate-reset-token",
+    { schema: userSchemas.validateResetTokenSchema },
+    async (req, reply) => {
+      const { token } = req.body;
+
+      try {
+        const payload = fastify.jwt.verify(token);
+        const hashedInputToken = crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
+        const user = await prisma.user.findUnique({
+          where: { id: payload.userId },
+        });
+
+        if (
+          !user ||
+          user.resetPasswordToken !== hashedInputToken ||
+          !user.resetPasswordExpires ||
+          user.resetPasswordExpires < new Date()
+        ) {
+          return reply.code(400).send({ error: "Invalid or expired token" });
+        }
+
+        return reply.send({ valid: true });
+      } catch {
+        return reply.code(400).send({ error: "Invalid or expired token" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
   fastify.post(
     "/users/logout",
     { schema: userSchemas.logoutSchema, preHandler: authenticate },
@@ -148,7 +310,6 @@ export async function userRoutes(fastify, _options) {
       reply.send(users);
     }
   );
-
   //####################################################################################################################################
 
   //REMOVE FOR PRODUCTION!!
@@ -180,7 +341,7 @@ export async function userRoutes(fastify, _options) {
       const hashedPassword = await bcryptjs.hash(password, 10);
 
       try {
-        /* const user =  */await prisma.user.create({
+        /* const user =  */ await prisma.user.create({
           data: { username, email, password: hashedPassword },
         });
         reply.code(200).send({ message: "User added successfully" }); //should be 201

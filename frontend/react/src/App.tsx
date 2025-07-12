@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import PongPals from "./pages/PongPals";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Stats from "./pages/Stats";
 import VerifyEmail from "./pages/VerifyEmail";
 import TournamentPage from "./pages/TournamentPage";
@@ -16,6 +17,8 @@ import { GameSettingsProvider } from "./contexts/GameSettingsContext";
 import api from "./api/axios";
 import Mfa from "./pages/Mfa";
 import i18n from "./i18n";
+
+
 
 const App: React.FC = () => {
   const logout = async () => {
@@ -43,6 +46,7 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verifyemail" element={<VerifyEmail />} />
         <Route path="/pongpals" element={<PongPals />} />
         <Route path="/settings" element={<Settings />} />

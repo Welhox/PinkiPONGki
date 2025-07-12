@@ -19,7 +19,8 @@
     	"submitButton": "Send Reset Link",
     	"successMessage": "If that email is registered, you'll receive password reset instructions shortly.",
     	"returnButton": "Return",
-    	"genericError": "Something went wrong. Please try again."
+    	"genericError": "Something went wrong. Please try again.",
+		"submitting": "Sending..."
 	},
 	"pongPals": {
 		"title": "Pong Pals",
@@ -137,8 +138,7 @@
 	"statsHeader": {
 		"back": "Back"
 	},
-	
-  	"mfa": {
+	"mfa": {
 		"heading": "Multi-Factor Authentication",
 		"otpLabel": "OTP",
 		"verify": "Verify",
@@ -151,5 +151,23 @@
 		"otpResent": "OTP has been resent. Please check your email.",
 		"resendError": "An error occurred while resending the OTP. Please try again later.",
 		"waitTime": "Please wait {{count}} seconds before requesting a new OTP."
-  }
+	},
+	"resetPassword": {
+		"title": "Reset Your Password",
+		"newPasswordLabel": "New Password",
+		"confirmPasswordLabel": "Confirm Password",
+		"fillBothFields": "Please fill in both password fields",
+		"passwordsDontMatch": "Passwords do not match",
+		"invalidOrMissingToken": "Invalid or missing token",
+		"failed": "Failed to reset password",
+		"submitting": "Resetting...",
+		"submitButton": "Reset Password",
+		"successTitle": "Password reset successful!",
+		"goToLogin": "Go to Login",
+		"invalidOrExpiredToken": "This reset link is invalid or has expired.",
+		"requestNew": "Please request a new password reset link.",
+		"requestNewLink": "Request New Link",
+		"validatingToken": "Validating reset link...",
+		"invalidPassword": "Password must be 8–42 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+	}
 }
