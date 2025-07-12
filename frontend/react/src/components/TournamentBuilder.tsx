@@ -125,10 +125,8 @@ const TournamentBuilder = () => {
         createdById: user?.id, // use user ID if logged in, otherwise 0
         status: "waiting",
       });
-      // console.log("Missing tournament saving API");
 
       const tournamentId = res.data.id;
-      // const tournamentId = 0; // for testing without backend
 
       // add participants
       await Promise.all(
@@ -143,9 +141,7 @@ const TournamentBuilder = () => {
           })
         )
       );
-      // console.log("Missing tournament players init API");
-      //navigate(`/tournament/${tournamentId}`); production
-      navigate(`/tournament/${tournamentId}`, { state: { players } }); // for testing without backend
+      navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access
     } catch (error) {
       console.error("Tournament creation failed.");
       alert(t("tournament.errorTournamentCreation"));

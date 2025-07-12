@@ -8,14 +8,18 @@ import { useGameSettings } from "../contexts/GameSettingsContext";
 import { generateInitialMatches } from "../utils/generateInitialMatches";
 import { handleMatchPlayed as handleMatchPlayedUtil } from "../utils/handleMatchPlayed";
 
+import {
+  fetchTournamentWithMatches,
+  formatPlayers,
+  formatMatches,
+  startTournamentIfWaiting,
+} from "../utils/initTournament";
+
 const TournamentPage = () => {
   const { id } = useParams<{ id: string }>();
   const tournamentId = parseInt(id || "0", 10);
   const navigate = useNavigate();
   const location = useLocation(); // for testing without backend
-  const state = location.state as {
-    players?: { username: string; isGuest: boolean }[];
-  };
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [matchesFromBackend, setMatchesFromBackend] = useState<Match[]>([]);
@@ -25,69 +29,55 @@ const TournamentPage = () => {
   const [finalStandings, setFinalStandings] = useState<Player[]>([]);
 
   useEffect(() => {
-    if (state?.players && state.players.length > 0) { // for testing without backend
-      const generatedPlayers: Player[] = state.players.map((p, index) => ({
-        id: p.isGuest ? null : index + 1,
-        name: p.username,
-      }));
-
-      setPlayers(generatedPlayers);
-	  setUpcomingMatches(generateInitialMatches(generatedPlayers));
-      setIsLoading(false);
+    if (!location.state) {
+      navigate("/", { replace: true });
     } else {
       fetchTournamentData();
     }
-  }, [tournamentId, state]);
+  }, [location.state, navigate]);
 
   const fetchTournamentData = async () => {
     setIsLoading(true);
-    try {
-      /* const [participantsRes, matchesRes] = await Promise.all([
-        api.get(`/tournament/${tournamentId}/participants`),
-        api.get(`/tournament/${tournamentId}/matches`),
-      ]); */
-      console.log("Missing API call for tournament participants and matches");
 
-      /* const playersData = participantsRes.data.map((p: any) => ({
-        id: p.userId ?? null,
-        name: p.user?.username ?? p.alias,
-      }));
+    try {
+      let data = await fetchTournamentWithMatches(tournamentId);
+
+      const playersData = formatPlayers(data.participants);
       setPlayers(playersData);
 
-      const backendMatches = matchesRes.data.map((m: any) => ({
-        id: m.id,
-        player1: { id: m.player.id, name: m.player.username },
-        player2: { id: m.opponent.id, name: m.opponent.username },
-        result: m.result,
-        winnerId:
-          m.result === "win"
-            ? m.player.id
-            : m.result === "loss"
-            ? m.opponent.id
-            : null,
-        round: m.round,
-        saved: true,
-      }));
-
+      let backendMatches = formatMatches(data.matches);
       setMatchesFromBackend(backendMatches);
-      if (backendMatches.length === 0) {
-        setUpcomingMatches(generateInitialMatches(playersData));
-      } */
+
+      if (backendMatches.length === 0 && data.status === "waiting") {
+        try {
+          const startedData = await startTournamentIfWaiting(tournamentId);
+          const updatedMatches = formatMatches(startedData.matches);
+          setMatchesFromBackend(updatedMatches);
+        } catch (startError) {
+          console.error("Failed to start tournament:", startError);
+        }
+      }
     } catch (error) {
-      console.error("Failed to fetch tournament data", error);
+      console.error("Failed to fetch tournament data:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleMatchPlayed = async (match: Match, winner: Player) => {
-	await handleMatchPlayedUtil(match, winner, matchesFromBackend, upcomingMatches, {
-		setMatchesFromBackend,
-		setUpcomingMatches,
-		setFinalStandings,
-	});
+    await handleMatchPlayedUtil(
+      match,
+      winner,
+      matchesFromBackend,
+      upcomingMatches,
+      {
+        setMatchesFromBackend,
+        setUpcomingMatches,
+        setFinalStandings,
+      }
+    );
   };
-  
+
   const allMatches = [...matchesFromBackend, ...upcomingMatches];
 
   return (
@@ -101,13 +91,24 @@ const TournamentPage = () => {
           Tournament Settings
         </h3>
         <div className="grid grid-cols-2 gap-2">
-          <p><strong>Map:</strong> {settings.mapType === 'classic' ? 'Classic' : 
-                           settings.mapType === 'corners' ? 'Corner Walls' : 'Center Wall'}</p>
-          <p><strong>Score to Win:</strong> {settings.scoreToWin}</p>
-          <p><strong>Power-ups:</strong> {settings.powerUpsEnabled ? 'Enabled' : 'Disabled'}</p>
+          <p>
+            <strong>Map:</strong>{" "}
+            {settings.mapType === "classic"
+              ? "Classic"
+              : settings.mapType === "corners"
+              ? "Corner Walls"
+              : "Center Wall"}
+          </p>
+          <p>
+            <strong>Score to Win:</strong> {settings.scoreToWin}
+          </p>
+          <p>
+            <strong>Power-ups:</strong>{" "}
+            {settings.powerUpsEnabled ? "Enabled" : "Disabled"}
+          </p>
         </div>
       </div>
-      
+
       {isLoading ? (
         <p>Loading...</p>
       ) : finalStandings.length > 0 ? (

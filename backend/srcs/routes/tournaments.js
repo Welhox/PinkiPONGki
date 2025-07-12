@@ -12,7 +12,8 @@ import { devOnly } from "../middleware/devOnly.js";
 
 
   // Create a tournament
-  fastify.post("/tournaments/create",
+  fastify.post(
+    "/tournaments/create",
     {
       schema: tournamentsSchemas.createTournamentSchema,
       config: {rateLimit: { max: 10, timeWindow: "1 minute", keyGenerator: (req) => req.ip, }}
@@ -26,19 +27,20 @@ import { devOnly } from "../middleware/devOnly.js";
       //the schema already validates and returns 400 if not the right size
       // if (![4, 8, 16, 32].includes(size)) return reply.code(400).send({ error: 'Invalid size' });
       try {
-      const tournament = await prisma.tournament.create({
-        data: {
-          name,
-          size,
-          createdById,
-          status,
-        },
-      });
-      reply.send(tournament);
-    } catch (error) {
-      console.error("Error creating tournament:", error);
-      reply.code(500).send({ message: "Server error" });
-    }}
+        const tournament = await prisma.tournament.create({
+          data: {
+            name,
+            size,
+            createdById,
+            status,
+          },
+        });
+        reply.send(tournament);
+      } catch (error) {
+        console.error("Error creating tournament:", error);
+        reply.code(500).send({ message: "Server error" });
+      }
+    }
   );
 
 //###############################################################
@@ -49,37 +51,50 @@ import { devOnly } from "../middleware/devOnly.js";
     { schema: tournamentsSchemas.registerTournamentSchema },
     async (req, reply) => {
       try {
-      const { id } = req.params;
-      const { userId, alias } = req.body;
-      console.log("Registering for tournament with ID:", id, "User ID:", userId, "Alias:", alias);
-      const tournament = await prisma.tournament.findUnique({
-        where: { id: Number(id) },
-        include: {
-          participants: true,
-        },
-      });
-      if (!tournament) {
-        return reply.code(404).send({ message: "Tournament not found" });
-      }
-      if (tournament.participants.length >= tournament.size) {
-        return reply.code(400).send({ message: "Tournament is full" });
-      }
-      if (!userId && !alias) {
-        return reply.code(400).send({ message: "Either userId or alias is required" });
-      }
+        const { id } = req.params;
+        const { userId, alias } = req.body;
+        console.log(
+          "Registering for tournament with ID:",
+          id,
+          "User ID:",
+          userId,
+          "Alias:",
+          alias
+        );
+        const tournament = await prisma.tournament.findUnique({
+          where: { id: Number(id) },
+          include: {
+            participants: true,
+          },
+        });
+        if (!tournament) {
+          return reply.code(404).send({ message: "Tournament not found" });
+        }
+        if (tournament.participants.length >= tournament.size) {
+          return reply.code(400).send({ message: "Tournament is full" });
+        }
+        if (!userId && !alias) {
+          return reply
+            .code(400)
+            .send({ message: "Either userId or alias is required" });
+        }
 
-      const participant = await prisma.tournamentParticipant.create({
-        data: {
-          tournamentId: Number(id),
-          userId: userId || null,
-          alias: alias || null,
-        },
-      });
-      reply.send(participant);
-    } catch (error) {
-      console.error("Error registering for tournament:", error);
-      reply.code(500).send({ message: "Server error" });
-    }
+        const tournamentUserId = tournament.participants.length + 1;
+
+        await prisma.tournamentParticipant.create({
+          data: {
+            tournamentId: Number(id),
+            userId: userId || null,
+            alias: alias || null,
+            tournamentUserId: tournamentUserId,
+          },
+        });
+
+        reply.code(200).send();
+      } catch (error) {
+        console.error("Error registering for tournament:", error);
+        reply.code(500).send({ message: "Server error" });
+      }
     }
   );
 
@@ -115,11 +130,11 @@ import { devOnly } from "../middleware/devOnly.js";
           tournamentMatches: true,
         },
       });
-      reply.send(tournament);
+      reply.send({ ...tournament, matches: tournament?.tournamentMatches });
     }
   );
 
-//###############################################################
+  //###############################################################
 
   // Start a tournament
   fastify.post(
@@ -137,33 +152,41 @@ import { devOnly } from "../middleware/devOnly.js";
           return reply.code(404).send({ message: "Tournament not found" });
         }
         if (tournament.status !== "waiting") {
-          return reply.code(400).send({ message: "Tournament cannot be started" });
+          return reply
+            .code(400)
+            .send({ message: "Tournament cannot be started" });
         }
         if (tournament.participants.length < tournament.size) {
-          return reply.code(400).send({ message: "Not enough participants to start the tournament" });
+          return reply.code(400).send({
+            message: "Not enough participants to start the tournament",
+          });
         }
         //generate matches based on participants
-        const participants = [...tournament.participants].sort(() => Math.random() - 0.5); // Shuffle participants
+        const participants = [...tournament.participants].sort(
+          () => Math.random() - 0.5
+        ); // Shuffle participants
         const matches = [];
 
         for (let i = 0; i < participants.length; i += 2) {
-            const p1 = participants[i];
-            const p2 = participants[i + 1];
-            if ((!p1.userId && !p1.alias) || (!p2.userId && !p2.alias)) {
-              return reply.code(400).send({ message: "Participant must have a userId or alias" });
-            }
-              matches.push({
-              round: 1,
-              tournamentId: tournament.id,
-              player1Id: p1.userId ?? null,
-              player1Alias: p1.alias ?? null,
-              player2Id: p2.userId ?? null,
-              player2Alias: p2.alias ?? null,
-            });
+          const p1 = participants[i];
+          const p2 = participants[i + 1];
+          if ((!p1.userId && !p1.alias) || (!p2.userId && !p2.alias)) {
+            return reply
+              .code(400)
+              .send({ message: "Participant must have a userId or alias" });
+          }
+          matches.push({
+            round: 1,
+            tournamentId: tournament.id,
+            player1Id: p1.tournamentUserId,
+            player1Alias: p1.user?.username || p1.alias,
+            player2Id: p2.tournamentUserId,
+            player2Alias: p2.user?.username || p2.alias,
+          });
         }
         console.log("Generated matches:", matches);
         // Create matches in the database
-        await prisma.TournamentMatch.createMany({
+        await prisma.tournamentMatch.createMany({
           data: matches,
         });
         // Update tournament status to 'in_progress'
@@ -173,13 +196,13 @@ import { devOnly } from "../middleware/devOnly.js";
         });
         console.log("Tournament started successfully:", updatedTournament);
         reply.send(updatedTournament);
-
       } catch (error) {
         console.error("Error starting tournament:", error);
         reply.code(500).send({ message: "Server error" });
       }
-  });
-  
+    }
+  );
+
   //##############################################################
 
   // update a tournament match
@@ -190,12 +213,23 @@ import { devOnly } from "../middleware/devOnly.js";
       const { id, matchId } = req.params;
       const { winnerId, winnerAlias } = req.body;
       if (!winnerId && !winnerAlias) {
-        return reply.code(400).send({ message: "Either winnerId or winnerAlias is required" });
+        return reply
+          .code(400)
+          .send({ message: "Either winnerId or winnerAlias is required" });
       }
       if (winnerId && winnerAlias) {
-        return reply.code(400).send({ message: "Only one of winnerId or winnerAlias should be provided" });
+        return reply
+          .code(400)
+          .send({
+            message: "Only one of winnerId or winnerAlias should be provided",
+          });
       }
-      console.log("Updating match for tournament ID:", id, "Match ID:", matchId);
+      console.log(
+        "Updating match for tournament ID:",
+        id,
+        "Match ID:",
+        matchId
+      );
       try {
         const match = await prisma.tournamentMatch.findUnique({
           where: { id: Number(matchId) },
@@ -204,7 +238,9 @@ import { devOnly } from "../middleware/devOnly.js";
           return reply.code(404).send({ message: "Match not found" });
         }
         if (match.tournamentId !== Number(id)) {
-          return reply.code(400).send({ message: "Match does not belong to this tournament" });
+          return reply
+            .code(400)
+            .send({ message: "Match does not belong to this tournament" });
         }
         if (match.status !== "pending") {
           return reply.code(400).send({ message: "Match is not in a pending state" });
@@ -220,11 +256,10 @@ import { devOnly } from "../middleware/devOnly.js";
         });
         console.log("Match updated successfully:", updatedMatch);
         try {
-        // generate matches for net round if applicable
-        generateNextRoundMatches(id);
-        //check if the tournament is finished
-        isTournamentFinished(id, updatedMatch);
-        
+          // generate matches for net round if applicable
+          generateNextRoundMatches(id);
+          //check if the tournament is finished
+          isTournamentFinished(id, updatedMatch);
         } catch (error) {
           console.error("Error generating next round matches:", error);
         }
@@ -274,13 +309,18 @@ async function isTournamentFinished(id, updatedMatch) {
     where: { id: Number(id) },
     include: { tournamentMatches: true },
   });
-  const pendingMatches = tournament.tournamentMatches.filter(match => match.status === "pending");
+  const pendingMatches = tournament.tournamentMatches.filter(
+    (match) => match.status === "pending"
+  );
   if (pendingMatches.length === 0) {
     // If no pending matches, update tournament status to 'finished'
     await prisma.tournament.update({
       where: { id: Number(id) },
-      data: { status: "finished", winnerId: updatedMatch.winnerId, 
-        winnerAlias: updatedMatch.winnerAlias },
+      data: {
+        status: "finished",
+        winnerId: updatedMatch.winnerId,
+        winnerAlias: updatedMatch.winnerAlias,
+      },
     });
     console.log("Tournament finished:", id);
     //increment the user's tournament wins
@@ -304,15 +344,20 @@ async function generateNextRoundMatches(tournamentId) {
   });
   if (matches.length === 0 || matches.length % 2 !== 0) {
     // If there are no completed matches or an odd number of matches, we cannot proceed
-    console.log("No completed matches or odd number of matches found:", tournamentId);
+    console.log(
+      "No completed matches or odd number of matches found:",
+      tournamentId
+    );
     return;
   }
-  const winners = matches.map(match => {
-    return match.winnerId ? { userId: match.winnerId, alias: match.winnerAlias } : { userId: null, alias: match.winnerAlias };
+  const winners = matches.map((match) => {
+    return match.winnerId
+      ? { userId: match.winnerId, alias: match.winnerAlias }
+      : { userId: null, alias: match.winnerAlias };
   });
   console.log("Winners from completed matches:", winners);
-  
-  const round = matches[0].round +1;
+
+  const round = matches[0].round + 1;
   const nextRoundMatches = [];
   for (let i = 0; i < winners.length; i += 2) {
     const p1 = winners[i];
@@ -326,9 +371,9 @@ async function generateNextRoundMatches(tournamentId) {
       player2Alias: p2.alias,
     });
   }
-  
+
   console.log("Generated next round matches:", nextRoundMatches);
-  
+
   // change the status of the used match reults to 'archived'
   await prisma.tournamentMatch.updateMany({
     where: { tournamentId: Number(tournamentId), status: "completed" },
