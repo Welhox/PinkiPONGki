@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await i18n.changeLanguage("en");
         localStorage.removeItem("language");
       }
-    } catch (error) {
+    } catch {
       if (status === "authorized") {
         setSessionExpired(true);
       }

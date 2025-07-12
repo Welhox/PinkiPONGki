@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { User } from "../auth/AuthProvider";
 
 type NavigationHeaderProps = {
   handleLogout: () => Promise<void>;
   status: string;
-  user: any;
+  user: User;
 };
 type NavigationLinkProps = {
   target: string;
