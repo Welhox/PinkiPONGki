@@ -17,7 +17,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [mfaCode, setMfaCode] = useState("");
+  const [code, setCode] = useState("");
 
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -32,7 +32,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
     try {
       const response = await api.post(
         "/auth/verify-otp",
-        { mfaCode },
+        { code },
         { headers: { "Content-Type": "application/json" } }
       );
       if (response.status === 200) {
@@ -114,8 +114,8 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           className="mb-2 p-2 border rounded w-48"
           type="password"
           placeholder={t("mfa.otpLabel")}
-          value={mfaCode}
-          onChange={(e) => setMfaCode(e.target.value)}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
         />
         <button
           className="bg-teal-700 text-white px-4 py-2 rounded"
