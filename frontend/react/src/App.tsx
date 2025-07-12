@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import PongPals from "./pages/PongPals";
 import Settings from "./pages/Settings";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Stats from "./pages/Stats";
 import VerifyEmail from "./pages/VerifyEmail";
 import TournamentPage from "./pages/TournamentPage";
@@ -52,7 +53,6 @@ const App: React.FC = () => {
         <Route path="/stats" element={<Stats />} />
         <Route path="/mfa" element={<Mfa />} />
         <Route path="/tournament/:id" element={<TournamentPage />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route
           path="/stats/:anything"
