@@ -11,33 +11,19 @@ interface PlayerBoxProps {
 
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
-  onRegister
+  onRegister,
 }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { t } = useTranslation();
   const { user, refreshSession } = useAuth();
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!username) {
-    setError(t('playerBox.usernameRequired'));
-    return;
-  }
-
-  if (!password) {
-    // Guest registration: allow any alias, no backend check
-    onRegister({ username, isGuest: true });
-
-  } else {
-    // Registered user login
-    try {
-      await api.post('/auth/login', { username, password });
-      onRegister({ username, isGuest: false });
-    } catch {
-      setError(t('playerBox.loginFailed'));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username) {
+      setError(t("playerBox.usernameRequired"));
+      return;
     }
     if (user && username === user.username && password) {
       setError("You're already logged in with this username.");
@@ -110,7 +96,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       {error && <div className="text-red-500 mt-2">{error}</div>}
     </form>
   );
-};
 };
 
 export default PlayerRegistrationBox;
