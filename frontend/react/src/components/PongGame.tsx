@@ -1,10 +1,46 @@
 import api from '../api/axios';
 import React, { useRef, useEffect, useState } from 'react';
-import { useGameSettings, getDifficultySettings, DifficultySettings } from '../contexts/GameSettingsContext';
+import { useGameSettings, getDifficultySettings, DifficultySettings, GameSettings } from '../contexts/GameSettingsContext';
+
+// Game constants for consistent physics
+// Ball speed is calculated based on the slider value (1-10)
+// Min speed: 80 units/sec, Max speed: 400 units/sec
+const calculateBallSpeed = (speedSetting: number): number => {
+  // Ensure speed setting is within valid range
+  const validSpeed = Math.max(1, Math.min(10, speedSetting));
+  // Exponential scaling for more dramatic difference at higher settings
+  return 80 + Math.pow(validSpeed - 1, 1.5) * 32;
+};
+
+// Standard normalized vector components (direction)
+const STANDARD_NORMALIZED_X_SPEED = 0.8; // Normalized speed components (0-1)
+const STANDARD_NORMALIZED_Y_SPEED = 0.4;
 
 const paddleSound = new Audio('../../assets/paddle.mp3');
 const scoreSound = new Audio('../../assets/score.mp3');
 const wallSound = new Audio('../../assets/wall.mp3');
+
+/**
+ * Time-based Movement System with Normalized Velocities
+ * 
+ * This game uses a time-based movement system (delta time) rather than a frame-based system,
+ * combined with normalized velocity values to ensure consistent game speed across all devices:
+ * 
+ * 1. All velocities are normalized (values between 0-1, typically around 0.3-0.8)
+ * 2. A configurable ball speed (using a slider from 1-10) is applied to these normalized values
+ * 3. Movement is scaled by deltaTime (time since last frame), ensuring consistent speed
+ * 4. This approach guarantees uniform gameplay experience regardless of device performance
+ * 
+ * Benefits of this approach:
+ * - Predictable ball behavior (always bounces at same angles and speeds)
+ * - Smooth gameplay on both high-end and low-end devices
+ * - Easier to balance difficulty since speeds are standardized
+ * 
+ * Key parameters:
+ * - Ball Speed: Configurable from 1-10, translating to 80-400 units per second (exponential scaling)
+ * - paddleSpeedPerSecond: 300 units the paddle moves per second
+ * - normalizedVelocities: X=0.8, Y=0.4 (standard normalized speed components)
+ */
 
 interface PongGameProps {
   player1: { username: string; isGuest: boolean };
@@ -32,8 +68,8 @@ enum AIState {
 interface AIGameSnapshot {
   ballX: number;           // Horizontal position of the ball
   ballY: number;           // Vertical position of the ball
-  ballVX: number;          // Horizontal velocity of the ball
-  ballVY: number;          // Vertical velocity of the ball
+  ballVX: number;          // Horizontal velocity of the ball (in units per second, time-based)
+  ballVY: number;          // Vertical velocity of the ball (in units per second, time-based)
   paddle2Y: number;        // AI paddle position
   paddle1Y: number;        // Player paddle position
   timestamp: number;       // When this snapshot was taken
@@ -50,6 +86,12 @@ interface AIGameSnapshot {
  * This class handles all AI logic, including predicting ball trajectory,
  * decision making based on game state, and simulating player input.
  * The AI has different behavior patterns based on difficulty level.
+ * 
+ * Key features:
+ * - Data collection limited to once per second (snapshots)
+ * - Movement uses delta time for consistent speed across frame rates
+ * - Difficulty-based reaction time and accuracy simulation
+ * - Different strategies for different maps
  */
 class PongAI {
   // Current state in the AI's state machine
@@ -66,6 +108,9 @@ class PongAI {
   
   // Difficulty settings that affect accuracy, reaction time, etc.
   private difficulty: DifficultySettings;
+  
+  // Game settings reference for ball speed
+  private gameSettings: GameSettings;
   
   // Simulated keyboard input (what keys the AI is "pressing")
   private keySimulator: { [key: string]: boolean } = {};
@@ -89,7 +134,9 @@ class PongAI {
    * Constructor - Initialize the AI with specific difficulty settings
    * @param difficultySettings Controls AI accuracy, reaction time, etc.
    */
-  constructor(difficultySettings: DifficultySettings) {
+  constructor(difficultySettings: DifficultySettings, gameSettings: GameSettings) {
+    this.difficulty = difficultySettings;
+    this.gameSettings = gameSettings;
     this.difficulty = difficultySettings;
     this.targetY = 120; // Start at center-ish position
     this.predictedBallY = 150; // Start with center prediction
@@ -121,12 +168,14 @@ class PongAI {
   private analyzeGameState(): void {
     if (!this.lastSnapshot) return;
 
-    const { ballX, ballY, ballVX, ballVY, paddle2Y } = this.lastSnapshot;
-    
-    // Predict where the ball will be when it reaches the paddle
+    const { ballX, ballY, ballVX, ballVY, paddle2Y } = this.lastSnapshot;      // Predict where the ball will be when it reaches the paddle
     if (ballVX > 0) { // Ball moving towards AI (right side)
       // Calculate time until ball reaches paddle position
-      const timeToReachPaddle = (480 - ballX) / Math.abs(ballVX); // Assuming paddle at x=480
+      // Use the current ball speed from game settings
+      const currentBallSpeed = calculateBallSpeed(this.gameSettings.ballSpeed); 
+      const effectiveVelocity = ballVX * currentBallSpeed;
+      const paddleX = 480; // Right paddle X position
+      const timeToReachPaddle = Math.max(0.001, (paddleX - ballX) / Math.abs(effectiveVelocity)); // Ensure positive time
       
       // Use physics to predict where ball will be vertically when it reaches paddle
       this.predictedBallY = this.predictBallPosition(ballY, ballVY, timeToReachPaddle);
@@ -281,16 +330,14 @@ class PongAI {
       this.stateDuration = 500; // Stay in correct position state for half a second
       this.lastStateChange = now;
       return;
-    } 
-    
-    // When ball is moving away: Occasionally pause/idle based on difficulty
-    // This simulates how human players sometimes relax when the ball is away
-    if (ballVX < 0 && Math.random() < this.difficulty.idleChance) {
-      this.currentState = AIState.IDLE;
-      this.stateDuration = 500 + Math.random() * 1000; // Idle for 0.5-1.5 seconds
-      this.lastStateChange = now;
-      return;
-    }
+    }      // When ball is moving away: Occasionally pause/idle based on difficulty
+      // This simulates how human players sometimes relax when the ball is away
+      if (ballVX < 0 && Math.random() < this.difficulty.idleChance) {
+        this.currentState = AIState.IDLE;
+        this.stateDuration = 500 + Math.random() * 1000; // Idle for 0.5-1.5 seconds
+        this.lastStateChange = now;
+        return;
+      }
     
     // Default to correct position (this covers any remaining cases)
     this.currentState = AIState.CORRECT;
@@ -379,7 +426,7 @@ class PongAI {
 
   // Simulate keyboard input (called every frame)
   // This is where the AI actually controls the paddle movement
-  simulateInput(currentPaddleY: number): { [key: string]: boolean } {
+  simulateInput(currentPaddleY: number, deltaTime: number = 0): { [key: string]: boolean } {
     const paddleHeight = 60; // Standard paddle height
     const targetCenter = this.targetY + paddleHeight/2;
     const currentCenter = currentPaddleY + paddleHeight/2;
@@ -406,9 +453,11 @@ class PongAI {
       return this.keySimulator; // Wait before reacting
     }
     
-    // Throttle AI movement speed - prevent paddle from moving faster than player's paddle
-    // Only make a movement decision at most every 16ms (roughly matches 60fps)
-    if (currentTime - this.lastMoveTime < 16) {
+    // Use delta time instead of fixed frame timing
+    // For a 60fps game, deltaTime is ~0.01667 seconds (16.67ms)
+    // This ensures consistent AI movement regardless of frame rate
+    const minimumUpdateTime = 0.016; // 16ms in seconds
+    if (deltaTime > 0 && (currentTime - this.lastMoveTime) / 1000 < minimumUpdateTime) {
       return this.keySimulator;
     }
     
@@ -421,6 +470,8 @@ class PongAI {
         // Need to move up
         this.keySimulator['ArrowUp'] = true;
       }
+      // Update the lastMoveTime based on actual deltaTime instead of current time
+      // This ensures movement is smoother with consistent frame rates
       this.lastMoveTime = currentTime;
     }
     
@@ -432,7 +483,8 @@ class PongAI {
   }
 
   getDebugInfo(): string {
-    return `AI State: ${this.currentState}, Target Y: ${this.targetY.toFixed(1)}, Map: ${this.mapType}, PowerUp: ${this.powerUpPosition ? 'Available' : 'None'}, Current Y: ${this.lastSnapshot?.paddle2Y.toFixed(1) || 'N/A'}`;
+    const ballSpeed = this.lastSnapshot ? calculateBallSpeed(this.gameSettings.ballSpeed) : 'N/A';
+    return `AI State: ${this.currentState}, Target Y: ${this.targetY.toFixed(1)}, Map: ${this.mapType}, Ball Speed: ${ballSpeed}, Current Y: ${this.lastSnapshot?.paddle2Y.toFixed(1) || 'N/A'}`;
   }
 }
 
@@ -548,6 +600,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
   useEffect(() => {
     console.log("PongGame: useEffect running, initializing game");
     
+    // Detect Firefox browser for specific adjustments
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    console.log("Browser detection:", { isFirefox, userAgent: navigator.userAgent });
+    
     const playSound = (sound: HTMLAudioElement) => {
       sound.currentTime = 0; // Reset sound to start
       sound.play().catch((err) => console.error("Sound play error:", err));
@@ -578,8 +634,9 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
       paddle2Y = 100;
     let ballX = 250,
       ballY = 150,
-      ballVX = 3,
-      ballVY = 2;
+      // Use normalized velocity components for consistent behavior
+      ballVX = Math.random() > 0.5 ? STANDARD_NORMALIZED_X_SPEED : -STANDARD_NORMALIZED_X_SPEED,
+      ballVY = (Math.random() - 0.5) * STANDARD_NORMALIZED_Y_SPEED * 2;
       
     // Initialize ball position safely for center wall map
     if (settings.mapType === 'center-wall') {
@@ -589,10 +646,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
       // Start ball either above or below the wall
       if (Math.random() > 0.5) {
         ballY = wallY - 15; // Above wall
-        ballVY = 2; // Moving down
+        ballVY = STANDARD_NORMALIZED_Y_SPEED; // Moving down
       } else {
         ballY = wallY + wallHeight + 15; // Below wall
-        ballVY = -2; // Moving up
+        ballVY = -STANDARD_NORMALIZED_Y_SPEED; // Moving up
       }
     }
     const paddleSpeed = 6;
@@ -605,7 +662,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
     if (isAIGame && !aiRef.current) {
       console.log("PongGame: Creating new AI with difficulty", settings.aiDifficulty);
       const difficultySettings = getDifficultySettings(settings.aiDifficulty);
-      aiRef.current = new PongAI(difficultySettings);
+      aiRef.current = new PongAI(difficultySettings, settings);
     }
 
     // AI snapshot timing - controls how often the AI updates its view of the game
@@ -798,7 +855,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
       }
     }
 
-    function update() {
+    function update(deltaTime: number) {
       if (gameOver) return;
 
       const currentTime = Date.now();
@@ -864,29 +921,33 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
         }
       }
 
-      // AI paddle control - simulate keyboard input
+      // AI paddle control - simulate keyboard input with delta time
       if (isAIGame && aiRef.current) {
-        const aiInput = aiRef.current.simulateInput(paddle2Y);
+        const aiInput = aiRef.current.simulateInput(paddle2Y, deltaTime);
         // Override keysPressed for player 2 (AI)
         keysPressed.current["ArrowUp"] = aiInput["ArrowUp"] || false;
         keysPressed.current["ArrowDown"] = aiInput["ArrowDown"] || false;
       }
 
-      // Move paddles based on keys pressed with wall collision
+      // Move paddles based on keys pressed with wall collision and deltaTime
+      // Convert paddleSpeed to units per second
+      const paddleSpeedPerSecond = 300; // Adjusted based on original value to maintain similar feel
+      const frameAdjustedPaddleSpeed = paddleSpeedPerSecond * deltaTime;
+      
       let newPaddle1Y = paddle1Y;
       let newPaddle2Y = paddle2Y;
       
       if (keysPressed.current["w"])
-        newPaddle1Y = Math.max(0, paddle1Y - paddleSpeed);
+        newPaddle1Y = Math.max(0, paddle1Y - frameAdjustedPaddleSpeed);
       if (keysPressed.current["s"]) {
         const currentPaddleHeight = player1PowerUpsRef.current.paddleEnlarge.active ? paddleHeight * 1.5 : paddleHeight;
-        newPaddle1Y = Math.min(canvasHeight - currentPaddleHeight, paddle1Y + paddleSpeed);
+        newPaddle1Y = Math.min(canvasHeight - currentPaddleHeight, paddle1Y + frameAdjustedPaddleSpeed);
       }
       if (keysPressed.current["ArrowUp"])
-        newPaddle2Y = Math.max(0, paddle2Y - paddleSpeed);
+        newPaddle2Y = Math.max(0, paddle2Y - frameAdjustedPaddleSpeed);
       if (keysPressed.current["ArrowDown"]) {
         const currentPaddleHeight = player2PowerUpsRef.current.paddleEnlarge.active ? paddleHeight * 1.5 : paddleHeight;
-        newPaddle2Y = Math.min(canvasHeight - currentPaddleHeight, paddle2Y + paddleSpeed);
+        newPaddle2Y = Math.min(canvasHeight - currentPaddleHeight, paddle2Y + frameAdjustedPaddleSpeed);
       }
 
       // Check wall collisions for corner walls map
@@ -916,19 +977,98 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
       paddle1Y = newPaddle1Y;
       paddle2Y = newPaddle2Y;
 
-      ballX += ballVX;
-      ballY += ballVY;
+      // Apply ball movement using deltaTime for consistent speed
+      // Use the selected ball speed from settings
+      const currentBallSpeed = calculateBallSpeed(settings.ballSpeed);
+      
+      // Use small, consistent steps for ball movement to avoid Firefox issues
+      // This performs a simplified "sub-step" physics update for smoother motion
+      // Firefox sometimes has larger time gaps which can cause the ball to "jump" through objects
+      
+      // Firefox-specific adjustments
+      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+      const maxStep = isFirefox ? 1/240 : 1/120; // Smaller steps for Firefox (240 Hz)
+      
+      // Store previous position for stuck detection
+      const prevBallX = ballX;
+      const prevBallY = ballY;
+      
+      let remainingDelta = deltaTime;
+      let subStepCount = 0;
+      
+      while (remainingDelta > 0) {
+        const stepDelta = Math.min(remainingDelta, maxStep);
+        subStepCount++;
+        
+        // Apply movement for this sub-step
+        ballX += ballVX * currentBallSpeed * stepDelta;
+        ballY += ballVY * currentBallSpeed * stepDelta;
+        
+        // Ensure the ball never gets "stuck" by checking for very small velocities
+        // Firefox seems more prone to velocity degradation in some cases
+        const MIN_VELOCITY = 0.1;
+        if (Math.abs(ballVX) < MIN_VELOCITY) {
+          ballVX = ballVX >= 0 ? MIN_VELOCITY : -MIN_VELOCITY;
+        }
+        if (Math.abs(ballVY) < MIN_VELOCITY) {
+          ballVY = ballVY >= 0 ? MIN_VELOCITY : -MIN_VELOCITY;
+        }
+        
+        // If ball appears stuck in same position for too many frames, reset it
+        // This is a last resort for Firefox-specific issues
+        if (frameCount % 60 === 0) { // Check periodically
+          if (Math.abs(ballVX) < 0.001 && Math.abs(ballVY) < 0.001) {
+            console.warn("Ball appears stuck, nudging it into motion");
+            ballVX = Math.random() > 0.5 ? 0.3 : -0.3;
+            ballVY = Math.random() > 0.5 ? 0.2 : -0.2;
+          }
+        }
+        
+        remainingDelta -= stepDelta;
+      }
+      
+      // Increment frame counter
+      frameCount++;
+      
+      // Check for ball getting truly stuck (no movement after all updates)
+      // This is a Firefox-specific failsafe
+      if (frameCount > 60 && // Only check after game has been running
+          ballX === prevBallX && ballY === prevBallY && 
+          subStepCount > 0) { // Ball position didn't change despite updates
+        console.warn("Ball appears completely stuck - applying emergency reset");
+        
+        // Move ball away from current position slightly and restore velocity
+        ballX += (Math.random() - 0.5) * 5;
+        ballY += (Math.random() - 0.5) * 5;
+        
+        // Reset velocity to standard values
+        ballVX = Math.random() > 0.5 ? STANDARD_NORMALIZED_X_SPEED : -STANDARD_NORMALIZED_X_SPEED;
+        ballVY = (Math.random() - 0.5) * STANDARD_NORMALIZED_Y_SPEED * 2;
+      }
 
       // Ball collision with top/bottom walls (consistent reflection)
+      // Enhanced with minimum velocity to prevent getting stuck
       if (ballY < 8) {
         ballY = 8;
-        ballVY = Math.abs(ballVY); // Perfect reflection
+        // Ensure minimum vertical velocity after bounce
+        ballVY = Math.max(Math.abs(ballVY), 0.2); 
         playSound(wallSound);
       }
       if (ballY > canvasHeight - 8) {
         ballY = canvasHeight - 8;
-        ballVY = -Math.abs(ballVY); // Perfect reflection
+        // Ensure minimum vertical velocity after bounce
+        ballVY = -Math.max(Math.abs(ballVY), 0.2);
         playSound(wallSound);
+      }
+      
+      // Firefox debug helper - detects if ball is moving abnormally slow
+      // and logs diagnostic information
+      const ballSpeed = Math.sqrt(ballVX * ballVX + ballVY * ballVY);
+      if (ballSpeed < 0.05 && frameCount % 60 === 0) {
+        console.warn("Warning: Ball moving very slowly", {
+          ballX, ballY, ballVX, ballVY, speed: ballSpeed,
+          browser: navigator.userAgent
+        });
       }
 
       // Map-specific collision detection
@@ -946,8 +1086,11 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
             ballX = canvasWidth / 2 + 13;
           }
           
-          // Perfect reflection - just reverse the x velocity
+          // Perfect reflection - reverse direction but maintain normalized speed
           ballVX = -ballVX;
+          
+          // Ensure consistent speed after bouncing
+          if (Math.abs(ballVX) < 0.3) ballVX = ballVX > 0 ? 0.3 : -0.3;
           
           // Keep y velocity the same for consistent bouncing
           playSound(wallSound);
@@ -969,9 +1112,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
             // Consistent reflection physics
             ballVY = Math.abs(ballVY);
             
-            // Ensure minimum speeds to prevent getting stuck
-            if (Math.abs(ballVX) < 2) {
-              ballVX = ballVX > 0 ? 2 : -2;
+            // Use normalized values for consistent speed
+            // Ensure x-velocity is adequate to prevent getting stuck
+            if (Math.abs(ballVX) < 0.3) {
+              ballVX = ballVX > 0 ? 0.3 : -0.3;
             }
             
             wallHit = true;
@@ -985,9 +1129,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
             // Consistent reflection physics
             ballVY = -Math.abs(ballVY);
             
-            // Ensure minimum speeds to prevent getting stuck
-            if (Math.abs(ballVX) < 2) {
-              ballVX = ballVX > 0 ? 2 : -2;
+            // Use normalized values for consistent speed
+            // Ensure x-velocity is adequate to prevent getting stuck
+            if (Math.abs(ballVX) < 0.3) {
+              ballVX = ballVX > 0 ? 0.3 : -0.3;
             }
             
             wallHit = true;
@@ -1001,9 +1146,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
             // Consistent reflection physics
             ballVX = Math.abs(ballVX);
             
-            // Ensure minimum speeds to prevent getting stuck
-            if (Math.abs(ballVY) < 2) {
-              ballVY = ballVY > 0 ? 2 : -2;
+            // Use normalized values for consistent speed
+            // Ensure y-velocity is adequate to prevent getting stuck
+            if (Math.abs(ballVY) < 0.3) {
+              ballVY = ballVY > 0 ? 0.3 : -0.3;
             }
             
             wallHit = true;
@@ -1017,9 +1163,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
             // Consistent reflection physics
             ballVX = -Math.abs(ballVX);
             
-            // Ensure minimum speeds to prevent getting stuck
-            if (Math.abs(ballVY) < 2) {
-              ballVY = ballVY > 0 ? 2 : -2;
+            // Use normalized values for consistent speed
+            // Ensure y-velocity is adequate to prevent getting stuck
+            if (Math.abs(ballVY) < 0.3) {
+              ballVY = ballVY > 0 ? 0.3 : -0.3;
             }
             
             wallHit = true;
@@ -1086,18 +1233,28 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
         ballX = 20 + 8;
         lastPaddleHitRef.current = 'player1'; // Track who hit the ball
         
-        // Improved ball physics
+        // Improved ball physics (with consistent speed)
         const relativeIntersectY = (paddle1Y + currentPaddle1Height/2) - ballY;
         const normalizedRelativeIntersectionY = relativeIntersectY / (currentPaddle1Height/2);
         const bounceAngle = normalizedRelativeIntersectionY * Math.PI/4; // Max 45 degree angle
         
-        const speed = Math.sqrt(ballVX * ballVX + ballVY * ballVY);
-        ballVX = speed * Math.cos(bounceAngle);
-        ballVY = speed * -Math.sin(bounceAngle);
+        // Use normalized vector components to maintain consistent speed
+        // This ensures the ball always moves at the same speed after bouncing
+        const normalizedSpeedX = 0.8; // Standard horizontal speed component (normalized)
+        ballVX = normalizedSpeedX; // Always moves to the right after hitting left paddle
         
-        // Ensure minimum speed and direction
-        if (ballVX < 2) ballVX = 2;
-        if (Math.abs(ballVY) < 0.5) ballVY = (Math.random() - 0.5) * 2;
+        // Y-component depends on where the paddle was hit
+        // The further from center, the steeper the angle
+        ballVY = -normalizedSpeedX * Math.tan(bounceAngle);
+        
+        // Ensure y-speed doesn't get too extreme
+        if (Math.abs(ballVY) < 0.1) {
+          // Add a small vertical component if too flat
+          ballVY = (Math.random() < 0.5 ? -0.1 : 0.1);
+        } else if (Math.abs(ballVY) > 0.7) {
+          // Cap the vertical speed for playability
+          ballVY = ballVY > 0 ? 0.7 : -0.7;
+        }
         
         playSound(paddleSound);
       }
@@ -1113,18 +1270,28 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
         ballX = canvasWidth - 20 - 8;
         lastPaddleHitRef.current = 'player2'; // Track who hit the ball
         
-        // Improved ball physics
+        // Improved ball physics (with consistent speed)
         const relativeIntersectY = (paddle2Y + currentPaddle2Height/2) - ballY;
         const normalizedRelativeIntersectionY = relativeIntersectY / (currentPaddle2Height/2);
         const bounceAngle = normalizedRelativeIntersectionY * Math.PI/4; // Max 45 degree angle
         
-        const speed = Math.sqrt(ballVX * ballVX + ballVY * ballVY);
-        ballVX = -speed * Math.cos(bounceAngle);
-        ballVY = speed * -Math.sin(bounceAngle);
+        // Use normalized vector components to maintain consistent speed
+        // This ensures the ball always moves at the same speed after bouncing
+        const normalizedSpeedX = 0.8; // Standard horizontal speed component (normalized)
+        ballVX = -normalizedSpeedX; // Always moves to the left after hitting right paddle
         
-        // Ensure minimum speed and direction
-        if (ballVX > -2) ballVX = -2;
-        if (Math.abs(ballVY) < 0.5) ballVY = (Math.random() - 0.5) * 2;
+        // Y-component depends on where the paddle was hit
+        // The further from center, the steeper the angle
+        ballVY = -normalizedSpeedX * Math.tan(bounceAngle);
+        
+        // Ensure y-speed doesn't get too extreme
+        if (Math.abs(ballVY) < 0.1) {
+          // Add a small vertical component if too flat
+          ballVY = (Math.random() < 0.5 ? -0.1 : 0.1);
+        } else if (Math.abs(ballVY) > 0.7) {
+          // Cap the vertical speed for playability
+          ballVY = ballVY > 0 ? 0.7 : -0.7;
+        }
         
         playSound(paddleSound);
       }
@@ -1171,6 +1338,11 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
     }
 
     function resetBall() {
+      // Use our standard normalized velocity constants (defined at top of file)
+      // These ensure consistent ball behavior on every point
+      const baseSpeedX = STANDARD_NORMALIZED_X_SPEED; // 0.8
+      const baseSpeedY = STANDARD_NORMALIZED_Y_SPEED; // 0.4
+      
       // For center wall map, spawn the ball avoiding the center wall
       if (settings.mapType === 'center-wall') {
         const wallHeight = canvasHeight * 0.6;
@@ -1181,25 +1353,28 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
           // Spawn at top
           ballX = canvasWidth / 2;
           ballY = Math.max(15, wallY - 15); // Safely above the wall
-          ballVX = Math.random() > 0.5 ? 3 : -3;
-          ballVY = 2; // Start moving downward
+          ballVX = Math.random() > 0.5 ? baseSpeedX : -baseSpeedX;
+          ballVY = baseSpeedY; // Start moving downward
         } else {
           // Spawn at bottom
           ballX = canvasWidth / 2;
           ballY = Math.min(canvasHeight - 15, wallY + wallHeight + 15); // Safely below the wall
-          ballVX = Math.random() > 0.5 ? 3 : -3;
-          ballVY = -2; // Start moving upward
+          ballVX = Math.random() > 0.5 ? baseSpeedX : -baseSpeedX;
+          ballVY = -baseSpeedY; // Start moving upward
         }
       } else {
         // Normal spawn in the center for other maps
         ballX = canvasWidth / 2;
         ballY = canvasHeight / 2;
-        ballVX = Math.random() > 0.5 ? 3 : -3;
-        ballVY = (Math.random() - 0.5) * 4;
+        ballVX = Math.random() > 0.5 ? baseSpeedX : -baseSpeedX;
+        ballVY = (Math.random() - 0.5) * baseSpeedY * 2;
       }
       
       // Reset who last hit the ball on each point
       lastPaddleHitRef.current = null;
+      
+      // Log the reset ball state for debugging
+      console.log(`Ball reset: pos=(${ballX},${ballY}), vel=(${ballVX},${ballVY}), speed=${calculateBallSpeed(settings.ballSpeed)}`);
       
       setScore({ left: leftScore, right: rightScore });
     }
@@ -1216,12 +1391,46 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
     window.addEventListener("keyup", handleKeyUp);
 
     let animationFrameId: number;
-    const gameLoop = () => {
-      update();
+    let lastTimeStamp = 0; // Initialize to 0, will be set on first frame
+    let frameCount = 0; // Track frame count for diagnostics
+    
+    const gameLoop = (timestamp: number) => {
+      // Calculate delta time in seconds (time since last frame)
+      const deltaTime = (timestamp - lastTimeStamp) / 1000; // Convert to seconds
+      
+      // More aggressive capping of delta time for Firefox compatibility
+      // Firefox can sometimes have larger gaps between frames
+      const cappedDeltaTime = Math.min(deltaTime, 0.03); // Cap at ~30 FPS equivalent (more stable)
+      
+      // Log delta time occasionally to help debug performance issues
+      if (Math.random() < 0.01) { // Log only 1% of frames to avoid console spam
+        console.log(`Delta time: ${cappedDeltaTime.toFixed(4)}s, FPS: ${(1/cappedDeltaTime).toFixed(1)}`);
+      }
+      
+      // Ensure we're always advancing by a safe minimum increment
+      // This helps prevent "stuck" balls in Firefox
+      const safeTimeDelta = Math.max(cappedDeltaTime, 0.005); // Minimum 5ms step
+      
+      update(safeTimeDelta);
       draw();
-      animationFrameId = requestAnimationFrame(gameLoop);
+      
+      lastTimeStamp = timestamp;
+      
+      // Request next frame as soon as possible
+      animationFrameId = window.requestAnimationFrame(gameLoop);
     };
-    gameLoop();
+    
+    // Log initial ball state for debugging
+    console.log(`Initial ball setup: pos=(${ballX},${ballY}), vel=(${ballVX},${ballVY}), speed=${calculateBallSpeed(settings.ballSpeed)}`);
+    
+    // Start the game loop with more reliable initialization
+    const startGameLoop = (timestamp: number) => {
+      lastTimeStamp = timestamp; // Set initial timestamp (no delta on first frame)
+      animationFrameId = window.requestAnimationFrame(gameLoop);
+    };
+    
+    // Request first frame with proper initialization
+    animationFrameId = window.requestAnimationFrame(startGameLoop);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);

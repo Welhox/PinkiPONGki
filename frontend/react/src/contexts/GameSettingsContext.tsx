@@ -12,6 +12,7 @@ export interface GameSettings {
   scoreToWin: number;
   aiDifficulty: 'easy' | 'medium' | 'hard' | 'expert';
   mapType: 'classic' | 'corners' | 'center-wall';
+  ballSpeed: number; // Changed to numeric value for slider (1-10 range)
   powerUpsEnabled: boolean;
   paddleEnlargePowerUp: boolean;
 }
@@ -26,6 +27,7 @@ const defaultSettings: GameSettings = {
   scoreToWin: 11,
   aiDifficulty: 'medium',
   mapType: 'classic',
+  ballSpeed: 5, // Default speed set to middle of slider (1-10)
   powerUpsEnabled: true,
   paddleEnlargePowerUp: true,
 };
