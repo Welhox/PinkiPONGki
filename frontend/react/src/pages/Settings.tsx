@@ -10,6 +10,8 @@ import api from "../api/axios";
 import ConfirmOtpField from "../components/ConfirmOtpField";
 import { useTranslation } from "react-i18next";
 
+const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
+
 const Settings: React.FC = () => {
   const navigate = useNavigate();
   const { status, user, refreshSession } = useAuth();
@@ -151,8 +153,8 @@ const Settings: React.FC = () => {
       <EditProfilePic
         pic={
           user?.profilePic
-            ? `${user.profilePic}`
-            : `/assets/default_avatar.png`
+            ? `${apiUrl}${user.profilePic}`
+            : `${apiUrl}/assets/default_avatar.png`
         }
         onChange={() => {}}
         onSave={uploadProfilePic}
