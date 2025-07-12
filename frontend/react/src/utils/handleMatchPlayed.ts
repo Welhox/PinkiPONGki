@@ -27,11 +27,15 @@ export const handleMatchPlayed = async (
 		id: match.id ?? Math.random(), // temp ID
 	};
 
-	const updatedMatches = [
+    // make sure there are no dublicate versions of matches array
+    const allMatches = [...matchesFromBackend, ...upcomingMatches];
+    const updatedMatches = allMatches.map((m) => m.id === updatedMatch.id ? updatedMatch : m);
+
+	/* const updatedMatches = [
 		...matchesFromBackend,
 		...upcomingMatches.filter((m) => m !== match),
 		updatedMatch,
-	];
+	]; */
 
 	// update both sources of truth
 	if (match.saved) {
@@ -48,11 +52,11 @@ export const handleMatchPlayed = async (
 		(m) => m.round === match.round
 	);
 
-	const allFinished = currentRoundMatches.every((m) => m.result);
+	const allFinished = currentRoundMatches.every((m) => m.winnerId !== null);
 
 	if (allFinished) {
 		const winners: Player[] = currentRoundMatches.map((m) =>
-			m.result === "win" ? m.player1 : m.player2
+			m.winnerId === m.player1.id ? m.player1 : m.player2
 		);
 
 		if (winners.length === 1) {

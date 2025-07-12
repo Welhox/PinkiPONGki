@@ -22,6 +22,7 @@ const TournamentPage = () => {
   const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
   const { settings } = useGameSettings();
   const [isLoading, setIsLoading] = useState<Boolean>(true);
+  const [finalStandings, setFinalStandings] = useState<Player[]>([]);
 
   useEffect(() => {
     if (state?.players && state.players.length > 0) { // for testing without backend
