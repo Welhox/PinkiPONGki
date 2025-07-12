@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthProvider";
@@ -15,6 +16,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   const [error, setError] = useState("");
   const { t } = useTranslation();
   const { user, refreshSession } = useAuth();
@@ -52,6 +54,10 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           if (i18n.language !== userLang) {
             await i18n.changeLanguage(userLang);
             localStorage.setItem("language", userLang);
+          }
+          if (data.mfaRequired) {
+            navigate("/mfa");
+            return;
           }
           await refreshSession();
         } else {
