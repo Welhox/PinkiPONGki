@@ -9,11 +9,13 @@ import i18n from "../i18n";
 interface PlayerBoxProps {
   label: string;
   onRegister: (player: { username: string; isGuest: boolean }) => void;
+  playerId: number;
 }
 
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
   onRegister,
+  playerId,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -94,7 +96,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           await refreshSession();
         } else {
           console.log("Implement custom tournament login API here");
-          //await api.post("/auth/login", { username, password });
+          await api.post("/users/player-2-login", { username, password });
         }
         onRegister({ username, isGuest: false });
       } catch {
