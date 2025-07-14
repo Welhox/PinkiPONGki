@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import Bracket from "../components/Bracket";
@@ -20,6 +20,7 @@ const TournamentPage = () => {
   const tournamentId = parseInt(id || "0", 10);
   const navigate = useNavigate();
   const location = useLocation(); // for testing without backend
+  const hasStartedRef = useRef(false);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [matchesFromBackend, setMatchesFromBackend] = useState<Match[]>([]);
@@ -34,7 +35,7 @@ const TournamentPage = () => {
     } else {
       fetchTournamentData();
     }
-  }, [location.state, navigate]);
+  }, []);
 
   const fetchTournamentData = async () => {
     setIsLoading(true);
@@ -48,7 +49,12 @@ const TournamentPage = () => {
       let backendMatches = formatMatches(data.matches);
       setMatchesFromBackend(backendMatches);
 
-      if (backendMatches.length === 0 && data.status === "waiting") {
+      if (
+        !hasStartedRef.current &&
+        backendMatches.length === 0 &&
+        data.status === "waiting"
+      ) {
+        hasStartedRef.current = true;
         try {
           const startedData = await startTournamentIfWaiting(tournamentId);
           const updatedMatches = formatMatches(startedData.matches);
