@@ -44,6 +44,8 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
       if (response.status === 200) {
         console.log("MFA verification successful");
         await refreshSession();
+        setConfirmPlayer2MFA(false);
+        onRegister({ username, isGuest: false });
       }
     } catch (error) {
       if (isAxiosError(error) && error.response) {
