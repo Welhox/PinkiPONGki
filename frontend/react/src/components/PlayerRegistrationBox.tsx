@@ -20,12 +20,45 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
-
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const { t } = useTranslation();
   const { user, refreshSession } = useAuth();
   const [confirmMFA, setConfirmMFA] = useState(false);
+  const [confirmPlayer2MFA, setConfirmPlayer2MFA] = useState(false);
+
+  const handleMfaPlayer2Submit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      console.log("Trying with code:", code, "Email", email);
+      const response = await api.post(
+        "/auth/verify-tournamentOtp",
+        { code, email },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      if (response.status === 200) {
+        console.log("MFA verification successful");
+        await refreshSession();
+      }
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        if (error.response.status === 401) {
+          setError(t("mfa.invalidOtp"));
+        } else if (error.response.status === 403) {
+          setError(t("mfa.otpExpired"));
+        } else {
+          setError(t("mfa.invalidOtp"));
+        }
+      } else {
+        setError(t("mfa.generalError"));
+      }
+    }
+  };
 
   const handleMfaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,19 +123,22 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             localStorage.setItem("language", userLang);
           }
           if (data.mfaRequired) {
+            //setEmail(data.email);
             setConfirmMFA(true);
             return;
           }
           await refreshSession();
         } else {
-          console.log("Implement custom tournament login API here");
+          console.log("Implement custom two player login API here");
           let player2Response;
           player2Response = await api.post("/users/player-2-login", {
             username,
             password,
           });
           if (player2Response.data.mfaRequired) {
-            setConfirmMFA(true);
+            console.log(player2Response);
+            setEmail(player2Response.data.email);
+            setConfirmPlayer2MFA(true);
             return;
           }
         }
@@ -117,6 +153,29 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
     return (
       <form
         onSubmit={handleMfaSubmit}
+        className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
+      >
+        <label className="mb-2 font-bold">{t("mfa.heading")}</label>
+        <input
+          className="mb-2 p-2 border rounded w-48"
+          type="password"
+          placeholder={t("mfa.otpLabel")}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
+        <button
+          className="bg-teal-700 text-white px-4 py-2 rounded"
+          type="submit"
+        >
+          {t("playerBox.continue")}
+        </button>
+        {error && <div className="text-red-500 mt-2">{error}</div>}
+      </form>
+    );
+  } else if (confirmPlayer2MFA === true) {
+    return (
+      <form
+        onSubmit={handleMfaPlayer2Submit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
       >
         <label className="mb-2 font-bold">{t("mfa.heading")}</label>

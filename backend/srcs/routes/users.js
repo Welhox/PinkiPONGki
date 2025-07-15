@@ -84,8 +84,10 @@ export async function userRoutes(fastify, _options) {
               path: "/",
               maxAge: 5 * 60,
             });
+            console.log("In users.js, trying to send email: ", user.email);
             return reply.code(200).send({
               message: "MFA still required",
+              email: user.email,
               mfaRequired: true,
               language: user.language || "en",
             });
@@ -157,6 +159,7 @@ export async function userRoutes(fastify, _options) {
             });
             return reply.code(200).send({
               message: "MFA still required",
+              email: user.email,
               mfaRequired: true,
               language: user.language || "en",
             });

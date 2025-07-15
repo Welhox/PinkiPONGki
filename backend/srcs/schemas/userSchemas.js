@@ -321,6 +321,7 @@ const loginUserSchema = {
       type: "object",
       properties: {
         message: { type: "string" },
+        email: {type: "string" },
         mfaRequired: { type: "boolean" },
         language: { type: "string" },
       },
