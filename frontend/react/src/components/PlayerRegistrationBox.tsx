@@ -8,14 +8,17 @@ import i18n from "../i18n";
 
 interface PlayerBoxProps {
   label: string;
-  onRegister: (player: { username: string; isGuest: boolean }) => void;
-  playerId: number;
+  onRegister: (player: {
+    username: string;
+    isGuest: boolean;
+    userId?: number | null;
+  }) => void;
 }
 
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
   onRegister,
-  playerId,
+  userId,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -144,7 +147,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             return;
           }
         }
-        onRegister({ username, isGuest: false });
+        onRegister({ username, isGuest: false, userId: response?.data.id });
       } catch {
         setError(t("playerBox.loginFailed"));
       }

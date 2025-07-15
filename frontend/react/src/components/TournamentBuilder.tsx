@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 type RegisteredPlayer = {
   username: string;
   isGuest: boolean;
+  userId?: number | null;
 };
 
 const TournamentBuilder = () => {
@@ -132,16 +133,12 @@ const TournamentBuilder = () => {
       await Promise.all(
         players.map((player, index) =>
           api.post(`/tournaments/${tournamentId}/register`, {
-            userId: player.isGuest
-              ? null
-              : user?.username === player.username
-              ? user.id
-              : null,
-            alias: player.isGuest ? player.username : "",
+            userId: player.userId ?? null,
+            alias: player.username,
           })
         )
       );
-      navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access
+      navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access, should probably random generate it...
     } catch (error) {
       console.error("Tournament creation failed.");
       alert(t("tournament.errorTournamentCreation"));
