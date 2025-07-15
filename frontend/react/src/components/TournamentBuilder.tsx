@@ -187,6 +187,7 @@ const TournamentBuilder = () => {
                 <PlayerRegistrationBox
                   label={`Player ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
+                  playerId={index + 1}
                 />
               )}
             </div>
