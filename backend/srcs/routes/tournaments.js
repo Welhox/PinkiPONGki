@@ -78,7 +78,7 @@ export async function tournamentsRoute(fastify, _options) {
   // Get all tournaments
   fastify.get(
     "/tournaments/all",
-    { schema: tournamentsSchemas.getAllTournamentsSchema },
+    { /* schema: tournamentsSchemas.getAllTournamentsSchema */ },
     async (req, reply) => {
       const tournaments = await prisma.tournament.findMany({
         include: { participants: true, tournamentMatches: true },
@@ -91,14 +91,14 @@ export async function tournamentsRoute(fastify, _options) {
   // Get tournament details (including participants and matches)
   fastify.get(
     "/tournaments/:id",
-    { schema: tournamentsSchemas.getTournamentSchema },
+    { /* schema: tournamentsSchemas.getTournamentSchema */ },
     async (req, reply) => {
       const { id } = req.params;
       const tournament = await prisma.tournament.findUnique({
         where: { id: Number(id) },
         include: {
           participants: true,
-          matches: true,
+          tournamentMatches: true,
         },
       });
       reply.send(tournament);
@@ -141,12 +141,13 @@ export async function tournamentsRoute(fastify, _options) {
               matches.push({
               round: 1,
               tournamentId: tournament.id,
-              participant1Id: p1.userId ?? null,
-              participant1Alias: p1.alias ?? null,
-              participant2Id: p2.userId ?? null,
-              participant2Alias: p2.alias ?? null,
+              player1Id: p1.userId ?? null,
+              player1Alias: p1.alias ?? null,
+              player2Id: p2.userId ?? null,
+              player2Alias: p2.alias ?? null,
             });
         }
+        console.log("Generated matches:", matches);
         // Create matches in the database
         await prisma.TournamentMatch.createMany({
           data: matches,
@@ -164,6 +165,129 @@ export async function tournamentsRoute(fastify, _options) {
         reply.code(500).send({ message: "Server error" });
       }
   });
+  
+  //##############################################################
+
+  // update a tournament match
+  fastify.post(
+    "/tournaments/:id/match/:matchId/update",
+    { /* schema: tournamentsSchemas.updateTournamentMatchSchema */ },
+    async (req, reply) => {
+      const { id, matchId } = req.params;
+      const { winnerId, winnerAlias } = req.body;
+      if (!winnerId && !winnerAlias) {
+        return reply.code(400).send({ message: "Either winnerId or winnerAlias is required" });
+      }
+      if (winnerId && winnerAlias) {
+        return reply.code(400).send({ message: "Only one of winnerId or winnerAlias should be provided" });
+      }
+      console.log("Updating match for tournament ID:", id, "Match ID:", matchId);
+      try {
+        const match = await prisma.tournamentMatch.findUnique({
+          where: { id: Number(matchId) },
+        });
+        if (!match) {
+          return reply.code(404).send({ message: "Match not found" });
+        }
+        if (match.tournamentId !== Number(id)) {
+          return reply.code(400).send({ message: "Match does not belong to this tournament" });
+        }
+        const updatedMatch = await prisma.tournamentMatch.update({
+          where: { id: Number(matchId) },
+          data: {
+            winnerId: winnerId || null,
+            winnerAlias: winnerAlias || null,
+            status: "completed",
+          },
+        });
+        console.log("Match updated successfully:", updatedMatch);
+        try {
+        // generate matches for net round if applicable
+        generateNextRoundMatches(id);
+        //check if the tournament is finished
+        isTournamentFinished(id, updatedMatch);
+        
+        } catch (error) {
+          console.error("Error generating next round matches:", error);
+        }
+        reply.send(updatedMatch);
+      } catch (error) {
+        console.error("Error updating match:", error);
+        reply.code(500).send({ message: "Server error" });
+      }
+    }
+  );
+
 }
 
 //##############################################################
+
+// Function to check if all matches in a tournament are completed
+async function isTournamentFinished(id, updatedMatch) {
+  const tournament = await prisma.tournament.findUnique({
+    where: { id: Number(id) },
+    include: { tournamentMatches: true },
+  });
+  const pendingMatches = tournament.tournamentMatches.filter(match => match.status === "pending");
+  if (pendingMatches.length === 0) {
+    // If no pending matches, update tournament status to 'finished'
+    await prisma.tournament.update({
+      where: { id: Number(id) },
+      data: { status: "finished", winnerId: updatedMatch.winnerId, 
+        winnerAlias: updatedMatch.winnerAlias },
+    });
+    console.log("Tournament finished:", id);
+    //increment the user's tournament wins
+    if (updatedMatch.winnerId) {
+      await prisma.user.update({
+        where: { id: updatedMatch.winnerId },
+        data: { tournamentWins: { increment: 1 } },
+      });
+      console.log("User's tournament wins incremented:", updatedMatch.winnerId);
+    }
+  }
+}
+
+//function for generating next round matches
+async function generateNextRoundMatches(tournamentId) {
+  const matches = await prisma.tournamentMatch.findMany({
+    where: { tournamentId: Number(tournamentId), status: "completed" },
+  });
+  if (matches.length === 0 || matches.length % 2 !== 0) {
+    // If there are no completed matches or an odd number of matches, we cannot proceed
+    console.log("No completed matches or odd number of matches found:", tournamentId);
+    return;
+  }
+  const winners = matches.map(match => {
+    return match.winnerId ? { userId: match.winnerId, alias: match.winnerAlias } : { userId: null, alias: match.winnerAlias };
+  });
+  console.log("Winners from completed matches:", winners);
+  
+  const round = matches[0].round +1;
+  const nextRoundMatches = [];
+  for (let i = 0; i < winners.length; i += 2) {
+    const p1 = winners[i];
+    const p2 = winners[i + 1];
+    nextRoundMatches.push({
+      round: round,
+      tournamentId: Number(tournamentId),
+      player1Id: p1.userId,
+      player1Alias: p1.alias,
+      player2Id: p2.userId,
+      player2Alias: p2.alias,
+    });
+  }
+  
+  console.log("Generated next round matches:", nextRoundMatches);
+  
+  // change the status of the used match reults to 'archived'
+  await prisma.tournamentMatch.updateMany({
+    where: { tournamentId: Number(tournamentId), status: "completed" },
+    data: { status: "archived" },
+  });
+
+  // Create next round matches in the database
+  await prisma.tournamentMatch.createMany({
+    data: nextRoundMatches,
+  });
+}
