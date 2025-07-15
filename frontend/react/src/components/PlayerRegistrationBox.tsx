@@ -96,7 +96,15 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           await refreshSession();
         } else {
           console.log("Implement custom tournament login API here");
-          await api.post("/users/player-2-login", { username, password });
+          let player2Response;
+          player2Response = await api.post("/users/player-2-login", {
+            username,
+            password,
+          });
+          if (player2Response.data.mfaRequired) {
+            setConfirmMFA(true);
+            return;
+          }
         }
         onRegister({ username, isGuest: false });
       } catch {
