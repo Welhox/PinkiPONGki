@@ -35,7 +35,78 @@ export async function userRoutes(fastify, _options) {
     },
   };
   //####################################################################################################################################
+  fastify.post(
+    "/users/player-2-login",
+    { schema: userSchemas.loginUserSchema, ...rateLimitConfig },
+    async (req, reply) => {
+      try {
+        const { username, password } = req.body;
 
+        // Find user by username
+        const user = await prisma.user.findUnique({
+          where: { username },
+        });
+        // if user not found then wait for a small time and then return error
+        if (!user) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return reply
+            .code(401)
+            .send({ error: "Invalid username or password" });
+        }
+        // Compare plain password with hashed one, if invalid password, then return same error
+        // again with a small wait to mitigate timed attacks
+        const isPasswordValid = await bcryptjs.compare(password, user.password);
+        if (!isPasswordValid) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return reply
+            .code(401)
+            .send({ error: "Invalid username or password" });
+        }
+        //if mfa is activated for the user, then generate and send a otp to be validated
+        //also send a token, which dose not give access, but in order to validate later that
+        //login had been successfull.
+        if (user.mfaInUse === true) {
+          try {
+            //make and send OTP to the matchin email
+            await handleOtp(user.email);
+            const otpToken = fastify.jwt.sign(
+              {
+                id: user.id,
+                email: user.email,
+              },
+              { expiresIn: "5min" }
+            );
+            //set a otp token to the user and reply so that frontend knows to redirect to OTP page.
+            reply.setCookie("otpToken", otpToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
+              path: "/",
+              maxAge: 5 * 60,
+            });
+            console.log("In users.js, trying to send email: ", user.email);
+            return reply.code(200).send({
+              message: "MFA still required",
+              email: user.email,
+              mfaRequired: true,
+              language: user.language || "en",
+            });
+          } catch (error) {
+            console.error("Error handling OTP:", error);
+            return reply.code(401).send({ error: "Invalid email for mfa" });
+          }
+        }
+        // send response with without token (token is in the cookie)
+        return reply.code(200).send({
+          message: "Login successful",
+          language: user.language || "en",
+        });
+      } catch (error) {
+        console.error("Login error:", error);
+        return reply.code(500).send({ error: "Internal server error" });
+      }
+    }
+  );
   // login user
   fastify.post(
     "/users/login",
@@ -88,6 +159,7 @@ export async function userRoutes(fastify, _options) {
             });
             return reply.code(200).send({
               message: "MFA still required",
+              email: user.email,
               mfaRequired: true,
               language: user.language || "en",
             });

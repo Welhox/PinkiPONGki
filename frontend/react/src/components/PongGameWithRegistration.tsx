@@ -43,13 +43,13 @@ const PongGameWithRegistration: React.FC = () => {
       >
         <div className="flex-1 flex items-center justify-center border-r border-gray-700">
           {!player1 && status !== "authorized" && (
-            <PlayerRegistrationBox label="Player 1" onRegister={setPlayer1} />
+            <PlayerRegistrationBox label="Player 1" onRegister={setPlayer1} playerId={1}/>
           )}
           {player1 && <span className="text-white">{player1.username}</span>}
         </div>
         <div className="flex-1 flex items-center justify-center">
           {!player2 && (
-            <PlayerRegistrationBox label="Player 2" onRegister={setPlayer2} />
+            <PlayerRegistrationBox label="Player 2" onRegister={setPlayer2} playerId={2}/>
           )}
         </div>
       </div>
