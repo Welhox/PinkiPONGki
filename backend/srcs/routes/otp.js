@@ -7,7 +7,7 @@ import { otpSchemas } from "../schemas/otpSchemas.js";
 export async function otpRoutes(fastify, _options) {
   //####################################################################################################################################
 
-  // a rout for verifing the OTP witout making a cookie
+  // a route for verifing the OTP witout making a cookie
   fastify.post(
     "/auth/otp/verify",
     { schema: otpSchemas.otpVerifyNoCoockieSchema, preHandler: authenticate },
@@ -147,7 +147,7 @@ export async function otpRoutes(fastify, _options) {
   fastify.post(
     "/auth/verify-tournamentOtp",
     { config: { rateLimit: { max: 10, timeWindow: "1 minute", keyGenerator: (req) => req.ip }},
-      /* schema: otpSchemas.otpVerifyWithCoockieSchema  */},
+      schema: otpSchemas.otpVerifyTournamentSchema },
     async (request, reply) => {
 
       const { code, email } = request.body;

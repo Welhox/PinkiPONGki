@@ -110,7 +110,7 @@ POST http://localhost:3000/auth/verify-tournamentOtp HTTP/1.1
 content-type: application/json
 
 {
-    "code": "162811",
+    "code": "839137",
     "email": "casi.lehtovuori@gmail.com"
 }
 ###
