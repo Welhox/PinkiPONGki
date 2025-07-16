@@ -72,13 +72,44 @@ content-type: application/json
 
 ###
 
+//GET TOURNAMENTS
+GET http://localhost:3000/tournaments HTTP/1.1
+###
+//GET TOURNAMENT BY ID
+GET http://localhost:3000/tournaments/8 HTTP/1.1
 
+###
+//start a  tournament
+POST http://localhost:3000/tournaments/2/start HTTP/1.1
 
+###
 
+//update a tournament match
+POST http://localhost:3000/tournaments/2/match/6/update HTTP/1.1
+content-type: application/json
 
+{
+    "winnerId": null,
+    "winnerAlias": "ccc"
+}
 
+###
 
+POST http://localhost:3000/auth/verify-tournamentOtp HTTP/1.1
+content-type: application/json
 
+{
+    "code": "162811",
+    "email": "casi.lehtovuori@gmail.com"
+}
+###
+POST http://localhost:3000/users/player-2-login HTTP/1.1
+content-type: application/json
+{
+    "username": "emmi",
+    "password": "42"
+}
+###
 
 
 

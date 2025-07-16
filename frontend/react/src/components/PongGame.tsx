@@ -332,16 +332,14 @@ class PongAI {
       this.stateDuration = 500; // Stay in correct position state for half a second
       this.lastStateChange = now;
       return;
-    } 
-    
-    // When ball is moving away: Occasionally pause/idle based on difficulty
-    // This simulates how human players sometimes relax when the ball is away
-    if (ballVX < 0 && Math.random() < this.difficulty.idleChance) {
-      this.currentState = AIState.IDLE;
-      this.stateDuration = 500 + Math.random() * 1000; // Idle for 0.5-1.5 seconds
-      this.lastStateChange = now;
-      return;
-    }
+    }      // When ball is moving away: Occasionally pause/idle based on difficulty
+      // This simulates how human players sometimes relax when the ball is away
+      if (ballVX < 0 && Math.random() < this.difficulty.idleChance) {
+        this.currentState = AIState.IDLE;
+        this.stateDuration = 500 + Math.random() * 1000; // Idle for 0.5-1.5 seconds
+        this.lastStateChange = now;
+        return;
+      }
     
     // Default to correct position (this covers any remaining cases)
     this.currentState = AIState.CORRECT;
@@ -603,6 +601,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
 
   useEffect(() => {
     console.log("PongGame: useEffect running, initializing game");
+    
+    // Detect Firefox browser for specific adjustments
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    console.log("Browser detection:", { isFirefox, userAgent: navigator.userAgent });
     
     const playSound = (sound: HTMLAudioElement) => {
       sound.currentTime = 0; // Reset sound to start
@@ -981,20 +983,94 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
       // Use the selected ball speed from settings
       const currentBallSpeed = calculateBallSpeed(settings.ballSpeed);
       
-      ballX += ballVX * currentBallSpeed * deltaTime;
-      ballY += ballVY * currentBallSpeed * deltaTime;
+      // Use small, consistent steps for ball movement to avoid Firefox issues
+      // This performs a simplified "sub-step" physics update for smoother motion
+      // Firefox sometimes has larger time gaps which can cause the ball to "jump" through objects
+      
+      // Firefox-specific adjustments
+      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+      const maxStep = isFirefox ? 1/240 : 1/120; // Smaller steps for Firefox (240 Hz)
+      
+      // Store previous position for stuck detection
+      const prevBallX = ballX;
+      const prevBallY = ballY;
+      
+      let remainingDelta = deltaTime;
+      let subStepCount = 0;
+      
+      while (remainingDelta > 0) {
+        const stepDelta = Math.min(remainingDelta, maxStep);
+        subStepCount++;
+        
+        // Apply movement for this sub-step
+        ballX += ballVX * currentBallSpeed * stepDelta;
+        ballY += ballVY * currentBallSpeed * stepDelta;
+        
+        // Ensure the ball never gets "stuck" by checking for very small velocities
+        // Firefox seems more prone to velocity degradation in some cases
+        const MIN_VELOCITY = 0.1;
+        if (Math.abs(ballVX) < MIN_VELOCITY) {
+          ballVX = ballVX >= 0 ? MIN_VELOCITY : -MIN_VELOCITY;
+        }
+        if (Math.abs(ballVY) < MIN_VELOCITY) {
+          ballVY = ballVY >= 0 ? MIN_VELOCITY : -MIN_VELOCITY;
+        }
+        
+        // If ball appears stuck in same position for too many frames, reset it
+        // This is a last resort for Firefox-specific issues
+        if (frameCount % 60 === 0) { // Check periodically
+          if (Math.abs(ballVX) < 0.001 && Math.abs(ballVY) < 0.001) {
+            console.warn("Ball appears stuck, nudging it into motion");
+            ballVX = Math.random() > 0.5 ? 0.3 : -0.3;
+            ballVY = Math.random() > 0.5 ? 0.2 : -0.2;
+          }
+        }
+        
+        remainingDelta -= stepDelta;
+      }
+      
+      // Increment frame counter
+      frameCount++;
+      
+      // Check for ball getting truly stuck (no movement after all updates)
+      // This is a Firefox-specific failsafe
+      if (frameCount > 60 && // Only check after game has been running
+          ballX === prevBallX && ballY === prevBallY && 
+          subStepCount > 0) { // Ball position didn't change despite updates
+        console.warn("Ball appears completely stuck - applying emergency reset");
+        
+        // Move ball away from current position slightly and restore velocity
+        ballX += (Math.random() - 0.5) * 5;
+        ballY += (Math.random() - 0.5) * 5;
+        
+        // Reset velocity to standard values
+        ballVX = Math.random() > 0.5 ? STANDARD_NORMALIZED_X_SPEED : -STANDARD_NORMALIZED_X_SPEED;
+        ballVY = (Math.random() - 0.5) * STANDARD_NORMALIZED_Y_SPEED * 2;
+      }
 
       // Ball collision with top/bottom walls (consistent reflection)
-      // No need to change the velocity calculations here as we're just reversing direction
+      // Enhanced with minimum velocity to prevent getting stuck
       if (ballY < 8) {
         ballY = 8;
-        ballVY = Math.abs(ballVY); // Perfect reflection
+        // Ensure minimum vertical velocity after bounce
+        ballVY = Math.max(Math.abs(ballVY), 0.2); 
         playSound(wallSound);
       }
       if (ballY > canvasHeight - 8) {
         ballY = canvasHeight - 8;
-        ballVY = -Math.abs(ballVY); // Perfect reflection
+        // Ensure minimum vertical velocity after bounce
+        ballVY = -Math.max(Math.abs(ballVY), 0.2);
         playSound(wallSound);
+      }
+      
+      // Firefox debug helper - detects if ball is moving abnormally slow
+      // and logs diagnostic information
+      const ballSpeed = Math.sqrt(ballVX * ballVX + ballVY * ballVY);
+      if (ballSpeed < 0.05 && frameCount % 60 === 0) {
+        console.warn("Warning: Ball moving very slowly", {
+          ballX, ballY, ballVX, ballVY, speed: ballSpeed,
+          browser: navigator.userAgent
+        });
       }
 
       // Map-specific collision detection
@@ -1317,32 +1393,46 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     window.addEventListener("keyup", handleKeyUp);
 
     let animationFrameId: number;
-    let lastTimeStamp = performance.now();
+    let lastTimeStamp = 0; // Initialize to 0, will be set on first frame
+    let frameCount = 0; // Track frame count for diagnostics
     
     const gameLoop = (timestamp: number) => {
       // Calculate delta time in seconds (time since last frame)
       const deltaTime = (timestamp - lastTimeStamp) / 1000; // Convert to seconds
       
-      // Cap delta time to prevent huge jumps after tab switching/inactivity
-      const cappedDeltaTime = Math.min(deltaTime, 0.1);
+      // More aggressive capping of delta time for Firefox compatibility
+      // Firefox can sometimes have larger gaps between frames
+      const cappedDeltaTime = Math.min(deltaTime, 0.03); // Cap at ~30 FPS equivalent (more stable)
       
       // Log delta time occasionally to help debug performance issues
       if (Math.random() < 0.01) { // Log only 1% of frames to avoid console spam
         console.log(`Delta time: ${cappedDeltaTime.toFixed(4)}s, FPS: ${(1/cappedDeltaTime).toFixed(1)}`);
       }
       
-      update(cappedDeltaTime);
+      // Ensure we're always advancing by a safe minimum increment
+      // This helps prevent "stuck" balls in Firefox
+      const safeTimeDelta = Math.max(cappedDeltaTime, 0.005); // Minimum 5ms step
+      
+      update(safeTimeDelta);
       draw();
       
       lastTimeStamp = timestamp;
-      animationFrameId = requestAnimationFrame(gameLoop);
+      
+      // Request next frame as soon as possible
+      animationFrameId = window.requestAnimationFrame(gameLoop);
     };
     
     // Log initial ball state for debugging
     console.log(`Initial ball setup: pos=(${ballX},${ballY}), vel=(${ballVX},${ballVY}), speed=${calculateBallSpeed(settings.ballSpeed)}`);
     
-    // Start the game loop
-    animationFrameId = requestAnimationFrame(gameLoop);
+    // Start the game loop with more reliable initialization
+    const startGameLoop = (timestamp: number) => {
+      lastTimeStamp = timestamp; // Set initial timestamp (no delta on first frame)
+      animationFrameId = window.requestAnimationFrame(gameLoop);
+    };
+    
+    // Request first frame with proper initialization
+    animationFrameId = window.requestAnimationFrame(startGameLoop);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);

@@ -3,6 +3,16 @@ import bcryptjs from "bcryptjs";
 import { userSchemas } from "../schemas/userSchemas.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { handleOtp } from "../handleOtp.js";
+import { sendResetPasswordEmail } from "../utils/mailer.js";
+import crypto from "crypto";
+
+function isValidPassword(password) {
+  const pwdValidationRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  const lengthOK = password.length >= 8 && password.length <= 42;
+  const matchesSpecs = pwdValidationRegex.test(password);
+  return lengthOK && matchesSpecs;
+}
 
 export async function userRoutes(fastify, _options) {
   const rateLimitConfig = {
@@ -15,8 +25,88 @@ export async function userRoutes(fastify, _options) {
     },
   };
 
+  const emailRateLimitConfig = {
+    config: {
+      rateLimit: {
+        max: 1,
+        timeWindow: "1 minute",
+        keyGenerator: (request) => request.body?.email || request.ip,
+      },
+    },
+  };
   //####################################################################################################################################
+  fastify.post(
+    "/users/player-2-login",
+    { schema: userSchemas.loginUserSchema, ...rateLimitConfig },
+    async (req, reply) => {
+      try {
+        const { username, password } = req.body;
 
+        // Find user by username
+        const user = await prisma.user.findUnique({
+          where: { username },
+        });
+        // if user not found then wait for a small time and then return error
+        if (!user) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return reply
+            .code(401)
+            .send({ error: "Invalid username or password" });
+        }
+        // Compare plain password with hashed one, if invalid password, then return same error
+        // again with a small wait to mitigate timed attacks
+        const isPasswordValid = await bcryptjs.compare(password, user.password);
+        if (!isPasswordValid) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          return reply
+            .code(401)
+            .send({ error: "Invalid username or password" });
+        }
+        //if mfa is activated for the user, then generate and send a otp to be validated
+        //also send a token, which dose not give access, but in order to validate later that
+        //login had been successfull.
+        if (user.mfaInUse === true) {
+          try {
+            //make and send OTP to the matchin email
+            await handleOtp(user.email);
+            const otpToken = fastify.jwt.sign(
+              {
+                id: user.id,
+                email: user.email,
+              },
+              { expiresIn: "5min" }
+            );
+            //set a otp token to the user and reply so that frontend knows to redirect to OTP page.
+            reply.setCookie("otpToken", otpToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "strict",
+              path: "/",
+              maxAge: 5 * 60,
+            });
+            console.log("In users.js, trying to send email: ", user.email);
+            return reply.code(200).send({
+              message: "MFA still required",
+              email: user.email,
+              mfaRequired: true,
+              language: user.language || "en",
+            });
+          } catch (error) {
+            console.error("Error handling OTP:", error);
+            return reply.code(401).send({ error: "Invalid email for mfa" });
+          }
+        }
+        // send response with without token (token is in the cookie)
+        return reply.code(200).send({
+          message: "Login successful",
+          language: user.language || "en",
+        });
+      } catch (error) {
+        console.error("Login error:", error);
+        return reply.code(500).send({ error: "Internal server error" });
+      }
+    }
+  );
   // login user
   fastify.post(
     "/users/login",
@@ -69,6 +159,7 @@ export async function userRoutes(fastify, _options) {
             });
             return reply.code(200).send({
               message: "MFA still required",
+              email: user.email,
               mfaRequired: true,
               language: user.language || "en",
             });
@@ -113,6 +204,149 @@ export async function userRoutes(fastify, _options) {
 
   //####################################################################################################################################
 
+  // 1) Request password reset and send reset link to email
+  fastify.post(
+    "/users/request-password-reset",
+    { schema: userSchemas.requestPasswordResetSchema, ...emailRateLimitConfig },
+    async (req, reply) => {
+      const { email } = req.body;
+
+      try {
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        // Always return generic response
+        if (!user) {
+          return reply.code(200).send({
+            message: "If this email exists, a reset link has been sent",
+          });
+        }
+
+        const resetToken = fastify.jwt.sign(
+          { userId: user.id },
+          { expiresIn: "15m" }
+        );
+
+        const hashedToken = crypto
+          .createHash("sha256")
+          .update(resetToken)
+          .digest("hex");
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: new Date(Date.now() + 15 * 60 * 1000),
+          },
+        });
+
+        await sendResetPasswordEmail(email, resetToken);
+
+        return reply.code(200).send({
+          message: "If this email exists, a reset link has been sent",
+        });
+      } catch (err) {
+        console.error("Password reset error:", err);
+        return reply.code(500).send({ error: "Internal server error" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
+  // 2) Reset password - verify token and update password
+  fastify.post(
+    "/users/reset-password",
+    { schema: userSchemas.resetPasswordSchema },
+    async (req, reply) => {
+      const { token, newPassword } = req.body;
+
+      try {
+        // Verify token (throws if invalid or expired)
+        const payload = fastify.jwt.verify(token);
+
+        const hashedInputToken = crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
+        // Find user by id and check token expiration
+        const user = await prisma.user.findUnique({
+          where: { id: payload.userId },
+        });
+
+        if (
+          !user ||
+          user.resetPasswordToken != hashedInputToken ||
+          !user.resetPasswordExpires ||
+          user.resetPasswordExpires < new Date()
+        ) {
+          return reply.code(400).send({ error: "Invalid or expired token" });
+        }
+
+        if (!isValidPassword(newPassword)) {
+          return reply.code(400).send({
+            error:
+              "Password must be 8–42 characters long and include uppercase, lowercase, number, and special character.",
+          });
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+        // Update password and clear reset token/expiration
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            password: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          },
+        });
+
+        return reply.code(200).send({ message: "Password reset successfully" });
+      } catch (error) {
+        return reply.code(400).send({ error: "Invalid or expired token" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
+  fastify.post(
+    "/users/validate-reset-token",
+    { schema: userSchemas.validateResetTokenSchema },
+    async (req, reply) => {
+      const { token } = req.body;
+
+      try {
+        const payload = fastify.jwt.verify(token);
+        const hashedInputToken = crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
+        const user = await prisma.user.findUnique({
+          where: { id: payload.userId },
+        });
+
+        if (
+          !user ||
+          user.resetPasswordToken !== hashedInputToken ||
+          !user.resetPasswordExpires ||
+          user.resetPasswordExpires < new Date()
+        ) {
+          return reply.code(400).send({ error: "Invalid or expired token" });
+        }
+
+        return reply.send({ valid: true });
+      } catch {
+        return reply.code(400).send({ error: "Invalid or expired token" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
+
   fastify.post(
     "/users/logout",
     { schema: userSchemas.logoutSchema, preHandler: authenticate },
@@ -148,7 +382,6 @@ export async function userRoutes(fastify, _options) {
       reply.send(users);
     }
   );
-
   //####################################################################################################################################
 
   //REMOVE FOR PRODUCTION!!
@@ -180,7 +413,7 @@ export async function userRoutes(fastify, _options) {
       const hashedPassword = await bcryptjs.hash(password, 10);
 
       try {
-        /* const user =  */await prisma.user.create({
+        /* const user =  */ await prisma.user.create({
           data: { username, email, password: hashedPassword },
         });
         reply.code(200).send({ message: "User added successfully" }); //should be 201

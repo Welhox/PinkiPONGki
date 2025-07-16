@@ -119,7 +119,7 @@ const TournamentBuilder = () => {
           })
         )
       );
-      console.log("Missing tournament players init API");
+      // console.log("Missing tournament players init API");
       //navigate(`/tournament/${tournamentId}`); production
       navigate(`/tournament/${tournamentId}`, { state: { players } }); // for testing without backend
     } catch (error) {
@@ -187,6 +187,7 @@ const TournamentBuilder = () => {
                 <PlayerRegistrationBox
                   label={`Player ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
+                  playerId={index + 1}
                 />
               )}
             </div>
