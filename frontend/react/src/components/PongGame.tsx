@@ -568,6 +568,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   const [winner, setWinner] = useState<string | null>(null);
   const [restartKey, setRestartKey] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const { settings } = useGameSettings();
   
   console.log("PongGame: Using game settings", settings);
@@ -583,29 +584,41 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   const isFocusedRef = useRef(false);
   
   // Handle keyboard events with focus awareness
+  // Create ref for tracking paused state
+  const isPausedRef = useRef(false);
+
   useEffect(() => {
     // Keyboard event handlers
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Always prevent default behavior for game control keys to avoid page scrolling
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+      // Handle pause toggle with 'p' key regardless of focus state
+      if (e.key === 'p') {
         e.preventDefault();
-        
-        // Only register keypresses if the canvas is focused
+        setIsPaused(prev => {
+          const newPausedState = !prev;
+          isPausedRef.current = newPausedState;
+          return newPausedState;
+        });
+        return;
+      }
+      
+      // For game control keys, only prevent default behavior if canvas is focused
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
         if (isFocusedRef.current) {
+          e.preventDefault();
           keysPressed.current[e.key] = true;
         }
+        // When not focused, allow normal browser behavior (scrolling with arrow keys)
       }
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
-      // Always prevent default for game keys
+      // For game control keys, only prevent default behavior if canvas is focused
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
-        e.preventDefault();
-        
-        // Only register key releases if the canvas is focused
         if (isFocusedRef.current) {
+          e.preventDefault();
           keysPressed.current[e.key] = false;
         }
+        // When not focused, allow normal browser behavior
       }
     };
     
@@ -631,6 +644,10 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     console.log("Game canvas blurred");
     setIsFocused(false);
     isFocusedRef.current = false;
+    
+    // Pause the game when focus is lost
+    setIsPaused(true);
+    isPausedRef.current = true;
     
     // Clear all key states when focus is lost to prevent stuck keys
     keysPressed.current = {};
@@ -1463,14 +1480,23 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         console.log(`Delta time: ${cappedDeltaTime.toFixed(4)}s, FPS: ${(1/cappedDeltaTime).toFixed(1)}`);
       }
       
-      // Ensure we're always advancing by a safe minimum increment
-      // This helps prevent "stuck" balls in Firefox
-      const safeTimeDelta = Math.max(cappedDeltaTime, 0.005); // Minimum 5ms step
-      
-      update(safeTimeDelta);
+      // Always draw the current state, even when paused
       draw();
       
-      lastTimeStamp = timestamp;
+      // Only update game state if not paused
+      if (!isPausedRef.current) {
+        // Ensure we're always advancing by a safe minimum increment
+        // This helps prevent "stuck" balls in Firefox
+        const safeTimeDelta = Math.max(cappedDeltaTime, 0.005); // Minimum 5ms step
+        update(safeTimeDelta);
+        
+        // Only update timestamp if game is active
+        lastTimeStamp = timestamp;
+      } else {
+        // When paused, we don't advance game state, 
+        // but we need to update timestamp to avoid large jumps when unpaused
+        lastTimeStamp = timestamp;
+      }
       
       // Request next frame as soon as possible
       animationFrameId = window.requestAnimationFrame(gameLoop);
@@ -1529,16 +1555,28 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         }}
       >
         <span className="dark:text-white text-black">{player1.username}</span>
+        <div className="text-xs text-gray-500 dark:text-gray-400">Press 'P' to pause/unpause</div>
         <span className="dark:text-white text-black">{player2.username}</span>
       </div>
       
       <div className="relative">
+        {/* Overlay when game is not focused */}
         {!isFocused && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-40 cursor-pointer"
                onClick={() => canvasRef.current?.focus()}>
             <div className="bg-blue-900 bg-opacity-80 px-6 py-4 rounded-lg text-white font-bold text-center animate-pulse">
               Click to play<br/>
               <span className="text-sm text-blue-200">Game controls only work when focused</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Overlay when game is manually paused with "p" key */}
+        {isPaused && isFocused && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-40">
+            <div className="bg-purple-900 bg-opacity-80 px-8 py-6 rounded-lg text-white font-bold text-center">
+              GAME PAUSED<br/>
+              <span className="text-sm text-purple-200 mt-2 block">Press 'P' to resume</span>
             </div>
           </div>
         )}
