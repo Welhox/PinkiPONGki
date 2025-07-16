@@ -567,9 +567,35 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   const [score, setScore] = useState({ left: 0, right: 0 });
   const [winner, setWinner] = useState<string | null>(null);
   const [restartKey, setRestartKey] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
   const { settings } = useGameSettings();
   
   console.log("PongGame: Using game settings", settings);
+
+  // Focus canvas when component loads to capture keyboard events immediately
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.focus();
+    }
+  }, []);
+
+  // Add a global event handler to prevent page scrolling with arrow keys
+  useEffect(() => {
+    const preventArrowScroll = (e: KeyboardEvent) => {
+      // Prevent default behavior for game control keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+    
+    // Add listener to window to catch events even when canvas loses focus
+    window.addEventListener('keydown', preventArrowScroll);
+    
+    return () => {
+      // Clean up on component unmount
+      window.removeEventListener('keydown', preventArrowScroll);
+    };
+  }, []);
 
   // AI instance
   const aiRef = useRef<PongAI | null>(null);
@@ -1383,10 +1409,20 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
 
     const handleKeyDown = (e: KeyboardEvent) => {
       keysPressed.current[e.key] = true;
+      
+      // Prevent default scrolling behavior for arrow keys and WASD
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       keysPressed.current[e.key] = false;
+      
+      // Prevent default behavior for arrow keys and WASD
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -1479,15 +1515,28 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         <span className="dark:text-white text-black">{player1.username}</span>
         <span className="dark:text-white text-black">{player2.username}</span>
       </div>
+      
+      {!isFocused && (
+        <div className="text-center mb-2 text-blue-500">
+          Click on the game area to play
+        </div>
+      )}
+      
       <canvas
         ref={canvasRef}
         width={500}
         height={300}
+        tabIndex={0}
+        onClick={(e) => e.currentTarget.focus()}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         style={{
           background: "#222",
           display: "block",
           margin: "0 auto",
           imageRendering: "pixelated",
+          outline: "none", // Remove the focus outline
+          boxShadow: isFocused ? "0 0 8px 2px rgba(0, 255, 255, 0.5)" : "none", // Visual indicator of focus
         }}
       />
       {winner && (
