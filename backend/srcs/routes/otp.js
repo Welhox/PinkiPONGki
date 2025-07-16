@@ -1,17 +1,11 @@
 import prisma from "../prisma.js";
 import bcryptjs from "bcryptjs";
-import ratelimit from "@fastify/rate-limit";
 import { handleOtp } from "../handleOtp.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { authenticateOptional } from "../middleware/authenticateOptional.js";
 import { otpSchemas } from "../schemas/otpSchemas.js";
 export async function otpRoutes(fastify, _options) {
   //####################################################################################################################################
-
-  await fastify.register(ratelimit, {
-    global: false,
-  });
-
 
   // a rout for verifing the OTP witout making a cookie
   fastify.post(

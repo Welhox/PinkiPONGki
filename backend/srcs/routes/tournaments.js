@@ -1,17 +1,15 @@
 import prisma from "../prisma.js";
 // import { authenticate } from "../middleware/authenticate.js";
 import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
-
+import { devOnly } from "../middleware/devOnly.js";
 /* TO-DO list for tournaments:
   need to make sure that too many tournaments cannot be created (some function for cleaning up database of old tournaments)
   same if the tournament creation is left undone */
 
   
   export async function tournamentsRoute(fastify, _options) {
+//###############################################################
 
-  //   await fastify.register(ratelimit, {
-  //   global: false,
-  // });
 
   // Create a tournament
   fastify.post("/tournaments/create",
@@ -42,6 +40,8 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
       reply.code(500).send({ message: "Server error" });
     }}
   );
+
+//###############################################################
 
   // Register for a tournament
   fastify.post(
@@ -83,10 +83,13 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
     }
   );
 
+//###############################################################
+
   // Get all tournaments
+  // This route is for development purposes only, to be accessed from localhost
   fastify.get(
     "/tournaments/all",
-    { /* schema: tournamentsSchemas.getAllTournamentsSchema */ },
+    { schema: tournamentsSchemas.getAllTournamentsSchema, preHandler: devOnly },
     async (req, reply) => {
       const tournaments = await prisma.tournament.findMany({
         include: { participants: true, tournamentMatches: true },
@@ -96,10 +99,13 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
     }
   );
 
+//###############################################################
+
+
   // Get tournament details (including participants and matches)
   fastify.get(
     "/tournaments/:id",
-    { /* schema: tournamentsSchemas.getTournamentSchema */ },
+    { schema: tournamentsSchemas.getTournamentSchema },
     async (req, reply) => {
       const { id } = req.params;
       const tournament = await prisma.tournament.findUnique({
@@ -118,7 +124,7 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
   // Start a tournament
   fastify.post(
     "/tournaments/:id/start",
-    { /* schema: tournamentsSchemas.startTournamentSchema */ },
+    { schema: tournamentsSchemas.startTournamentSchema },
     async (req, reply) => {
       const { id } = req.params;
       console.log("Starting tournament with ID:", id);
@@ -179,7 +185,7 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
   // update a tournament match
   fastify.post(
     "/tournaments/:id/match/:matchId/update",
-    { /* schema: tournamentsSchemas.updateTournamentMatchSchema */ },
+    { schema: tournamentsSchemas.updateTournamentMatchSchema },
     async (req, reply) => {
       const { id, matchId } = req.params;
       const { winnerId, winnerAlias } = req.body;
@@ -200,6 +206,10 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
         if (match.tournamentId !== Number(id)) {
           return reply.code(400).send({ message: "Match does not belong to this tournament" });
         }
+        if (match.status !== "pending") {
+          return reply.code(400).send({ message: "Match is not in a pending state" });
+        }
+        // Update the match with the winner
         const updatedMatch = await prisma.tournamentMatch.update({
           where: { id: Number(matchId) },
           data: {
@@ -255,6 +265,9 @@ async function isTournamentFinished(id, updatedMatch) {
     }
   }
 }
+
+//###############################################################
+
 
 //function for generating next round matches
 async function generateNextRoundMatches(tournamentId) {
