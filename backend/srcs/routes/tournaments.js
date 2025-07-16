@@ -6,16 +6,24 @@ import { tournamentsSchemas } from "../schemas/tournamentsSchemas.js";
   need to make sure that too many tournaments cannot be created (some function for cleaning up database of old tournaments)
   same if the tournament creation is left undone */
 
-export async function tournamentsRoute(fastify, _options) {
+  
+  export async function tournamentsRoute(fastify, _options) {
+
+  //   await fastify.register(ratelimit, {
+  //   global: false,
+  // });
+
   // Create a tournament
   fastify.post("/tournaments/create",
     {
       schema: tournamentsSchemas.createTournamentSchema,
+      config: {rateLimit: { max: 10, timeWindow: "1 minute", keyGenerator: (req) => req.ip, }}
       // commented out in order to allow unauthenticated users to create tournaments
       // preHandler: authenticate,
     },
     async (req, reply) => {
       const { name, size, createdById, status } = req.body;
+
       console.log("Creating tournament with data:", req.body);
       //the schema already validates and returns 400 if not the right size
       // if (![4, 8, 16, 32].includes(size)) return reply.code(400).send({ error: 'Invalid size' });
