@@ -579,23 +579,62 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     }
   }, []);
 
-  // Add a global event handler to prevent page scrolling with arrow keys
+  // Create a ref to track canvas focus state that persists across renders
+  const isFocusedRef = useRef(false);
+  
+  // Handle keyboard events with focus awareness
   useEffect(() => {
-    const preventArrowScroll = (e: KeyboardEvent) => {
-      // Prevent default behavior for game control keys
+    // Keyboard event handlers
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Always prevent default behavior for game control keys to avoid page scrolling
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
         e.preventDefault();
+        
+        // Only register keypresses if the canvas is focused
+        if (isFocusedRef.current) {
+          keysPressed.current[e.key] = true;
+        }
       }
     };
     
-    // Add listener to window to catch events even when canvas loses focus
-    window.addEventListener('keydown', preventArrowScroll);
+    const handleKeyUp = (e: KeyboardEvent) => {
+      // Always prevent default for game keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
+        e.preventDefault();
+        
+        // Only register key releases if the canvas is focused
+        if (isFocusedRef.current) {
+          keysPressed.current[e.key] = false;
+        }
+      }
+    };
     
+    // Add listeners
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    // Clean up
     return () => {
-      // Clean up on component unmount
-      window.removeEventListener('keydown', preventArrowScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
+  
+  // Handle focus events
+  const handleFocus = () => {
+    console.log("Game canvas focused");
+    setIsFocused(true);
+    isFocusedRef.current = true;
+  };
+  
+  const handleBlur = () => {
+    console.log("Game canvas blurred");
+    setIsFocused(false);
+    isFocusedRef.current = false;
+    
+    // Clear all key states when focus is lost to prevent stuck keys
+    keysPressed.current = {};
+  };
 
   // AI instance
   const aiRef = useRef<PongAI | null>(null);
@@ -1407,27 +1446,6 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
       setScore({ left: leftScore, right: rightScore });
     }
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      keysPressed.current[e.key] = true;
-      
-      // Prevent default scrolling behavior for arrow keys and WASD
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
-        e.preventDefault();
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current[e.key] = false;
-      
-      // Prevent default behavior for arrow keys and WASD
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
     let animationFrameId: number;
     let lastTimeStamp = 0; // Initialize to 0, will be set on first frame
     let frameCount = 0; // Track frame count for diagnostics
@@ -1471,8 +1489,6 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     animationFrameId = window.requestAnimationFrame(startGameLoop);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
       cancelAnimationFrame(animationFrameId);
     };
   }, [player1.username, player2.username, restartKey, isAIGame, settings]);
@@ -1516,28 +1532,33 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         <span className="dark:text-white text-black">{player2.username}</span>
       </div>
       
-      {!isFocused && (
-        <div className="text-center mb-2 text-blue-500">
-          Click on the game area to play
-        </div>
-      )}
-      
-      <canvas
-        ref={canvasRef}
-        width={500}
-        height={300}
-        tabIndex={0}
-        onClick={(e) => e.currentTarget.focus()}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        style={{
-          background: "#222",
-          display: "block",
-          margin: "0 auto",
-          imageRendering: "pixelated",
-          outline: "none", // Remove the focus outline
-          boxShadow: isFocused ? "0 0 8px 2px rgba(0, 255, 255, 0.5)" : "none", // Visual indicator of focus
-        }}
+      <div className="relative">
+        {!isFocused && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-40 cursor-pointer"
+               onClick={() => canvasRef.current?.focus()}>
+            <div className="bg-blue-900 bg-opacity-80 px-6 py-4 rounded-lg text-white font-bold text-center animate-pulse">
+              Click to play<br/>
+              <span className="text-sm text-blue-200">Game controls only work when focused</span>
+            </div>
+          </div>
+        )}
+        
+        <canvas
+          ref={canvasRef}
+          width={500}
+          height={300}
+          tabIndex={0}
+          onClick={(e) => e.currentTarget.focus()}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          style={{
+            background: "#222",
+            display: "block",
+            margin: "0 auto",
+            imageRendering: "pixelated",
+            outline: "none", // Remove the focus outline
+            boxShadow: isFocused ? "0 0 10px 4px rgba(0, 255, 255, 0.6)" : "0 0 5px 1px rgba(255, 0, 0, 0.3)", // Visual indicator of focus
+          }}
       />
       {winner && (
         <div
@@ -1569,6 +1590,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
