@@ -42,6 +42,7 @@ export const formatMatches = (matches: any[]): Match[] =>
       winnerId,
       round: m.round,
       saved: true,
+      tournamentId: m.tournamentId,
     };
   });
 

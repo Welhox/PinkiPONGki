@@ -217,13 +217,13 @@ import { devOnly } from "../middleware/devOnly.js";
           .code(400)
           .send({ message: "Either winnerId or winnerAlias is required" });
       }
-      if (winnerId && winnerAlias) {
+      /* if (winnerId && winnerAlias) {
         return reply
           .code(400)
           .send({
             message: "Only one of winnerId or winnerAlias should be provided",
           });
-      }
+      } */
       console.log(
         "Updating match for tournament ID:",
         id,
@@ -249,15 +249,23 @@ import { devOnly } from "../middleware/devOnly.js";
         const updatedMatch = await prisma.tournamentMatch.update({
           where: { id: Number(matchId) },
           data: {
-            winnerId: winnerId || null,
-            winnerAlias: winnerAlias || null,
+            winnerId: winnerId,
+            winnerAlias: winnerAlias,
             status: "completed",
           },
         });
         console.log("Match updated successfully:", updatedMatch);
         try {
-          // generate matches for net round if applicable
-          generateNextRoundMatches(id);
+          const roundIsComplete = await isRoundComplete(id, match.round);
+          if (roundIsComplete) {
+            // generate matches for net round if applicable
+            generateNextRoundMatches(id);
+          } else {
+            console.log(
+              `Round ${match.round} not complete yet — skipping next round generation.`
+            );
+          }
+
           //check if the tournament is finished
           isTournamentFinished(id, updatedMatch);
         } catch (error) {
@@ -384,4 +392,16 @@ async function generateNextRoundMatches(tournamentId) {
   await prisma.tournamentMatch.createMany({
     data: nextRoundMatches,
   });
+}
+
+//function for checking if all matches in a round have been completed
+async function isRoundComplete(tournamentId, round) {
+  const matches = await prisma.tournamentMatch.findMany({
+    where: {
+      tournamentId: Number(tournamentId),
+      round: round,
+    },
+  });
+  // all matches should have status "completed"
+  return matches.every((match) => match.status === "completed");
 }

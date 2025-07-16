@@ -11,4 +11,5 @@ export interface Match {
   winnerId: number | null;
   round: number;
   saved: boolean;
+  tournamentId: number;
 }

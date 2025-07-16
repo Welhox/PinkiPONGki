@@ -14,8 +14,8 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
   return (
     <div className="flex justify-between items-center p-3 border rounded mb-2">
       <div>
-        <span className="font-semibold">{player1.name}</span> vs{" "}
-        <span className="font-semibold">{player2.name}</span>
+        <span className="font-semibold">{player1?.name ?? "TBD"}</span> vs{" "}
+        <span className="font-semibold">{player2?.name ?? "TBD"}</span>
       </div>
       {result ? (
         <div className="text-green-600 font-semibold">

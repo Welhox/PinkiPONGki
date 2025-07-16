@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import api from "../api/axios";
 import Bracket from "../components/Bracket";
 import Victory from "../components/Victory";
 import { Match, Player } from "../types/game";
 import { useGameSettings } from "../contexts/GameSettingsContext";
-import { generateInitialMatches } from "../utils/generateInitialMatches";
-import { handleMatchPlayed as handleMatchPlayedUtil } from "../utils/handleMatchPlayed";
+import { handleMatchPlayed as handleMatchPlayedUtil } from "../utils/updateMatchNRefreshTournament";
 
 import {
   fetchTournamentWithMatches,
@@ -71,17 +69,11 @@ const TournamentPage = () => {
   };
 
   const handleMatchPlayed = async (match: Match, winner: Player) => {
-    await handleMatchPlayedUtil(
-      match,
-      winner,
-      matchesFromBackend,
-      upcomingMatches,
-      {
-        setMatchesFromBackend,
-        setUpcomingMatches,
-        setFinalStandings,
-      }
-    );
+    await handleMatchPlayedUtil(match, winner, {
+      setMatchesFromBackend,
+      setUpcomingMatches,
+      setFinalStandings,
+    });
   };
 
   const allMatches = [...matchesFromBackend, ...upcomingMatches];
