@@ -6,7 +6,7 @@ let isHandlingSessionExpiry = false;
 const isSessionAuthFailure = (status: number, url: string): boolean => {
   const isSessionOrUserEndpoint =
     url.includes("/session") ||
-    (url.includes("/users") && !url.includes("/users/login"));
+    (url.includes("/users") && !url.includes("login"));
   return (status === 401 || status === 419) && isSessionOrUserEndpoint;
 };
 
