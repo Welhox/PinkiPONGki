@@ -15,6 +15,7 @@ const TournamentBuilder = () => {
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [players, setPlayers] = useState<RegisteredPlayer[]>([]);
   const [registeredPlayers, setRegisteredPlayers] = useState<boolean[]>([]);
+  const [tournamentName, setTournamentName] = useState("");
   const { user } = useAuth();
   const { settings } = useGameSettings();
   const navigate = useNavigate();
@@ -98,11 +99,14 @@ const TournamentBuilder = () => {
       alert(t("tournament.errorAllPlayersRequired"));
       return;
     }
-
+    if (tournamentName === "") {
+      setTournamentName("Pong Tournament"); // default name if not provided
+    }
     try {
       // create a tournament
+
       const res = await api.post("/tournaments/create", {
-        name: "Pong Tournament",
+        name: tournamentName,
         size: playerCount,
         createdById: user?.id, // use user ID if logged in, otherwise 0
         status: "waiting",
@@ -188,7 +192,22 @@ const TournamentBuilder = () => {
             </p>
           </div>
         </div>
-
+        <div className="flex flex-col items-center mb-4">
+          <label
+            className="dark:text-white mb-2 font-bold"
+            htmlFor="nameTournament"
+          >
+            Tournament Name
+          </label>
+          <input
+            id="nameTournament"
+            placeholder="Pong Tournament"
+            type="text"
+            value={tournamentName}
+            className="dark:text-white mb-2 p-2 border rounded w-100"
+            onChange={(e) => setTournamentName(e.target.value)}
+          />
+        </div>
         <p className="dark:text-white">{t("tournament.enterUsernames")}</p>
         <div className="flex flex-col">
           {players.map((player, index) => (
