@@ -336,6 +336,40 @@ const updateTournamentMatchSchema = {
   },
 }};
   
+//schema for deleting a tournament
+const deleteTournamentSchema = {
+  description: "Delete a tournament",
+  tags: ["tournaments"],
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "integer", minimum: 1 },
+      name: { type: "string" },
+    },
+    required: ["id", "name"],
+  },
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Tournament deleted successfully" },
+      },
+      required: ["message"],
+    },
+    404: {
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Tournament not found" },
+      },
+      required: ["message"],
+    },
+    500: {
+      type: "object",
+      properties: { message: { type: "string", example: "Server error" } },
+      required: ["message"],
+    },
+  },
+};
 
 export const tournamentsSchemas = {
   updateTournamentMatchSchema,
