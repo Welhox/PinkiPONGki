@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
@@ -15,6 +15,18 @@ const ForgotPassword: React.FC = () => {
   const { status } = useAuth();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+  const liveRegionRef = useRef<HTMLDivElement>(null);
+  const [liveMessage, setLiveMessage] = useState<string | null>(null); // for screen reader aria announcements
+  useEffect(() => {
+	if (error || submitted) {
+	 setLiveMessage(null); // force remount
+	 setTimeout(() => {
+	   setLiveMessage(submitted ? t("forgotPassword.successMessage") : error);
+	   setTimeout(() => {
+		 liveRegionRef.current?.focus();
+	   }, 10);
+	 }, 100);
+ }}, [error, submitted]);
 
   const labelStyles =
     "block mb-2 text-sm font-medium text-gray-900 dark:text-white";
@@ -62,7 +74,18 @@ const ForgotPassword: React.FC = () => {
       <h1 className="text-3xl font-bold text-teal-800 dark:text-teal-300 mb-6">
         {t("forgotPassword.title")}
       </h1>
-
+   {/* This next part is a secret div, visible only to screen readers, which ensures that the error
+	  or success messages get announced using aria. */}
+       {liveMessage && (
+        <div
+          ref={liveRegionRef}
+          tabIndex={-1}
+          aria-live="assertive"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {liveMessage}
+        </div>)}
       {submitted ? (
         <>
           <p className="text-green-600 dark:text-green-400 mb-4">
@@ -85,6 +108,7 @@ const ForgotPassword: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={inputStyles}
+			  aria-label="Enter your email address to reset your password"
             />
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
