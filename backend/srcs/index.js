@@ -17,6 +17,7 @@ import rateLimit from "@fastify/rate-limit";
 import dotenv from "dotenv";
 import { matchesRoute } from "./routes/matches.js";
 import { tournamentsRoute } from "./routes/tournaments.js";
+import { startDBCleaner } from "./utils/DBCleaner.js";
 
 const fastify = Fastify({ logger: true });
 
@@ -89,6 +90,10 @@ const start = async () => {
 
     await fastify.listen({ port: 3000, host: "0.0.0.0" });
     console.log("Server listening on http://localhost:3000");
+
+    // Start the database cleaner
+    startDBCleaner(60 * 60 * 1000); // runs every hour
+
   } catch (err) {
     console.log("Catch activated!!");
     fastify.log.error(err);
