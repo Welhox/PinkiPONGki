@@ -201,6 +201,61 @@
     "errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",
     "consoleCreating": "Luodaan turnaus",
-	"placeholder": "Pong Turnaus" 
+	  "placeholder": "Pong Turnaus"
+  },
+  "gamecustomization": {
+    "title": "Pelin mukautus",
+    "scoreToWin": "Pisteet voittoon",
+    "aiDifficulty": "Tietokoneen vaikeustaso",
+    "difficulty": {
+      "easy": "Helppo – Tekoäly tekee paljon virheitä",
+      "medium": "Keskitaso – Tasapainoinen peli",
+      "hard": "Vaikea – Haastava vastustaja",
+      "expert": "Ekspertti – Lähes virheetön tekoäly"
+    },
+    "mapType": "Kentän tyyppi",
+    "map": {
+      "classic": "Klassinen – Tavallinen Pong",
+      "corners": "Kulmaseinät – Maalit vain keskeltä",
+      "centerWall": "Keskiseinä – Pallo liikkuu vain ylös/alas"
+    },
+    "ballSpeed": "Pallon nopeus",
+    "speed": {
+      "slow": "Hidas",
+      "medium": "Keskitaso",
+      "fast": "Nopea",
+      "extreme": "Äärimmäinen"
+    },
+    "speedDescription": {
+      "easy": "Sopii aloittelijoille – Reaktioaikaa riittää",
+      "medium": "Tasapainoinen – Hyvä peruspeliin",
+      "hard": "Haastava – Testaa refleksit",
+      "extreme": "Äärimmäinen – Vain mestareille!"
+    },
+    "powerUps": {
+      "title": "Tehosteet",
+      "bigPaddle": "Suuri maila",
+      "description": "Suurentaa mailaa 8 sekunniksi"
+    },
+    "reset": "Palauta oletusasetukset",
+    "back": "Takaisin",
+    "start": "Aloita peli"
+  },
+  "matchcard": {
+    "winner": "Voittaja",
+    "win": "{{name}} voitti"
+  },
+  "powerups": {
+    "bigPaddle": "Iso Maila"
+  },
+  "pongGame": {
+    "pressPToPause": "Paina 'P' keskeyttääksesi/jatkaaksesi",
+    "clickToPlay": "Klikkaa pelataksesi",
+    "controlsWorkWhenFocused": "Pelin ohjaimet toimivat vain, kun peli on valittuna",
+    "gamePaused": "PELI TAUOLLA",
+    "pressPToResume": "Paina 'P' jatkaaksesi",
+    "winnerMessage": "{{winner}} voitti!",
+    "restartMatch": "Aloita Uudelleen",
+    "returnToMainMenu": "Palaa Päävalikkoon"
   }
 }

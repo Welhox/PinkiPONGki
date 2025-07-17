@@ -201,6 +201,61 @@
     "errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
     "errorTournamentCreation": "Fel vid skapande av turnering.",
     "consoleCreating": "Skapar turnering",
-	"placeholder": "Pong Turnering" 
+	  "placeholder": "Pong Turnering" 
+  },
+  "gamecustomization": {
+    "title": "Spelanpassning",
+    "scoreToWin": "Poäng för att vinna",
+    "aiDifficulty": "AI-svårighetsgrad",
+    "difficulty": {
+      "easy": "Lätt – AI gör många misstag",
+      "medium": "Medel – Balanserat spel",
+      "hard": "Svår – Utmanande motståndare",
+      "expert": "Expert – Nästan perfekt AI"
+    },
+    "mapType": "Banans typ",
+    "map": {
+      "classic": "Klassisk – Standard Pong",
+      "corners": "Hörnväggar – Mål endast i mitten",
+      "centerWall": "Mittvägg – Bollen går bara upp/ner"
+    },
+    "ballSpeed": "Bollhastighet",
+    "speed": {
+      "slow": "Långsam",
+      "medium": "Medel",
+      "fast": "Snabb",
+      "extreme": "Extrem"
+    },
+    "speedDescription": {
+      "easy": "Bra för nybörjare – Gott om reaktionstid",
+      "medium": "Balanserad – Bra för standardspelet",
+      "hard": "Utmanande – Testa dina reflexer",
+      "extreme": "Extrem – Endast för mästare!"
+    },
+    "powerUps": {
+      "title": "Power-ups",
+      "bigPaddle": "Stor racket",
+      "description": "Förstorar racket i 8 sekunder"
+    },
+    "reset": "Återställ standard",
+    "back": "Tillbaka",
+    "start": "Starta spelet"
+  },
+  "matchcard": {
+    "winner": "Vinnare",
+    "win": "{{name}} vinner"
+  },
+  "powerups": {
+    "bigPaddle": "Stor Racket"
+  },
+  "pongGame": {
+    "pressPToPause": "Tryck på 'P' för att pausa/fortsätta",
+    "clickToPlay": "Klicka för att spela",
+    "controlsWorkWhenFocused": "Spelkontroller fungerar endast när spelet är i fokus",
+    "gamePaused": "PAUSAT",
+    "pressPToResume": "Tryck på 'P' för att fortsätta",
+    "winnerMessage": "{{winner}} vinner!",
+    "restartMatch": "Starta om Match",
+    "returnToMainMenu": "Tillbaka till Huvudmenyn"
   }
 }
