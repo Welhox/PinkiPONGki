@@ -236,9 +236,37 @@ import { devOnly } from "../middleware/devOnly.js";
     }
   );
 
-}
-
 //##############################################################
+
+//Route to delete a tournament
+//Requires both tournament ID and Name for security resons
+fastify.delete(
+  "/tournaments/:id/:name",
+  { schema: tournamentsSchemas.deleteTournamentSchema, 
+    config: { ratelimit: {max: 20, timeWindow: "1 minute", keyGenerator: (req) => req.ip}} 
+  },
+  async (req, reply) => {
+    const { id, name } = req.params;
+    console.log("Deleting tournament with ID:", id);
+    try {
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: Number(id) },
+      });
+      console.log("name:", name, "tournament name:", tournament.name);
+      if (!tournament || name !== tournament.name) {
+        return reply.code(404).send({ message: "Tournament not found" });
+      }
+      await prisma.tournament.delete({
+        where: { id: Number(id) },
+      });
+      return reply.code(200).send({ message: `Tournament ${id} successfully removed`});
+    } catch(error){
+      console.error("Error deleting tournament:", error );
+      return reply.code(500).send({ error: "Unable to delete tournament"});
+    }
+  });
+}
+//################################################################
 
 // Function to check if all matches in a tournament are completed
 async function isTournamentFinished(id, updatedMatch) {
