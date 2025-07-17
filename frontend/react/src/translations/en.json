@@ -200,5 +200,60 @@
     "errorAllPlayersRequired": "All players must enter a username.",
     "errorTournamentCreation": "Error creating tournament.",
     "consoleCreating": "Let's make a tournament"
+  },
+  "gamecustomization": {
+    "title": "Game Customization",
+    "scoreToWin": "Score to Win",
+    "aiDifficulty": "AI Difficulty",
+    "difficulty": {
+      "easy": "Easy - AI makes many mistakes",
+      "medium": "Medium - Balanced gameplay",
+      "hard": "Hard - Challenging opponent",
+      "expert": "Expert - Nearly perfect AI"
+    },
+    "mapType": "Map Type",
+    "map": {
+      "classic": "Classic - Standard Pong",
+      "corners": "Corner Walls - Score only through center",
+      "centerWall": "Center Wall - Ball goes top/bottom only"
+    },
+    "ballSpeed": "Ball Speed",
+    "speed": {
+      "slow": "Slow",
+      "medium": "Medium",
+      "fast": "Fast",
+      "extreme": "Extreme"
+    },
+    "speedDescription": {
+      "easy": "Beginner friendly - Plenty of time to react",
+      "medium": "Balanced - Good for standard gameplay",
+      "hard": "Challenging - Test your reflexes",
+      "extreme": "Extreme - For Pong masters only!"
+    },
+    "powerUps": {
+      "title": "Power-ups",
+      "bigPaddle": "Big Paddle",
+      "description": "Enlarges paddle for 8 seconds"
+    },
+    "reset": "Reset to Defaults",
+    "back": "Back",
+    "start": "Start Game"
+  },
+  "matchcard": {
+    "winner": "Winner",
+    "win": "{{name}} Wins"
+  },
+  "powerups": {
+    "bigPaddle": "Big Paddle"
+  },
+  "pongGame": {
+    "pressPToPause": "Press 'P' to pause/unpause",
+    "clickToPlay": "Click to play",
+    "controlsWorkWhenFocused": "Game controls only work when focused",
+    "gamePaused": "GAME PAUSED",
+    "pressPToResume": "Press 'P' to resume",
+    "winnerMessage": "{{winner}} wins!",
+    "restartMatch": "Restart Match",
+    "returnToMainMenu": "Return to Main Menu"
   }
 }

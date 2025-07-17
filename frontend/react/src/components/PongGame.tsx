@@ -1,6 +1,7 @@
 import api from '../api/axios';
 import React, { useRef, useEffect, useState } from 'react';
 import { useGameSettings, getDifficultySettings, DifficultySettings, GameSettings } from '../contexts/GameSettingsContext';
+import { useTranslation } from "react-i18next";
 
 // Game constants for consistent physics
 // Ball speed is calculated based on the slider value (1-10)
@@ -570,6 +571,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   const [isFocused, setIsFocused] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const { settings } = useGameSettings();
+  const { t } = useTranslation();
   
   console.log("PongGame: Using game settings", settings);
 
@@ -919,12 +921,12 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         
         if (player1PowerUpsRef.current.paddleEnlarge.active) {
           const timeLeft = Math.max(0, (player1PowerUpsRef.current.paddleEnlarge.endTime - Date.now()) / 1000);
-          ctx.fillText(`Big Paddle: ${timeLeft.toFixed(1)}s`, 20, canvasHeight - 20);
+          ctx.fillText(`${t("powerups.bigPaddle")}: ${timeLeft.toFixed(1)}s`, 20, canvasHeight - 20);
         }
         
         if (player2PowerUpsRef.current.paddleEnlarge.active) {
           const timeLeft = Math.max(0, (player2PowerUpsRef.current.paddleEnlarge.endTime - Date.now()) / 1000);
-          ctx.fillText(`Big Paddle: ${timeLeft.toFixed(1)}s`, canvasWidth - 120, canvasHeight - 20);
+          ctx.fillText(`${t("powerups.bigPaddle")}: ${timeLeft.toFixed(1)}s`, canvasWidth - 120, canvasHeight - 20);
         }
         
         ctx.restore();
@@ -1555,7 +1557,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         }}
       >
         <span className="dark:text-white text-black">{player1.username}</span>
-        <div className="text-xs text-gray-500 dark:text-gray-400">Press 'P' to pause/unpause</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">{t("pongGame.pressPToPause")}</div>
         <span className="dark:text-white text-black">{player2.username}</span>
       </div>
       
@@ -1565,8 +1567,8 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-40 cursor-pointer"
                onClick={() => canvasRef.current?.focus()}>
             <div className="bg-blue-900 bg-opacity-80 px-6 py-4 rounded-lg text-white font-bold text-center animate-pulse">
-              Click to play<br/>
-              <span className="text-sm text-blue-200">Game controls only work when focused</span>
+              {t("pongGame.clickToPlay")}<br/>
+              <span className="text-sm text-blue-200">{t("pongGame.controlsWorkWhenFocused")}</span>
             </div>
           </div>
         )}
@@ -1575,8 +1577,8 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         {isPaused && isFocused && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black bg-opacity-40">
             <div className="bg-purple-900 bg-opacity-80 px-8 py-6 rounded-lg text-white font-bold text-center">
-              GAME PAUSED<br/>
-              <span className="text-sm text-purple-200 mt-2 block">Press 'P' to resume</span>
+              {t("pongGame.gamePaused")}<br/>
+              <span className="text-sm text-purple-200 mt-2 block">{t("pongGame.pressPToResume")}</span>
             </div>
           </div>
         )}
@@ -1611,20 +1613,20 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
             zIndex: 10, // Ensure it's above the canvas
           }}
         >
-          <div className="mb-8">{winner} wins!</div>
+          <div className="mb-8">{t("pongGame.winnerMessage", { winner })}</div>
           <div className="flex flex-col gap-4 w-64">
             <button
               className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
               onClick={handleRestart}
             >
-              Restart Match
+              {t("pongGame.restartMatch")}
             </button>
             <button
               className="text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800"
 
               onClick={handleReturnToMenu}
             >
-              Return to Main Menu
+              {t("pongGame.returnToMainMenu")}
             </button>
           </div>
         </div>
