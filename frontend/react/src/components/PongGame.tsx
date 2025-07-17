@@ -1620,7 +1620,8 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
               Restart Match
             </button>
             <button
-              className="px-6 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-lg text-xl font-bold transition-colors"
+              className="text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800"
+
               onClick={handleReturnToMenu}
             >
               Return to Main Menu

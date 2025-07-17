@@ -21,6 +21,15 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
     updateSettings({ scoreToWin: value });
   };
 
+  const labelStyles =
+    "block mb-2 text-sm font-medium text-gray-900 dark:text-white";
+  const inputStyles =
+    "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+  const buttonStyles =
+    "my-3 mx-3 px-10 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800";
+  const altButtonStyles =
+    "text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800";
+
   const handleDifficultyChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -39,12 +48,12 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
     updateSettings({ paddleEnlargePowerUp: !settings.paddleEnlargePowerUp });
   };
 
-  const buttonStyles =
-    "px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded font-semibold transition-colors";
-  const inputStyles =
-    "px-3 py-2 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-white";
-  const labelStyles =
-    "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2";
+//   const buttonStyles =
+//     "px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded font-semibold transition-colors";
+//   const inputStyles =
+//     "px-3 py-2 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-white";
+//   const labelStyles =
+//     "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2";
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -152,12 +161,13 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
         {/* Power-ups Section */}
         <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+            <label htmlFor="togglePowerUpsCheckbox" className="text-lg font-semibold text-gray-700 dark:text-gray-300">
               Power-ups
-            </span>
-            <label className="flex items-center cursor-pointer">
+            </label>
+            <div className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
+				id="togglePowerUpsCheckbox"
                 checked={settings.powerUpsEnabled}
                 onChange={togglePowerUps}
                 className="sr-only"
@@ -175,7 +185,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
                   }`}
                 ></div>
               </div>
-            </label>
+            </div>
           </div>
 
           {settings.powerUpsEnabled && (
@@ -224,19 +234,17 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
               console.log("GameCustomization: Reset settings to defaults");
               resetToDefaults();
             }}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+			className={altButtonStyles}
           >
             Reset to Defaults
           </button>
-
-          <div className="space-x-3">
             <button
               onClick={() => {
                 console.log("GameCustomization: Back button clicked");
                 onBack();
               }}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
+			  className={altButtonStyles}
+			 >
               Back
             </button>
             <button
@@ -251,7 +259,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
             >
               Start Game
             </button>
-          </div>
+          
         </div>
       </div>
     </div>
