@@ -236,14 +236,12 @@ import { devOnly } from "../middleware/devOnly.js";
     }
   );
 
-}
-
 //##############################################################
 
 //Route to delete a tournament
 //Requires both tournament ID and Name for security resons
 fastify.delete(
-  "/tournaments/:id",
+  "/tournaments/:id/:name",
   { schema: tournamentsSchemas.deleteTournamentSchema, 
     config: { ratelimit: {max: 20, timeWindow: "1 minute", keyGenerator: (req) => req.ip}} 
   },
@@ -254,6 +252,7 @@ fastify.delete(
       const tournament = await prisma.tournament.findUnique({
         where: { id: Number(id) },
       });
+      console.log("name:", name, "tournament name:", tournament.name);
       if (!tournament || name !== tournament.name) {
         return reply.code(404).send({ message: "Tournament not found" });
       }
@@ -266,7 +265,7 @@ fastify.delete(
       return reply.code(500).send({ error: "Unable to delete tournament"});
     }
   });
-
+}
 //################################################################
 
 // Function to check if all matches in a tournament are completed

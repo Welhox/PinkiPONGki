@@ -372,6 +372,7 @@ const deleteTournamentSchema = {
 };
 
 export const tournamentsSchemas = {
+  deleteTournamentSchema,
   updateTournamentMatchSchema,
   startTournamentSchema,
   createTournamentSchema,

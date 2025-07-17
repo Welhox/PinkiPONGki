@@ -121,9 +121,10 @@ content-type: application/json
     "password": "42"
 }
 ###
+//Delete a tournament with id + name
+DELETE http://localhost:3000/tournaments/147/Pong%20Tournament HTTP/1.1
 
-
-
+###
 
 
 
