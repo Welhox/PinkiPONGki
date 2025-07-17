@@ -100,7 +100,7 @@ const TournamentBuilder = () => {
       return;
     }
     if (tournamentName === "") {
-      setTournamentName("Pong Tournament"); // default name if not provided
+      setTournamentName(t("tournament.placeholder")); // default name if not provided
     }
     try {
       // create a tournament
@@ -197,11 +197,11 @@ const TournamentBuilder = () => {
             className="dark:text-white mb-2 font-bold"
             htmlFor="nameTournament"
           >
-            Tournament Name
+            {t("tournament.placeholder")}
           </label>
           <input
             id="nameTournament"
-            placeholder="Pong Tournament"
+            placeholder={t("tournament.placeholder")}
             type="text"
             value={tournamentName}
             className="dark:text-white mb-2 p-2 border rounded w-100"

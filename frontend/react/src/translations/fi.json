@@ -200,6 +200,7 @@
     "errorAlreadyLoggedIn": "Olet jo kirjautunut nimellä {{username}}.",
     "errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",
-    "consoleCreating": "Luodaan turnaus"
+    "consoleCreating": "Luodaan turnaus",
+	"placeholder": "Pong Turnaus" 
   }
 }

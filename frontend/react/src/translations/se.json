@@ -200,6 +200,7 @@
     "errorAlreadyLoggedIn": "Du är redan inloggad som {{username}}.",
     "errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
     "errorTournamentCreation": "Fel vid skapande av turnering.",
-    "consoleCreating": "Skapar turnering"
+    "consoleCreating": "Skapar turnering",
+	"placeholder": "Pong Turnering" 
   }
 }
