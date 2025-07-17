@@ -198,8 +198,9 @@
     "errorUsernameTaken": "Username \"{{username}}\" is already taken.",
     "errorAlreadyLoggedIn": "You're already logged in as {{username}}.",
     "errorAllPlayersRequired": "All players must enter a username.",
-    "errorTournamentCreation": "Error creating tournament.",
-    "consoleCreating": "Let's make a tournament"
+    "errorTournamentCreation": "Error creating tournament",
+    "consoleCreating": "Let's make a tournament",
+	  "placeholder": "Pong Tournament" 
   },
   "gamecustomization": {
     "title": "Game Customization",
