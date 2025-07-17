@@ -49,62 +49,14 @@ import { devOnly } from "../middleware/devOnly.js";
     { schema: tournamentsSchemas.registerTournamentSchema },
     async (req, reply) => {
       try {
-        const { id } = req.params;
-        const { userId, alias } = req.body;
-        console.log(
-          "Registering for tournament with ID:",
-          id,
-          "User ID:",
-          userId,
-          "Alias:",
-          alias
-        );
-        const tournament = await prisma.tournament.findUnique({
-          where: { id: Number(id) },
-          include: {
-            participants: true,
-          },
-        });
-        if (!tournament) {
-          return reply.code(404).send({ message: "Tournament not found" });
-        }
-        if (tournament.participants.length >= tournament.size) {
-          return reply.code(400).send({ message: "Tournament is full" });
-        }
-        if (!alias) {
-          return reply.code(400).send({ message: "Alias is required" });
-        }
-
-        const tournamentUserId = tournament.participants.length + 1;
-
-        await prisma.tournamentParticipant.create({
-          data: {
-            tournamentId: Number(id),
-            userId: userId || null,
-            alias: alias || null,
-            tournamentUserId: tournamentUserId,
-          },
-        });
-
-        reply.code(200).send();
-      } catch (error) {
-        console.error("Error registering for tournament:", error);
-        reply.code(500).send({ message: "Server error" });
-      }
-    }
-  );
-
-//###############################################################
-
-  // Get all tournaments
-  // This route is for development purposes only, to be accessed from localhost
-  fastify.get(
-    "/tournaments/all",
-    { schema: tournamentsSchemas.getAllTournamentsSchema, preHandler: devOnly },
-    async (req, reply) => {
-      const tournaments = await prisma.tournament.findMany({
-        include: { participants: true, tournamentMatches: true },
-        orderBy: { createdAt: "desc" },
+      const { id } = req.params;
+      const { userId, alias } = req.body;
+      console.log("Registering for tournament with ID:", id, "User ID:", userId, "Alias:", alias);
+      const tournament = await prisma.tournament.findUnique({
+        where: { id: Number(id) },
+        include: {
+          participants: true,
+        },
       });
       if (!tournament) {
         return reply.code(404).send({ message: "Tournament not found" });
@@ -133,6 +85,22 @@ import { devOnly } from "../middleware/devOnly.js";
 
 //###############################################################
 
+  // Get all tournaments
+  // This route is for development purposes only, to be accessed from localhost
+  fastify.get(
+    "/tournaments/all",
+    { schema: tournamentsSchemas.getAllTournamentsSchema, preHandler: devOnly },
+    async (req, reply) => {
+      const tournaments = await prisma.tournament.findMany({
+        include: { participants: true, tournamentMatches: true },
+        orderBy: { createdAt: "desc" },
+      });
+      reply.send(tournaments);
+    }
+  );
+
+//###############################################################
+
 
   // Get tournament details (including participants and matches)
   fastify.get(
@@ -147,16 +115,7 @@ import { devOnly } from "../middleware/devOnly.js";
           tournamentMatches: true,
         },
       });
-
-      if (!tournament) {
-        return reply.status(404).send({ message: "Tournament not found" });
-      }
-      const response = {
-        ...tournament,
-        matches: tournament.tournamentMatches,
-      };
-      delete response.tournamentMatches;
-      reply.send(response);
+      reply.send(tournament);
     }
   );
 
@@ -204,7 +163,7 @@ import { devOnly } from "../middleware/devOnly.js";
         }
         console.log("Generated matches:", matches);
         // Create matches in the database
-        await prisma.tournamentMatch.createMany({
+        await prisma.TournamentMatch.createMany({
           data: matches,
         });
         // Update tournament status to 'in_progress'
@@ -320,7 +279,7 @@ async function isTournamentFinished(id, updatedMatch) {
     // If no pending matches, update tournament status to 'finished'
     await prisma.tournament.update({
       where: { id: Number(id) },
-      data: { status: "finished", winnerId: updatedMatch.winnerId, 
+      data: { status: "completed", winnerId: updatedMatch.winnerId, 
         winnerAlias: updatedMatch.winnerAlias },
     });
     console.log("Tournament finished:", id);

@@ -32,39 +32,25 @@ const TournamentPage = () => {
     setIsLoading(true);
     try {
       console.log("Tournament id:", id);
-      const res = await api.get(`/tournaments/${id}`);
-      const tournament = res.data;
+      
+      // Re-fetch after starting
+      const tournamentRes = await api.get(`/tournaments/${id}`);
+      let tournament = tournamentRes.data;
 
-      if (!tournament.participants || !Array.isArray(tournament.participants)) {
-      tournament.participants = [];
-        }
-        if (!tournament.matches || !Array.isArray(tournament.matches)) {
-        tournament.matches = [];
-        }
-
-      if (tournament.status === "waiting" && tournament.matches.length === 0) {
+      if (tournament.status === "waiting") {
         await api.post(`/tournaments/${id}/start`);
-        // Re-fetch after starting
-        const startedRes = await api.get(`/tournaments/${id}`);
-        tournament.participants = startedRes.data.participants;
-        tournament.matches = startedRes.data.matches;
-
-            // Again, guard in case something goes wrong
-        if (!tournament.participants || !Array.isArray(tournament.participants)) {
-            tournament.participants = [];
-        }
-        if (!tournament.matches || !Array.isArray(tournament.matches)) {
-            tournament.matches = [];
-        }
+         const updatedTournament = await api.get(`/tournaments/${id}`);
+         tournament = updatedTournament.data;
       }
+
       const playersData = formatPlayers(tournament.participants);
-      const formattedMatches = formatMatches(tournament.matches);
+      const formattedMatches = formatMatches(tournament.tournamentMatches);
 
       setPlayers(playersData);
       setMatches(formattedMatches);
 
-      if (formattedMatches.length === 0 && tournament.status === "completed") {
-        const top3 = getTop3FromMatches(formatMatches);
+      if (formattedMatches.length === 0 && tournament.data.status === "completed") {
+        const top3 = getTop3FromMatches(formattedMatches);
         setFinalStandings(top3);
       }
     } catch (error) {
@@ -82,12 +68,14 @@ const TournamentPage = () => {
         );
 
         const res = await api.get(`/tournaments/${match.tournamentId}`);
-        const updatedMatches = formatMatches(res.data.matches);
+        const updatedMatches = formatMatches(res.data.tournamentMatches);
+
         setMatches(updatedMatches);
 
-        if (updatedMatches.length === 0) {
+        if (res.data.status === "completed") {
             const top3 = getTop3FromMatches(updatedMatches);
             setFinalStandings(top3);
+            console.log("Final standings", top3);
         }
     } catch (error) {
         console.error("Failed to update match:", error);
