@@ -53,8 +53,13 @@ down:
 
 fclean: down
 	@printf "Clean of all docker configs\n"
-	@docker system prune --all
-	@rm -rf ./frontend/srcs/react/dist
+	@docker rmi backend frontend --force || true
+	@rm -rf ./frontend/react/dist
+
+deepclean: fclean
+	@printf "Deepcleaning all docker configs and node_modules\n"
+	@rm -rf ./frontend/react/node_modules
+	@rm -rf ./backend/node_modules
 
 re: fclean all
 

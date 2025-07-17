@@ -111,7 +111,7 @@ model Tournament {
 
 model TournamentParticipant {
   id           Int        @id @default(autoincrement())
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   tournamentId Int
   user         User?      @relation(fields: [userId], references: [id])
   userId       Int?
@@ -121,7 +121,7 @@ model TournamentParticipant {
 
 model TournamentMatch {
   id           Int        @id @default(autoincrement())
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   tournamentId Int
 
   round Int
