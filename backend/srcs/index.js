@@ -17,6 +17,7 @@ import rateLimit from "@fastify/rate-limit";
 import dotenv from "dotenv";
 import { matchesRoute } from "./routes/matches.js";
 import { tournamentsRoute } from "./routes/tournaments.js";
+
 const fastify = Fastify({ logger: true });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -61,7 +62,9 @@ const start = async () => {
       },
     });
 
-    await fastify.register(rateLimit);
+    await fastify.register(rateLimit, {
+      global:false,
+    });
 
     //connect the routes to the backend
     fastify.register(userRoutes);

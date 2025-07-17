@@ -60,6 +60,17 @@ content-type: application/json
 DELETE http://localhost:3000/users/delete/9 HTTP/1.1
 
 ###
+//create a tournament
+POST http://localhost:3000/tournaments/create HTTP/1.1
+content-type: application/json
+
+{
+    "name": "sample tournament",
+    "size": 4,
+    "createdById": 1,
+    "status": "waiting"
+}
+###
 
 //ADD user to tournament
 POST http://localhost:3000/tournaments/1/register HTTP/1.1
@@ -72,25 +83,25 @@ content-type: application/json
 
 ###
 
-//GET TOURNAMENTS
-GET http://localhost:3000/tournaments HTTP/1.1
+//GET ALL TOURNAMENTS
+GET http://localhost:3000/tournaments/all HTTP/1.1
 ###
 //GET TOURNAMENT BY ID
-GET http://localhost:3000/tournaments/8 HTTP/1.1
+GET http://localhost:3000/tournaments/145 HTTP/1.1
 
 ###
 //start a  tournament
-POST http://localhost:3000/tournaments/2/start HTTP/1.1
+POST http://localhost:3000/tournaments/145/start HTTP/1.1
 
 ###
 
 //update a tournament match
-POST http://localhost:3000/tournaments/2/match/6/update HTTP/1.1
+POST http://localhost:3000/tournaments/145/match/3/update HTTP/1.1
 content-type: application/json
 
 {
     "winnerId": null,
-    "winnerAlias": "ccc"
+    "winnerAlias": "asd"
 }
 
 ###
@@ -99,7 +110,7 @@ POST http://localhost:3000/auth/verify-tournamentOtp HTTP/1.1
 content-type: application/json
 
 {
-    "code": "162811",
+    "code": "839137",
     "email": "casi.lehtovuori@gmail.com"
 }
 ###

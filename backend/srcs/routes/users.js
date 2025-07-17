@@ -305,6 +305,7 @@ export async function userRoutes(fastify, _options) {
 
         return reply.code(200).send({ message: "Password reset successfully" });
       } catch (error) {
+        console.error("Reset password error:", error);
         return reply.code(400).send({ error: "Invalid or expired token" });
       }
     }
