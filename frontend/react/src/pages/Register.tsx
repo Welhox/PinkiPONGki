@@ -22,8 +22,9 @@ const Register: React.FC = () => {
   });
 
   const [errorMessage, setErrorMsg] = useState<string>(""); // custom error message
-  const fileInputRef = useRef<HTMLInputElement>(null); // to reset input
   const liveRegionRef = useRef<HTMLDivElement>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [liveMessage, setLiveMessage] = useState<string | null>(null); // for screen reader aria announcements
   useEffect(() => {
     if (errorMessage) {
@@ -37,12 +38,25 @@ const Register: React.FC = () => {
       }, 100); // wait for file input focus shift to complete
     }
   }, [errorMessage]);
-
+  useEffect(() => {
+    if (success) {
+      setLiveMessage(null); // force remount
+      setTimeout(() => {
+        setLiveMessage(success);
+      }, 10);
+      setTimeout(() => {
+        navigate("/login", {
+          state: {
+            email: signupData.email,
+          },
+        });
+      }, 3000);
+    }
+  }, [navigate, success]);
   const usernameRegex = /^[a-zA-Z0-9]{2,20}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const pwdValidationRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,42}$/;
-  const navigate = useNavigate();
 
   // saves data to the object
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,11 +103,8 @@ const Register: React.FC = () => {
         // 	});
         // 	console.log('OTP Response: ', otpResponse);
         // navigate('/verifyemail', {
-        navigate("/", {
-          state: {
-            email: signupData.email,
-          },
-        });
+        setSuccess("Registration successful, navigating to login page");
+        
       }
       return;
     } catch (error) {
@@ -189,9 +200,12 @@ const Register: React.FC = () => {
           {errorMessage && (
             <p className="m-5 text-red-600 dark:text-red-500">{errorMessage}</p>
           )}
+          {success && (
+            <p className="m-5 text-green-600 dark:text-green-500">{success}</p>
+          )}
           {/* This next part is a secret div, visible only to screen readers, which ensures that the error
 	  or success messages get announced using aria. */}
-          {liveMessage && (
+          { (
             <div
               ref={liveRegionRef}
               tabIndex={-1}
