@@ -11,6 +11,7 @@ export default [
         __dirname: "readonly",
         console: "readonly",
         setTimeout: "readonly",
+        setInterval: "readonly",
       },
     },
     rules: {
