@@ -126,6 +126,18 @@ DELETE http://localhost:3000/tournaments/145/Pong%20Tournament HTTP/1.1
 
 ###
 
+//match result API
+POST http://localhost:3000/matches HTTP/1.1
+content-type: application/json
+
+{
+    "player1": 1,
+    "player2": 2,
+    "winner": 1,
+    "loser": 2,
+}
+
+###
 
 
 

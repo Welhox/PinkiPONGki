@@ -77,7 +77,7 @@ model Match {
   opponent User @relation("OpponentMatches", fields: [opponentId], references: [id], onDelete: Cascade)
 
   //tournament   Tournament? @relation(fields: [tournamentId], references: [id])
-  tournamentId Int?
+  //tournamentId Int?
 }
 
 // what happens to a match data if one of the players who participated in the game gets deleted?
