@@ -119,7 +119,7 @@ async function resetFriendshipData() {
 async function main() {
   await resetFriendshipData(); // resets all friendship data in the beginning!! comment out if wanting to preserve user connections
   await seedUsers();
-  await seedMatches();
+  // await seedMatches();
   await recalculateUserStats();
   await prisma.$disconnect();
 }

@@ -131,10 +131,9 @@ POST http://localhost:3000/matches HTTP/1.1
 content-type: application/json
 
 {
-    "player1": 1,
-    "player2": 2,
-    "winner": 1,
-    "loser": 2,
+    "player1": 2,
+    "player2": 1,
+    "winner": 1
 }
 
 ###
