@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import PongGameWithRegistration from "./PongGameWithRegistration";
 import PongGameAI from "./PongGameAI";
 import TournamentBuilder from "./TournamentBuilder";
@@ -6,6 +7,29 @@ import GameCustomization from "./GameCustomization";
 
 const ChoosePlayMode = () => {
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const location = useLocation();
+  const initialRenderRef = useRef(true);
+  const prevKeyRef = useRef(location.key);
+  
+  // Handle home button click detection and game state reset
+  useEffect(() => {
+    // Skip the effect on the initial render
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      return;
+    }
+    
+    // Only process if location.key has changed (actual navigation event)
+    // and we're on the home page, and a game mode is selected
+    if (prevKeyRef.current !== location.key && location.pathname === '/' && selectedMode !== null) {
+      console.log("HOME button navigation detected - resetting game state");
+      setSelectedMode(null);
+    }
+    
+    // Always update the previous key reference
+    prevKeyRef.current = location.key;
+  }, [location.key, location.pathname, selectedMode]);
+  
   useEffect(() => {
     if (selectedMode) {
       console.log("selectedMode: ", selectedMode);
