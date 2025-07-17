@@ -7,91 +7,101 @@ import { useTranslation } from "react-i18next";
 const apiUrl = import.meta.env.VITE_API_BASE_URL || "api";
 
 const ForgotPassword: React.FC = () => {
-	const [email, setEmail] = useState('');
-	const [submitted, setSubmitted] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
-	const navigate = useNavigate();
-	const { status } = useAuth();
-	const { t } = useTranslation();
-	const [isLoading, setIsLoading] = useState(false);
-	
-	if (status === 'loading') return <p>Loading...</p>
-	//if (status === 'unauthorized') return <Navigate to="/" replace />;
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { status } = useAuth();
+  const { t } = useTranslation();
+  const [isLoading, setIsLoading] = useState(false);
 
-	const handleReturn = () => {
-		navigate('/');
-	}
-	
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError(null);
-		setLoading(true);
+  const labelStyles =
+    "block mb-2 text-sm font-medium text-gray-900 dark:text-white";
+  const inputStyles =
+    "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
+  const buttonStyles =
+    "block mx-auto my-5 px-20 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800";
+  const altButtonStyles =
+    "text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800";
 
-		try {
-			await axios.post(
-				`${apiUrl}/users/request-password-reset`,
-				{ email },
-				{
-					headers: { 'Content-Type': 'application/json' },
-					withCredentials: true,
-				}
-			);
+  if (status === "loading") return <p>Loading...</p>;
+  //if (status === 'unauthorized') return <Navigate to="/" replace />;
 
-			setSubmitted(true);
-		} catch (error: any) {
-			setError(
-				error.response?.data?.message || t('forgotPassword.genericError')
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+  const handleReturn = () => {
+    navigate("/");
+  };
 
-	return (
-		<div className="text-center max-w-md mx-auto bg-white dark:bg-black p-6 rounded-lg shadow-md mt-10">
-			<h1 className="text-3xl font-bold text-teal-800 dark:text-teal-300 mb-6">
-				{t('forgotPassword.title')}
-			</h1>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
-			{submitted ? (
-				<>
-					<p className="text-green-600 dark:text-green-400 mb-4">{t('forgotPassword.successMessage')}</p>
-					<button
-						onClick={handleReturn}
-						className="bg-amber-700 hover:bg-amber-800 text-white font-semibold py-2 px-6 rounded"
-					>
-						{t('forgotPassword.returnButton')}
-					</button>
-				</>
-			) : (
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-							{t('forgotPassword.emailLabel')}
-						</label>
-						<input
-							type="email"
-							id="email"
-							required
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-						/>
-					</div>
-					{error && <p className="text-red-600 text-sm">{error}</p>}
+    try {
+      await axios.post(
+        `${apiUrl}/users/request-password-reset`,
+        { email },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
 
-					<button
-						type="submit"
-						disabled={isLoading}
-						className="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-					>
-						{isLoading ? t('forgotPassword.submitting') : t('forgotPassword.submitButton')}
-					</button>
-				</form>
-			)}
-		</div>
-	);
+      setSubmitted(true);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || t("forgotPassword.genericError")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="text-center max-w-md mx-auto bg-white dark:bg-black p-6 rounded-lg shadow-md mt-10">
+      <h1 className="text-3xl font-bold text-teal-800 dark:text-teal-300 mb-6">
+        {t("forgotPassword.title")}
+      </h1>
+
+      {submitted ? (
+        <>
+          <p className="text-green-600 dark:text-green-400 mb-4">
+            {t("forgotPassword.successMessage")}
+          </p>
+          <button onClick={handleReturn} className={buttonStyles}>
+            {t("forgotPassword.returnButton")}
+          </button>
+        </>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className={labelStyles}>
+              {t("forgotPassword.emailLabel")}
+            </label>
+            <input
+              type="email"
+              id="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={inputStyles}
+            />
+          </div>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={altButtonStyles}
+          >
+            {isLoading
+              ? t("forgotPassword.submitting")
+              : t("forgotPassword.submitButton")}
+          </button>
+        </form>
+      )}
+    </div>
+  );
 };
 
 export default ForgotPassword;
