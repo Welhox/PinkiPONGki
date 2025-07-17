@@ -59,6 +59,7 @@ const TournamentBuilder = () => {
         updated[firstGuestIndex] = {
           username: user.username,
           isGuest: false,
+          userId: user.id,
         };
         setPlayers(updated);
 
@@ -96,7 +97,9 @@ const TournamentBuilder = () => {
     updatedPlayers[index] = {
       ...player,
       userId:
-        !player.isGuest && user?.username === player.username
+        !player.isGuest && player.userId != null
+          ? player.userId
+          : user?.username === player.username
           ? Number(user.id)
           : null,
     };
@@ -137,11 +140,12 @@ const TournamentBuilder = () => {
 
       const tournamentId = res.data.id;
 
+      console.log("Players:", players);
       // add participants
       await Promise.all(
-        players.map((player, index) =>
+        players.map((player) =>
           api.post(`/tournaments/${tournamentId}/register`, {
-            userId: player.userId ?? null,
+            userId: player.userId,
             alias: player.username,
           })
         )

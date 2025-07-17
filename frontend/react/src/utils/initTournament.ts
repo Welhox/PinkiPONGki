@@ -1,4 +1,3 @@
-import api from "../api/axios";
 import { Match, Player } from "../types/game";
 
 export const formatPlayers = (participants: any[]): Player[] =>
@@ -48,13 +47,4 @@ export const formatMatches = (matches: any[]): Match[] =>
     };
   });
 
-export const fetchTournamentWithMatches = async (id: number) => {
-  const res = await api.get(`/tournaments/${id}`);
-  return res.data;
-};
 
-export const startTournamentIfWaiting = async (id: number) => {
-  await api.post(`/tournaments/${id}/start`);
-  const res = await api.get(`/tournaments/${id}`);
-  return res.data;
-};

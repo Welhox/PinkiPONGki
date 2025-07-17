@@ -1,31 +1,24 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import api from "../api/axios";
 import Bracket from "../components/Bracket";
 import Victory from "../components/Victory";
+import { formatPlayers, formatMatches } from "../utils/initTournament";
 import { Match, Player } from "../types/game";
 import { useGameSettings } from "../contexts/GameSettingsContext";
-import { handleMatchPlayed as handleMatchPlayedUtil } from "../utils/updateMatchNRefreshTournament";
-
-import {
-  fetchTournamentWithMatches,
-  formatPlayers,
-  formatMatches,
-  startTournamentIfWaiting,
-} from "../utils/initTournament";
+import { getTop3FromMatches } from "../utils/getTop3FromMatches";
 
 const TournamentPage = () => {
   const { id } = useParams<{ id: string }>();
   const tournamentId = parseInt(id || "0", 10);
   const navigate = useNavigate();
-  const location = useLocation(); // for testing without backend
-  const hasStartedRef = useRef(false);
+  const location = useLocation();
 
   const [players, setPlayers] = useState<Player[]>([]);
-  const [matchesFromBackend, setMatchesFromBackend] = useState<Match[]>([]);
-  const [upcomingMatches, setUpcomingMatches] = useState<Match[]>([]);
-  const { settings } = useGameSettings();
-  const [isLoading, setIsLoading] = useState<Boolean>(true);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [finalStandings, setFinalStandings] = useState<Player[]>([]);
+  const { settings } = useGameSettings();
 
   useEffect(() => {
     if (!location.state) {
@@ -37,46 +30,70 @@ const TournamentPage = () => {
 
   const fetchTournamentData = async () => {
     setIsLoading(true);
-
     try {
-      let data = await fetchTournamentWithMatches(tournamentId);
+      console.log("Tournament id:", id);
+      const res = await api.get(`/tournaments/${id}`);
+      const tournament = res.data;
 
-      const playersData = formatPlayers(data.participants);
-      setPlayers(playersData);
-
-      let backendMatches = formatMatches(data.matches);
-      setMatchesFromBackend(backendMatches);
-
-      if (
-        !hasStartedRef.current &&
-        backendMatches.length === 0 &&
-        data.status === "waiting"
-      ) {
-        hasStartedRef.current = true;
-        try {
-          const startedData = await startTournamentIfWaiting(tournamentId);
-          const updatedMatches = formatMatches(startedData.matches);
-          setMatchesFromBackend(updatedMatches);
-        } catch (startError) {
-          console.error("Failed to start tournament:", startError);
+      if (!tournament.participants || !Array.isArray(tournament.participants)) {
+      tournament.participants = [];
         }
+        if (!tournament.matches || !Array.isArray(tournament.matches)) {
+        tournament.matches = [];
+        }
+
+      if (tournament.status === "waiting" && tournament.matches.length === 0) {
+        await api.post(`/tournaments/${id}/start`);
+        // Re-fetch after starting
+        const startedRes = await api.get(`/tournaments/${id}`);
+        tournament.participants = startedRes.data.participants;
+        tournament.matches = startedRes.data.matches;
+
+            // Again, guard in case something goes wrong
+        if (!tournament.participants || !Array.isArray(tournament.participants)) {
+            tournament.participants = [];
+        }
+        if (!tournament.matches || !Array.isArray(tournament.matches)) {
+            tournament.matches = [];
+        }
+      }
+      const playersData = formatPlayers(tournament.participants);
+      const formattedMatches = formatMatches(tournament.matches);
+
+      setPlayers(playersData);
+      setMatches(formattedMatches);
+
+      if (formattedMatches.length === 0 && tournament.status === "completed") {
+        const top3 = getTop3FromMatches(formatMatches);
+        setFinalStandings(top3);
       }
     } catch (error) {
       console.error("Failed to fetch tournament data:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
   const handleMatchPlayed = async (match: Match, winner: Player) => {
-    await handleMatchPlayedUtil(match, winner, {
-      setMatchesFromBackend,
-      setUpcomingMatches,
-      setFinalStandings,
-    });
+    try {
+        await api.post(
+        `/tournaments/${match.tournamentId}/match/${match.id}/update`,
+        { winnerId: winner.id, winnerAlias: winner.name }
+        );
+
+        const res = await api.get(`/tournaments/${match.tournamentId}`);
+        const updatedMatches = formatMatches(res.data.matches);
+        setMatches(updatedMatches);
+
+        if (updatedMatches.length === 0) {
+            const top3 = getTop3FromMatches(updatedMatches);
+            setFinalStandings(top3);
+        }
+    } catch (error) {
+        console.error("Failed to update match:", error);
+    }
   };
 
-  const allMatches = [...matchesFromBackend, ...upcomingMatches];
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
@@ -112,7 +129,7 @@ const TournamentPage = () => {
       ) : finalStandings.length > 0 ? (
         <Victory standings={finalStandings} />
       ) : (
-        <Bracket matches={allMatches} onPlay={handleMatchPlayed} />
+        <Bracket matches={matches} onPlay={handleMatchPlayed} />
       )}
     </div>
   );

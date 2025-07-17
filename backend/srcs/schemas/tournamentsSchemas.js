@@ -55,7 +55,7 @@ const createTournamentSchema = {
       createdById: { type: "integer" },
       status: { type: "string", enum: ["waiting"] },
     },
-    required: ["name", "size" /* , "createdById" */, "status"],
+    required: ["name", "size"/* , "createdById" */, "status"],
   },
   response: {
     200: {
@@ -112,8 +112,7 @@ const registerTournamentSchema = {
     ]
   },
   response: {
-    //200: participantSchema,
-    200: { type: "null" },
+    200: participantSchema,
     400: {
       type: "object",
       properties: {

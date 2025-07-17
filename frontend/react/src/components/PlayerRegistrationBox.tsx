@@ -108,6 +108,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
     } else {
       // Registered user login
       let response;
+      let player2Response;
       try {
         if (!user) {
           response = await api.post(
@@ -135,7 +136,6 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           await refreshSession();
         } else {
           console.log("Implement custom two player login API here");
-          let player2Response;
           player2Response = await api.post("/users/player-2-login", {
             username,
             password,
