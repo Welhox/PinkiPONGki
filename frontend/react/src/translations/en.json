@@ -1,204 +1,204 @@
 {
-	"home": {
-	  "welcome": "Welcome!",
-	  "checkingSession": "Checking session...",
-	  "hello": "Hello",
-	  "pleaseLogin": "Please log in to access exclusive Pong content and connect with other registered players!",
-	  "noAccount": "No account?",
-	  "register": "Register"
-	},
-	"stats": {
-	  "loading": "Loading...",
-	  "unknownUser": "Unknown User",
-	  "fetchError": "Failed to fetch username for viewed user",
-	  "title": "{{username}}'s Pong Stats"
-	},
-	"forgotPassword": {
-    	"title": "Reset Password",
-    	"emailLabel": "Email address:",
-    	"submitButton": "Send Reset Link",
-    	"successMessage": "If that email is registered, you'll receive password reset instructions shortly.",
-    	"returnButton": "Return",
-    	"genericError": "Something went wrong. Please try again.",
-		"submitting": "Sending..."
-	},
-	"pongPals": {
-		"title": "Pong Pals",
-		"searchUsers": "Search users",
-		"yourFriends": "Your friends",
-		"back": "Back"
-	},
-	"settings": {
-    	"title": "Settings",
-    	"email": "Email",
-    	"password": "Password",
-    	"language": "Language",
-    	"twoFactorAuth": "Enable Two-Factor Authentication",
-    	"deleteAccountConfirm": "Your account has been deleted.",
-    	"deleteAccountError": "Failed to delete account. Please try again later.",
-    	"languageError": "Failed to update language preference. Please try again.",
-    	"back": "Back",
-    	"save": "Save",
-		"updateButton": "Update",
-		"newLabel": "New {{label}}",
-		"confirmLabel": "Confirm {{label}}",
-		"currentPassword": "Current password",
-		"passwordErrorLength": "Password must be between 8 and 42 characters.",
-		"passwordErrorFormat": "Password must be at least 8 characters, including uppercase, lowercase, number and special character.",
-		"emailErrorLength": "Email must be 42 characters or less.",
-		"emailErrorFormat": "Please enter a valid email address.",
-		"valuesMismatch": "New values don't match.",
-		"currentPasswordRequired": "Current password required.",
-		"updateSuccess": "{{label}} updated successfully.",
-		"updateFailed": "Update failed.",
-		"somethingWentWrong": "Something went wrong.",
-		"cancel": "Cancel"
-  	},
-	"befriendButton": {
-		"befriend": "Befriend",
-		"unfriend": "Unfriend",
-		"friend_request_pending": "Friend request pending..."
-	},
-	"confirmOtp": {
-		"invalid_otp_format": "Please enter a valid 6-digit OTP.",
-		"email_verified_success": "Email verified and 2FA enabled successfully!",
-		"otp_invalid": "Invalid or expired OTP. Please try again.",
-		"otp_placeholder": "Enter the 6-digit OTP sent to your email",
-		"confirm": "Confirm"
-	},
-	"deleteAccount": {
-    	"ariaPrompt": "Enter your password to confirm deletion of your account",
-    	"enterPassword": "Please enter your password",
-    	"passwordPlaceholder": "Enter your password",
-    	"ariaLabel": "Enter your password to confirm deleting your account",
-    	"confirm": "Confirm Delete",
-    	"cancel": "Cancel",
-    	"delete": "Delete Account"
-  	},
-	"editProfilePic": {
-    	"onlyImages": "Only JPG and PNG images are allowed.",
-    	"fileTooLarge": "File size must be less than 2MB.",
-		"notValidImage": "The file is not a valid image.",
-    	"saved": "Picture saved!",
-    	"save": "Save"
-  	},
-	"friendList": {
-		"noFriends": "You don't have any pals yet"
-	},
-	"navigation": {
-    	"home": "Home",
-    	"myStats": "My Stats",
-    	"pongPals": "Pong Pals",
-    	"tournaments": "Tournaments",
-    	"settings": "Settings",
-    	"logout": "Logout",
-    	"login": "Login"
-  	},
-	"passcode": {
-    	"label": "Enter verification code:",
-    	"errorTooShort": "Code is too short",
-    	"submit": "Submit"
-  	},
-	"friendRequests": {
-    	"title": "Pending friend requests:",
-    	"request": "{{username}} wants to be your friend!",
-    	"accept": "Accept",
-    	"decline": "Decline",
-    	"accepted": "You're now friends with {{username}}",
-    	"declined": "Request declined",
-    	"error": "Something went wrong. Please try again."
-  	},
-	"matchHistory": {
-		"loadingStats": "Loading stats...",
-		"errorFetching": "Failed to fetch stats",
-		"totalWins": "Total Wins",
-		"totalLosses": "Total Losses",
-		"totalTournamentsWon": "Total Tournaments Won",
-		"matchHistoryTitle": "Match History",
-		"noHistory": "No match history available"
-	},
-	"playerBox": {
-    	"usernameRequired": "Username required",
-    	"loginFailed": "Login failed. Check your credentials.",
-    	"usernamePlaceholder": "Username or alias",
-    	"passwordPlaceholder": "Password (leave blank for guest)",
-    	"continue": "Continue",
-    	"guestHint": "Keep password clear to sign up as guest"
-  	},
-	"results": {
-  		"Win": "Win",
-  		"Loss": "Loss"
-	},
-	"searchPals": {
-		"placeholder": "Give username",
-		"errorInvalidUsername": "Usernames only contain letters and numbers.",
-		"errorSearchFailed": "Something went wrong while searching.",
-		"noUsersFound": "No matching users found."
-  	},
-	"statsHeader": {
-		"back": "Back"
-	},
-	"mfa": {
-		"heading": "Multi-Factor Authentication",
-		"otpLabel": "OTP",
-		"verify": "Verify",
-		"verifying": "Verifying...",
-		"loading": "Loading...",
-		"resend": "Resend OTP",
-		"invalidOtp": "Invalid OTP. Please try again.",
-		"otpExpired": "OTP expired. Please request a new one.",
-		"generalError": "An error occurred. Please try again later.",
-		"otpResent": "OTP has been resent. Please check your email.",
-		"resendError": "An error occurred while resending the OTP. Please try again later.",
-		"waitTime": "Please wait {{count}} seconds before requesting a new OTP."
-	},
-	"resetPassword": {
-		"title": "Reset Your Password",
-		"newPasswordLabel": "New Password",
-		"confirmPasswordLabel": "Confirm Password",
-		"fillBothFields": "Please fill in both password fields",
-		"passwordsDontMatch": "Passwords do not match",
-		"invalidOrMissingToken": "Invalid or missing token",
-		"failed": "Failed to reset password",
-		"submitting": "Resetting...",
-		"submitButton": "Reset Password",
-		"successTitle": "Password reset successful!",
-		"goToLogin": "Go to Login",
-		"invalidOrExpiredToken": "This reset link is invalid or has expired.",
-		"requestNew": "Please request a new password reset link.",
-		"requestNewLink": "Request New Link",
-		"validatingToken": "Validating reset link...",
-		"invalidPassword": "Password must be 8–42 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
-	},
-	"CPM": {
-		"choosePlayMode": "Choose Play Mode",
-		"singlevsAI": "Single Player vs AI",
-		"twoplayersingle": "2 Player Single Game",
-		"createTournament": "Create Tournament"
-	},
-	"tournament": {
-		"createTitle": "Create Tournament",
-		"4playerMode": "4 Player Mode",
-		"8playerMode": "8 Player Mode",
-		"gameSettings": "Game Settings",
-		"map": "Map",
-		"mapClassic": "Classic",
-		"mapCorners": "Corner Walls",
-		"mapCenter": "Center Wall",
-		"scoreToWin": "Score to Win",
-		"powerUps": "Power-ups",
-		"enabled": "Enabled",
-		"disabled": "Disabled",
-		"enterUsernames": "Enter the usernames or register as a guest.",
-		"playerYou": "Player 1 (You): {{username}}",
-		"player": "Player {{index}}: {{username}}",
-		"playerLabel": "Player",
-		"createButton": "Create Tournament",
-		"errorUsernameInvalid": "Username must be alphanumeric and between 2 and 20 characters.",
-		"errorUsernameTaken": "Username \"{{username}}\" is already taken.",
-		"errorAlreadyLoggedIn": "You're already logged in as {{username}}.",
-		"errorAllPlayersRequired": "All players must enter a username.",
-		"errorTournamentCreation": "Error creating tournament.",
-		"consoleCreating": "Let's make a tournament"
-	}
+  "home": {
+    "welcome": "Welcome!",
+    "checkingSession": "Checking session...",
+    "hello": "Hello",
+    "pleaseLogin": "Please log in to access exclusive Pong content and connect with other registered players!",
+    "noAccount": "No account?",
+    "register": "Register"
+  },
+  "stats": {
+    "loading": "Loading...",
+    "unknownUser": "Unknown User",
+    "fetchError": "Failed to fetch username for viewed user",
+    "title": "{{username}}'s Pong Stats"
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "emailLabel": "Email address:",
+    "submitButton": "Send Reset Link",
+    "successMessage": "If that email is registered, you'll receive password reset instructions shortly.",
+    "returnButton": "Return",
+    "genericError": "Something went wrong. Please try again.",
+    "submitting": "Sending..."
+  },
+  "pongPals": {
+    "title": "Pong Pals",
+    "searchUsers": "Search users",
+    "yourFriends": "Your friends",
+    "back": "Back"
+  },
+  "settings": {
+    "title": "Settings",
+    "email": "Email",
+    "password": "Password",
+    "language": "Language",
+    "twoFactorAuth": "Enable Two-Factor Authentication",
+    "deleteAccountConfirm": "Your account has been deleted.",
+    "deleteAccountError": "Failed to delete account. Please try again later.",
+    "languageError": "Failed to update language preference. Please try again.",
+    "back": "Back",
+    "save": "Save",
+    "updateButton": "Update",
+    "newLabel": "New {{label}}",
+    "confirmLabel": "Confirm {{label}}",
+    "currentPassword": "Current password",
+    "passwordErrorLength": "Password must be between 8 and 42 characters.",
+    "passwordErrorFormat": "Password must be at least 8 characters, including uppercase, lowercase, number and special character.",
+    "emailErrorLength": "Email must be 42 characters or less.",
+    "emailErrorFormat": "Please enter a valid email address.",
+    "valuesMismatch": "New values don't match.",
+    "currentPasswordRequired": "Current password required.",
+    "updateSuccess": "{{label}} updated successfully.",
+    "updateFailed": "Update failed.",
+    "somethingWentWrong": "Something went wrong.",
+    "cancel": "Cancel"
+  },
+  "befriendButton": {
+    "befriend": "Befriend",
+    "unfriend": "Unfriend",
+    "friend_request_pending": "Friend request pending..."
+  },
+  "confirmOtp": {
+    "invalid_otp_format": "Please enter a valid 6-digit OTP.",
+    "email_verified_success": "Email verified and 2FA enabled successfully!",
+    "otp_invalid": "Invalid or expired OTP. Please try again.",
+    "otp_placeholder": "Enter the 6-digit OTP sent to your email",
+    "confirm": "Confirm"
+  },
+  "deleteAccount": {
+    "ariaPrompt": "Enter your password to confirm deletion of your account",
+    "enterPassword": "Please enter your password",
+    "passwordPlaceholder": "Enter your password",
+    "ariaLabel": "Enter your password to confirm deleting your account",
+    "confirm": "Confirm Delete",
+    "cancel": "Cancel",
+    "delete": "Delete Account"
+  },
+  "editProfilePic": {
+    "onlyImages": "Only JPG and PNG images are allowed.",
+    "fileTooLarge": "File size must be less than 2MB.",
+    "notValidImage": "The file is not a valid image.",
+    "saved": "Picture saved!",
+    "save": "Save"
+  },
+  "friendList": {
+    "noFriends": "You don't have any pals yet"
+  },
+  "navigation": {
+    "home": "Home",
+    "myStats": "My Stats",
+    "pongPals": "Pong Pals",
+    "tournaments": "Tournaments",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "passcode": {
+    "label": "Enter verification code:",
+    "errorTooShort": "Code is too short",
+    "submit": "Submit"
+  },
+  "friendRequests": {
+    "title": "Pending friend requests:",
+    "request": "{{username}} wants to be your friend!",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "You're now friends with {{username}}",
+    "declined": "Request declined",
+    "error": "Something went wrong. Please try again."
+  },
+  "matchHistory": {
+    "loadingStats": "Loading stats...",
+    "errorFetching": "Failed to fetch stats",
+    "totalWins": "Total Wins",
+    "totalLosses": "Total Losses",
+    "totalTournamentsWon": "Total Tournaments Won",
+    "matchHistoryTitle": "Match History",
+    "noHistory": "No match history available"
+  },
+  "playerBox": {
+    "usernameRequired": "Username required",
+    "loginFailed": "Login failed. Check your credentials.",
+    "usernamePlaceholder": "Username or alias",
+    "passwordPlaceholder": "Password (leave blank for guest)",
+    "continue": "Continue",
+    "guestHint": "Keep password clear to sign up as guest"
+  },
+  "results": {
+    "Win": "Win",
+    "Loss": "Loss"
+  },
+  "searchPals": {
+    "placeholder": "Give username",
+    "errorInvalidUsername": "Usernames only contain letters and numbers.",
+    "errorSearchFailed": "Something went wrong while searching.",
+    "noUsersFound": "No matching users found."
+  },
+  "statsHeader": {
+    "back": "Back"
+  },
+  "mfa": {
+    "heading": "Multi-Factor Authentication",
+    "otpLabel": "OTP",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "loading": "Loading...",
+    "resend": "Resend OTP",
+    "invalidOtp": "Invalid OTP. Please try again.",
+    "otpExpired": "OTP expired. Please request a new one.",
+    "generalError": "An error occurred. Please try again later.",
+    "otpResent": "OTP has been resent. Please check your email.",
+    "resendError": "An error occurred while resending the OTP. Please try again later.",
+    "waitTime": "Please wait {{count}} seconds before requesting a new OTP."
+  },
+  "resetPassword": {
+    "title": "Reset Your Password",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "fillBothFields": "Please fill in both password fields",
+    "passwordsDontMatch": "Passwords do not match",
+    "invalidOrMissingToken": "Invalid or missing token",
+    "failed": "Failed to reset password",
+    "submitting": "Resetting...",
+    "submitButton": "Reset Password",
+    "successTitle": "Password reset successful!",
+    "goToLogin": "Go to Login",
+    "invalidOrExpiredToken": "This reset link is invalid or has expired.",
+    "requestNew": "Please request a new password reset link.",
+    "requestNewLink": "Request New Link",
+    "validatingToken": "Validating reset link...",
+    "invalidPassword": "Password must be 8–42 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+  },
+  "CPM": {
+    "choosePlayMode": "Choose Play Mode",
+    "singlevsAI": "Single Player vs AI",
+    "twoplayersingle": "2 Player Single Game",
+    "createTournament": "Create Tournament"
+  },
+  "tournament": {
+    "createTitle": "Create Tournament",
+    "4playerMode": "4 Player Mode",
+    "8playerMode": "8 Player Mode",
+    "gameSettings": "Game Settings",
+    "map": "Map",
+    "mapClassic": "Classic",
+    "mapCorners": "Corner Walls",
+    "mapCenter": "Center Wall",
+    "scoreToWin": "Score to Win",
+    "powerUps": "Power-ups",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "enterUsernames": "Enter the usernames or register as a guest.",
+    "playerYou": "Player 1 (You): {{username}}",
+    "player": "Player {{index}}: {{username}}",
+    "playerLabel": "Player",
+    "createButton": "Create Tournament",
+    "errorUsernameInvalid": "Username must be alphanumeric and between 2 and 20 characters.",
+    "errorUsernameTaken": "Username \"{{username}}\" is already taken.",
+    "errorAlreadyLoggedIn": "You're already logged in as {{username}}.",
+    "errorAllPlayersRequired": "All players must enter a username.",
+    "errorTournamentCreation": "Error creating tournament.",
+    "consoleCreating": "Let's make a tournament"
+  }
 }

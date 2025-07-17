@@ -49,7 +49,7 @@ const TournamentBuilder = () => {
       (p, i) => i !== index && p.username === player.username
     );
     if (duplicate) {
-      alert((t("tournament.errorUsernameTaken", { username: player.username })));
+      alert(t("tournament.errorUsernameTaken", { username: player.username }));
       return;
     }
     // prevent re-login of logged-in user
@@ -101,7 +101,7 @@ const TournamentBuilder = () => {
 
     try {
       // create a tournament
-        const res = await api.post("/tournaments/create", {
+      const res = await api.post("/tournaments/create", {
         name: "Pong Tournament",
         size: playerCount,
         createdById: user?.id, // use user ID if logged in, otherwise 0
@@ -116,7 +116,11 @@ const TournamentBuilder = () => {
       await Promise.all(
         players.map((player, index) =>
           api.post(`/tournaments/${tournamentId}/register`, {
-            userId: player.isGuest ? null : (user?.username === player.username ? user.id : null),
+            userId: player.isGuest
+              ? null
+              : user?.username === player.username
+              ? user.id
+              : null,
             alias: player.isGuest ? player.username : "",
           })
         )
@@ -157,23 +161,35 @@ const TournamentBuilder = () => {
         <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
           {t("tournament.createTitle")}
         </h1>
-        
+
         <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-teal-700 dark:text-teal-300 mb-2">
             {t("tournament.gameSettings")}
           </h3>
-          
+
           <div className="grid grid-cols-2 gap-4 dark:text-white">
-            <p><strong>{t("tournament.map")}:</strong> {settings.mapType === 'classic' ? t('tournament.mapClassic') : 
-                             settings.mapType === 'corners' ? t('tournament.mapCorners') : t('tournament.mapCenter')}</p>
-            <p><strong>{t("tournament.scoreToWin")}:</strong> {settings.scoreToWin}</p>
-            <p><strong>{t("tournament.powerUps")}:</strong> {settings.powerUpsEnabled ? t("tournament.enabled") : t("tournament.disabled")}</p>
+            <p>
+              <strong>{t("tournament.map")}:</strong>{" "}
+              {settings.mapType === "classic"
+                ? t("tournament.mapClassic")
+                : settings.mapType === "corners"
+                ? t("tournament.mapCorners")
+                : t("tournament.mapCenter")}
+            </p>
+            <p>
+              <strong>{t("tournament.scoreToWin")}:</strong>{" "}
+              {settings.scoreToWin}
+            </p>
+            <p>
+              <strong>{t("tournament.powerUps")}:</strong>{" "}
+              {settings.powerUpsEnabled
+                ? t("tournament.enabled")
+                : t("tournament.disabled")}
+            </p>
           </div>
         </div>
-        
-        <p className="dark:text-white">
-          {t("tournament.enterUsernames")}
-        </p>
+
+        <p className="dark:text-white">{t("tournament.enterUsernames")}</p>
         <div className="flex flex-col">
           {players.map((player, index) => (
             <div key={index} className="my-2">
@@ -183,7 +199,10 @@ const TournamentBuilder = () => {
                 </div>
               ) : registeredPlayers[index] ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-semibold">
-                  {t("tournament.player", { index: index + 1, username: player.username })}
+                  {t("tournament.player", {
+                    index: index + 1,
+                    username: player.username,
+                  })}
                 </div>
               ) : (
                 <PlayerRegistrationBox

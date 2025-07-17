@@ -1,205 +1,205 @@
 {
-	"home": {
-	  "welcome": "Välkommen!",
-	  "checkingSession": "Kontrollerar session...",
-	  "hello": "Hej",
-	  "pleaseLogin": "Vänligen logga in för att få tillgång till exklusivt Pong-innehåll och för att kunna koppla upp dig med andra registrerade spelare!",
-	  "noAccount": "Inget konto?",
-	  "register": "Registrera dig"
-	},
-	"stats": {
-		"loading": "Laddar...",
-		"unknownUser": "Okänd användare",
-		"fetchError": "Misslyckades att hämta användarnamn för visad användare",
-		"title": "Pong-statistik för {{username}}"
-	},
-	"forgotPassword": {
-		"title": "Återställ lösenord",
-		"emailLabel": "E-postadress:",
-		"submitButton": "Skicka återställningslänk",
-		"successMessage": "Om den e-postadressen är registrerad får du snart instruktioner för att återställa lösenordet.",
-		"returnButton": "Tillbaka",
-		"genericError": "Något gick fel. Försök igen.",
-		"submitting": "Skickar..."
-	},
-	"pongPals": {
-		"title": "Pong Vänner",
-		"searchUsers": "Sök användare",
-		"yourFriends": "Dina vänner",
-		"back": "Tillbaka"
-	},
-	"settings": {
-    	"title": "Inställningar",
-    	"email": "E-post",
-    	"password": "Lösenord",
-    	"language": "Språk",
-    	"twoFactorAuth": "Aktivera tvåfaktorsautentisering",
-    	"deleteAccountConfirm": "Ditt konto har raderats.",
-    	"deleteAccountError": "Konto radering misslyckades. Försök igen senare.",
-    	"languageError": "Det gick inte att uppdatera språkinställningen. Försök igen.",
-    	"back": "Tillbaka",
-		"updateButton": "Uppdatera",
-		"newLabel": "Ny {{label}}",
-		"confirmLabel": "Bekräfta {{label}}",
-		"currentPassword": "Nuvarande lösenord",
-		"passwordErrorLength": "Lösenordet måste vara mellan 8 och 42 tecken.",
-		"passwordErrorFormat": "Lösenordet måste innehålla minst 8 tecken, inklusive versaler, gemener, siffror och specialtecken.",
-		"emailErrorLength": "E-post måste vara 42 tecken eller mindre.",
-		"emailErrorFormat": "Ange en giltig e-postadress.",
-		"valuesMismatch": "Nya värden matchar inte.",
-		"currentPasswordRequired": "Nuvarande lösenord krävs.",
-		"updateSuccess": "{{label}} uppdaterades.",
-		"updateFailed": "Uppdateringen misslyckades.",
-		"somethingWentWrong": "Något gick fel.",
-		"save": "Spara",
-		"cancel": "Avbryt"
-	},
-	"befriendButton": {
-  		"befriend": "Bli vän",
-  		"unfriend": "Ta bort vän",
-  		"friend_request_pending": "Vänförfrågan skickad..."
-	},
-	"confirmOtp": {
-		"invalid_otp_format": "Ange en giltig 6-siffrig bekräftelsekod",
-		"email_verified_success": "E-post verifierad och tvåfaktorsautentisering aktiverad!",
-		"otp_invalid": "Ogiltig eller utgången bekräftelsekod. Försök igen.",
-		"otp_placeholder": "Ange den 6-siffriga koden som skickats till din e-post",
-		"confirm": "Bekräfta"
-	},
-	"deleteAccount": {
-  		"ariaPrompt": "Ange ditt lösenord för att bekräfta borttagning av kontot",
-  		"enterPassword": "Ange ditt lösenord",
-  		"passwordPlaceholder": "Ange ditt lösenord",
-  		"ariaLabel": "Ange ditt lösenord för att bekräfta borttagning av kontot",
-  		"confirm": "Bekräfta borttagning",
-  		"cancel": "Avbryt",
-  		"delete": "Radera konto"
-	},
-	"editProfilePic": {
-   		"onlyImages": "Endast JPG- och PNG-bilder är tillåtna.",
-    	"fileTooLarge": "Filstorleken får vara högst 2 MB.",
-		"notValidImage": "Filen är inte en giltig bild.",
-    	"saved": "Bilden har sparats!",
-    	"save": "Spara"
-  	},
-	"friendList": {
-		"noFriends": "Du har inga kompisar ännu"
-	},
-	"navigation": {
-    	"home": "Hem",
-    	"myStats": "Mina statistik",
-    	"pongPals": "Pong-vänner",
-    	"tournaments": "Turneringar",
-    	"settings": "Inställningar",
-    	"logout": "Logga ut",
-    	"login": "Logga in"
-  	},
-	"passcode": {
-    	"label": "Ange verifieringskod:",
-    	"errorTooShort": "Koden är för kort",
-    	"submit": "Skicka"
-  	},
-	"friendRequests": {
-    	"title": "Vänförfrågningar som väntar:",
-    	"request": "{{username}} vill bli din vän!",
-    	"accept": "Acceptera",
-    	"decline": "Avböj",
-    	"accepted": "Du är nu vän med {{username}}",
-    	"declined": "Förfrågan avböjd",
-    	"error": "Något gick fel. Försök igen."
-  	},
-	"matchHistory": {
-		"loadingStats": "Laddar statistik...",
-		"errorFetching": "Misslyckades att hämta statistik",
-		"totalWins": "Totala vinster",
-		"totalLosses": "Totala förluster",
-		"totalTournamentsWon": "Totala vunna turneringar",
-		"matchHistoryTitle": "Matchhistorik",
-		"noHistory": "Ingen matchhistorik tillgänglig"
-	},
-	"playerBox": {
-		"usernameRequired": "Användarnamn krävs",
-		"loginFailed": "Inloggning misslyckades. Kontrollera dina uppgifter.",
-		"usernamePlaceholder": "Användarnamn eller alias",
-		"passwordPlaceholder": "Lösenord (lämna tomt för gäst)",
-		"continue": "Fortsätt",
-		"guestHint": "Lämna lösenordet tomt för att registrera som gäst"
-  	},
-	"results": {
-  		"Win": "Vinst",
-  		"Loss": "Förlust"
-	},
-	"searchPals": {
-		"placeholder": "Ange användarnamn",
-		"errorInvalidUsername": "Användarnamn får endast innehålla bokstäver och siffror.",
-		"errorSearchFailed": "Något gick fel vid sökningen.",
-		"noUsersFound": "Inga matchande användare hittades."
-  	},
-	"statsHeader": {
-		"back": "Tillbaka"
-	},
-	"mfa": {
-		"heading": "Tvåfaktorsautentisering",
-		"otpLabel": "Engångskod (OTP)",
-		"verify": "Verifiera",
-		"verifying": "Verifierar...",
-		"resend": "Skicka ny OTP",
-		"invalidOtp": "Ogiltig OTP. Försök igen.",
-		"otpExpired": "OTP har gått ut. Vänligen begär en ny.",
-		"tryAgainError": "Ett fel inträffade. Försök igen senare.",
-		"generalError": "Ett fel inträffade",
-		"otpResent": "OTP har skickats igen. Kontrollera din e-post.",
-		"resendError": "Ett fel uppstod vid återutsändning av OTP. Försök igen senare.",
-		"waitTime": "Vänligen vänta {{count}} sekunder innan du begär en ny OTP.",
-		"loading": "Laddar..."
+  "home": {
+    "welcome": "Välkommen!",
+    "checkingSession": "Kontrollerar session...",
+    "hello": "Hej",
+    "pleaseLogin": "Vänligen logga in för att få tillgång till exklusivt Pong-innehåll och för att kunna koppla upp dig med andra registrerade spelare!",
+    "noAccount": "Inget konto?",
+    "register": "Registrera dig"
   },
-	"resetPassword": {
-		"title": "Återställ ditt lösenord",
-		"newPasswordLabel": "Nytt lösenord",
-		"confirmPasswordLabel": "Bekräfta lösenord",
-		"fillBothFields": "Fyll i båda lösenordsfälten",
-		"passwordsDontMatch": "Lösenorden matchar inte",
-		"invalidOrMissingToken": "Ogiltig eller saknad länk",
-		"failed": "Det gick inte att återställa lösenordet",
-		"submitting": "Återställer...",
-		"submitButton": "Återställ lösenord",
-		"successTitle": "Lösenordet har återställts!",
-		"goToLogin": "Gå till inloggningen",
-		"invalidOrExpiredToken": "Denna återställningslänk är ogiltig eller har gått ut.",
-		"requestNew": "Vänligen begär en ny återställningslänk.",
-		"requestNewLink": "Begär ny länk",
-		"validatingToken": "Verifierar återställningslänk...",
-		"invalidPassword": "Lösenordet måste vara 8–42 tecken långt och innehålla minst en versal, en gemen, en siffra och ett specialtecken."
-	},
-	"CPM": {
-  		"choosePlayMode": "Välj spelläge",
-  		"singlevsAI": "Enspelare mot AI",
-  		"twoplayersingle": "Tvåspelarläge",
-  		"createTournament": "Skapa turnering"
-	},
-	"tournament": {
-		"createTitle": "Skapa Turnering",
-		"4playerMode": "4 Spelare-läge",
-		"8playerMode": "8 Spelare-läge",
-		"gameSettings": "Spelinställningar",
-		"map": "Karta",
-		"mapClassic": "Klassisk",
-		"mapCorners": "Hörnväggar",
-		"mapCenter": "Mittvägg",
-		"scoreToWin": "Poäng för vinst",
-		"powerUps": "Power-ups",
-		"enabled": "Aktiverat",
-		"disabled": "Avaktiverat",
-		"enterUsernames": "Ange användarnamn eller registrera dig som gäst.",
-		"playerYou": "Spelare 1 (Du): {{username}}",
-		"player": "Spelare {{index}}: {{username}}",
-		"playerLabel": "Spelare",
-		"createButton": "Skapa Turnering",
-		"errorUsernameInvalid": "Användarnamnet måste vara alfanumeriskt och mellan 2 och 20 tecken.",
-		"errorUsernameTaken": "Användarnamnet \"{{username}}\" är redan taget.",
-		"errorAlreadyLoggedIn": "Du är redan inloggad som {{username}}.",
-		"errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
-		"errorTournamentCreation": "Fel vid skapande av turnering.",
-		"consoleCreating": "Skapar turnering"
-	}
+  "stats": {
+    "loading": "Laddar...",
+    "unknownUser": "Okänd användare",
+    "fetchError": "Misslyckades att hämta användarnamn för visad användare",
+    "title": "Pong-statistik för {{username}}"
+  },
+  "forgotPassword": {
+    "title": "Återställ lösenord",
+    "emailLabel": "E-postadress:",
+    "submitButton": "Skicka återställningslänk",
+    "successMessage": "Om den e-postadressen är registrerad får du snart instruktioner för att återställa lösenordet.",
+    "returnButton": "Tillbaka",
+    "genericError": "Något gick fel. Försök igen.",
+    "submitting": "Skickar..."
+  },
+  "pongPals": {
+    "title": "Pong Vänner",
+    "searchUsers": "Sök användare",
+    "yourFriends": "Dina vänner",
+    "back": "Tillbaka"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "email": "E-post",
+    "password": "Lösenord",
+    "language": "Språk",
+    "twoFactorAuth": "Aktivera tvåfaktorsautentisering",
+    "deleteAccountConfirm": "Ditt konto har raderats.",
+    "deleteAccountError": "Konto radering misslyckades. Försök igen senare.",
+    "languageError": "Det gick inte att uppdatera språkinställningen. Försök igen.",
+    "back": "Tillbaka",
+    "updateButton": "Uppdatera",
+    "newLabel": "Ny {{label}}",
+    "confirmLabel": "Bekräfta {{label}}",
+    "currentPassword": "Nuvarande lösenord",
+    "passwordErrorLength": "Lösenordet måste vara mellan 8 och 42 tecken.",
+    "passwordErrorFormat": "Lösenordet måste innehålla minst 8 tecken, inklusive versaler, gemener, siffror och specialtecken.",
+    "emailErrorLength": "E-post måste vara 42 tecken eller mindre.",
+    "emailErrorFormat": "Ange en giltig e-postadress.",
+    "valuesMismatch": "Nya värden matchar inte.",
+    "currentPasswordRequired": "Nuvarande lösenord krävs.",
+    "updateSuccess": "{{label}} uppdaterades.",
+    "updateFailed": "Uppdateringen misslyckades.",
+    "somethingWentWrong": "Något gick fel.",
+    "save": "Spara",
+    "cancel": "Avbryt"
+  },
+  "befriendButton": {
+    "befriend": "Bli vän",
+    "unfriend": "Ta bort vän",
+    "friend_request_pending": "Vänförfrågan skickad..."
+  },
+  "confirmOtp": {
+    "invalid_otp_format": "Ange en giltig 6-siffrig bekräftelsekod",
+    "email_verified_success": "E-post verifierad och tvåfaktorsautentisering aktiverad!",
+    "otp_invalid": "Ogiltig eller utgången bekräftelsekod. Försök igen.",
+    "otp_placeholder": "Ange den 6-siffriga koden som skickats till din e-post",
+    "confirm": "Bekräfta"
+  },
+  "deleteAccount": {
+    "ariaPrompt": "Ange ditt lösenord för att bekräfta borttagning av kontot",
+    "enterPassword": "Ange ditt lösenord",
+    "passwordPlaceholder": "Ange ditt lösenord",
+    "ariaLabel": "Ange ditt lösenord för att bekräfta borttagning av kontot",
+    "confirm": "Bekräfta borttagning",
+    "cancel": "Avbryt",
+    "delete": "Radera konto"
+  },
+  "editProfilePic": {
+    "onlyImages": "Endast JPG- och PNG-bilder är tillåtna.",
+    "fileTooLarge": "Filstorleken får vara högst 2 MB.",
+    "notValidImage": "Filen är inte en giltig bild.",
+    "saved": "Bilden har sparats!",
+    "save": "Spara"
+  },
+  "friendList": {
+    "noFriends": "Du har inga kompisar ännu"
+  },
+  "navigation": {
+    "home": "Hem",
+    "myStats": "Mina statistik",
+    "pongPals": "Pong-vänner",
+    "tournaments": "Turneringar",
+    "settings": "Inställningar",
+    "logout": "Logga ut",
+    "login": "Logga in"
+  },
+  "passcode": {
+    "label": "Ange verifieringskod:",
+    "errorTooShort": "Koden är för kort",
+    "submit": "Skicka"
+  },
+  "friendRequests": {
+    "title": "Vänförfrågningar som väntar:",
+    "request": "{{username}} vill bli din vän!",
+    "accept": "Acceptera",
+    "decline": "Avböj",
+    "accepted": "Du är nu vän med {{username}}",
+    "declined": "Förfrågan avböjd",
+    "error": "Något gick fel. Försök igen."
+  },
+  "matchHistory": {
+    "loadingStats": "Laddar statistik...",
+    "errorFetching": "Misslyckades att hämta statistik",
+    "totalWins": "Totala vinster",
+    "totalLosses": "Totala förluster",
+    "totalTournamentsWon": "Totala vunna turneringar",
+    "matchHistoryTitle": "Matchhistorik",
+    "noHistory": "Ingen matchhistorik tillgänglig"
+  },
+  "playerBox": {
+    "usernameRequired": "Användarnamn krävs",
+    "loginFailed": "Inloggning misslyckades. Kontrollera dina uppgifter.",
+    "usernamePlaceholder": "Användarnamn eller alias",
+    "passwordPlaceholder": "Lösenord (lämna tomt för gäst)",
+    "continue": "Fortsätt",
+    "guestHint": "Lämna lösenordet tomt för att registrera som gäst"
+  },
+  "results": {
+    "Win": "Vinst",
+    "Loss": "Förlust"
+  },
+  "searchPals": {
+    "placeholder": "Ange användarnamn",
+    "errorInvalidUsername": "Användarnamn får endast innehålla bokstäver och siffror.",
+    "errorSearchFailed": "Något gick fel vid sökningen.",
+    "noUsersFound": "Inga matchande användare hittades."
+  },
+  "statsHeader": {
+    "back": "Tillbaka"
+  },
+  "mfa": {
+    "heading": "Tvåfaktorsautentisering",
+    "otpLabel": "Engångskod (OTP)",
+    "verify": "Verifiera",
+    "verifying": "Verifierar...",
+    "resend": "Skicka ny OTP",
+    "invalidOtp": "Ogiltig OTP. Försök igen.",
+    "otpExpired": "OTP har gått ut. Vänligen begär en ny.",
+    "tryAgainError": "Ett fel inträffade. Försök igen senare.",
+    "generalError": "Ett fel inträffade",
+    "otpResent": "OTP har skickats igen. Kontrollera din e-post.",
+    "resendError": "Ett fel uppstod vid återutsändning av OTP. Försök igen senare.",
+    "waitTime": "Vänligen vänta {{count}} sekunder innan du begär en ny OTP.",
+    "loading": "Laddar..."
+  },
+  "resetPassword": {
+    "title": "Återställ ditt lösenord",
+    "newPasswordLabel": "Nytt lösenord",
+    "confirmPasswordLabel": "Bekräfta lösenord",
+    "fillBothFields": "Fyll i båda lösenordsfälten",
+    "passwordsDontMatch": "Lösenorden matchar inte",
+    "invalidOrMissingToken": "Ogiltig eller saknad länk",
+    "failed": "Det gick inte att återställa lösenordet",
+    "submitting": "Återställer...",
+    "submitButton": "Återställ lösenord",
+    "successTitle": "Lösenordet har återställts!",
+    "goToLogin": "Gå till inloggningen",
+    "invalidOrExpiredToken": "Denna återställningslänk är ogiltig eller har gått ut.",
+    "requestNew": "Vänligen begär en ny återställningslänk.",
+    "requestNewLink": "Begär ny länk",
+    "validatingToken": "Verifierar återställningslänk...",
+    "invalidPassword": "Lösenordet måste vara 8–42 tecken långt och innehålla minst en versal, en gemen, en siffra och ett specialtecken."
+  },
+  "CPM": {
+    "choosePlayMode": "Välj spelläge",
+    "singlevsAI": "Enspelare mot AI",
+    "twoplayersingle": "Tvåspelarläge",
+    "createTournament": "Skapa turnering"
+  },
+  "tournament": {
+    "createTitle": "Skapa Turnering",
+    "4playerMode": "4 Spelare-läge",
+    "8playerMode": "8 Spelare-läge",
+    "gameSettings": "Spelinställningar",
+    "map": "Karta",
+    "mapClassic": "Klassisk",
+    "mapCorners": "Hörnväggar",
+    "mapCenter": "Mittvägg",
+    "scoreToWin": "Poäng för vinst",
+    "powerUps": "Power-ups",
+    "enabled": "Aktiverat",
+    "disabled": "Avaktiverat",
+    "enterUsernames": "Ange användarnamn eller registrera dig som gäst.",
+    "playerYou": "Spelare 1 (Du): {{username}}",
+    "player": "Spelare {{index}}: {{username}}",
+    "playerLabel": "Spelare",
+    "createButton": "Skapa Turnering",
+    "errorUsernameInvalid": "Användarnamnet måste vara alfanumeriskt och mellan 2 och 20 tecken.",
+    "errorUsernameTaken": "Användarnamnet \"{{username}}\" är redan taget.",
+    "errorAlreadyLoggedIn": "Du är redan inloggad som {{username}}.",
+    "errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
+    "errorTournamentCreation": "Fel vid skapande av turnering.",
+    "consoleCreating": "Skapar turnering"
+  }
 }
