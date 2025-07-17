@@ -116,7 +116,7 @@ model TournamentParticipant {
   user         User?      @relation(fields: [userId], references: [id])
   userId       Int?
   tournamentUserId Int
-  alias        String? // for guests
+  alias        String?
   joinedAt     DateTime   @default(now())
 }
 

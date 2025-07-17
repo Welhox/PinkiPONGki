@@ -73,10 +73,8 @@ import { devOnly } from "../middleware/devOnly.js";
         if (tournament.participants.length >= tournament.size) {
           return reply.code(400).send({ message: "Tournament is full" });
         }
-        if (!userId && !alias) {
-          return reply
-            .code(400)
-            .send({ message: "Either userId or alias is required" });
+        if (!alias) {
+          return reply.code(400).send({ message: "Alias is required" });
         }
 
         const tournamentUserId = tournament.participants.length + 1;
@@ -165,6 +163,8 @@ import { devOnly } from "../middleware/devOnly.js";
         const participants = [...tournament.participants].sort(
           () => Math.random() - 0.5
         ); // Shuffle participants
+
+        console.log("Participants:", participants);
         const matches = [];
 
         for (let i = 0; i < participants.length; i += 2) {
@@ -179,9 +179,9 @@ import { devOnly } from "../middleware/devOnly.js";
             round: 1,
             tournamentId: tournament.id,
             player1Id: p1.tournamentUserId,
-            player1Alias: p1.user?.username || p1.alias,
+            player1Alias: p1.alias,
             player2Id: p2.tournamentUserId,
-            player2Alias: p2.user?.username || p2.alias,
+            player2Alias: p2.alias,
           });
         }
         console.log("Generated matches:", matches);
@@ -212,6 +212,8 @@ import { devOnly } from "../middleware/devOnly.js";
     async (req, reply) => {
       const { id, matchId } = req.params;
       const { winnerId, winnerAlias } = req.body;
+      console.log("WinnerAlias from backend:", winnerAlias);
+      console.log("WinnerId from backend:", winnerId);
       if (!winnerId && !winnerAlias) {
         return reply
           .code(400)
@@ -317,6 +319,7 @@ async function isTournamentFinished(id, updatedMatch) {
     where: { id: Number(id) },
     include: { tournamentMatches: true },
   });
+
   const pendingMatches = tournament.tournamentMatches.filter(
     (match) => match.status === "pending"
   );
@@ -370,6 +373,12 @@ async function generateNextRoundMatches(tournamentId) {
   for (let i = 0; i < winners.length; i += 2) {
     const p1 = winners[i];
     const p2 = winners[i + 1];
+
+    if (!p1 || !p2) {
+      console.error("Missing player in pair:", { p1, p2 });
+      continue;
+    }
+
     nextRoundMatches.push({
       round: round,
       tournamentId: Number(tournamentId),
@@ -377,10 +386,9 @@ async function generateNextRoundMatches(tournamentId) {
       player1Alias: p1.alias,
       player2Id: p2.userId,
       player2Alias: p2.alias,
+      status: "pending",
     });
   }
-
-  console.log("Generated next round matches:", nextRoundMatches);
 
   // change the status of the used match reults to 'archived'
   await prisma.tournamentMatch.updateMany({
@@ -388,6 +396,7 @@ async function generateNextRoundMatches(tournamentId) {
     data: { status: "archived" },
   });
 
+  console.log("Next round matches:", nextRoundMatches);
   // Create next round matches in the database
   await prisma.tournamentMatch.createMany({
     data: nextRoundMatches,

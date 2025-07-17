@@ -28,12 +28,14 @@ const TournamentBuilder = () => {
       const initialPlayers: RegisteredPlayer[] = Array(playerCount).fill({
         username: "",
         isGuest: true,
+        userId: null,
       });
 
       if (user) {
         initialPlayers[0] = {
           username: user.username,
           isGuest: false,
+          userId: Number(user.id),
         };
       }
 
@@ -91,7 +93,13 @@ const TournamentBuilder = () => {
       return;
     }
     const updatedPlayers = [...players];
-    updatedPlayers[index] = player;
+    updatedPlayers[index] = {
+      ...player,
+      userId:
+        !player.isGuest && user?.username === player.username
+          ? Number(user.id)
+          : null,
+    };
     setPlayers(updatedPlayers);
 
     // mark this player as registered (hides input fields from them)
@@ -234,7 +242,6 @@ const TournamentBuilder = () => {
                 <PlayerRegistrationBox
                   label={`${t("tournament.playerLabel")} ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
-                  playerId={index + 1}
                 />
               )}
             </div>

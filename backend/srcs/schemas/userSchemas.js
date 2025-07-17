@@ -321,9 +321,10 @@ const loginUserSchema = {
       type: "object",
       properties: {
         message: { type: "string" },
-        email: {type: "string" },
+        email: { type: "string" },
         mfaRequired: { type: "boolean" },
         language: { type: "string" },
+        id: { type: "integer" },
       },
     },
     400: { type: "object", properties: { error: { type: "string" } } },
@@ -333,49 +334,51 @@ const loginUserSchema = {
 };
 
 const requestPasswordResetSchema = {
-	body: {
-		type: 'object',
-		properties: {
-			email: {type: 'string', format: 'email'}
-		},
-		required: ['email']
-	},
-	response: {
-		200: { type: 'object', properties: {email: { type: 'string', format: 'email'}}},
-		400: { type: 'object', properties: { error: { type: 'string' }}},
-	}
-}
+  body: {
+    type: "object",
+    properties: {
+      email: { type: "string", format: "email" },
+    },
+    required: ["email"],
+  },
+  response: {
+    200: {
+      type: "object",
+      properties: { email: { type: "string", format: "email" } },
+    },
+    400: { type: "object", properties: { error: { type: "string" } } },
+  },
+};
 
 //CHECK: PASSWORD RESTRICTIONS ALREADY IN SCHEMA
 const resetPasswordSchema = {
-	body: {
-		type: 'object',
-		properties: {
-			token: {type: 'string'},
-			newPassword: {type: 'string', minLength: 8} 
-		},
-		required: ['token', 'newPassword']
-	},
-	response: {
-		200: { type: 'object', properties: {email: { type: 'string'}}},
-		400: { type: 'object', properties: { error: { type: 'string' }}},
-	}
-}
+  body: {
+    type: "object",
+    properties: {
+      token: { type: "string" },
+      newPassword: { type: "string", minLength: 8 },
+    },
+    required: ["token", "newPassword"],
+  },
+  response: {
+    200: { type: "object", properties: { email: { type: "string" } } },
+    400: { type: "object", properties: { error: { type: "string" } } },
+  },
+};
 
 const validateResetTokenSchema = {
-	body: {
-		type: 'object',
-		properties: {
-			token: {type: 'string'},
-		},
-		required: ['token']
-	},
-	response: {
-		200: { type: 'object', properties: {email: { type: 'boolean'}}},
-		400: { type: 'object', properties: { error: { type: 'string' }}},
-	}
-}
-
+  body: {
+    type: "object",
+    properties: {
+      token: { type: "string" },
+    },
+    required: ["token"],
+  },
+  response: {
+    200: { type: "object", properties: { email: { type: "boolean" } } },
+    400: { type: "object", properties: { error: { type: "string" } } },
+  },
+};
 
 export const userSchemas = {
   deleteUserSchema,

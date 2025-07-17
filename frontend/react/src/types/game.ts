@@ -12,4 +12,5 @@ export interface Match {
   round: number;
   saved: boolean;
   tournamentId: number;
+  status?: "pending" | "completed" | "archived";
 }

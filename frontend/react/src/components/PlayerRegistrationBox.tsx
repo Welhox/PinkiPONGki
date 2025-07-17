@@ -18,7 +18,6 @@ interface PlayerBoxProps {
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
   onRegister,
-  userId,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -48,7 +47,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         console.log("MFA verification successful");
         await refreshSession();
         setConfirmPlayer2MFA(false);
-        onRegister({ username, isGuest: false });
+        onRegister({ username, isGuest: false, userId: response?.data.id });
       }
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -121,6 +120,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
 
           const data = response.data;
           const userLang = response.data.language ?? "en";
+          console.log("USERID IN MAIN USER LOGIN:", response.data.id);
 
           // Change language immediately
           if (i18n.language !== userLang) {
@@ -140,12 +140,18 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             username,
             password,
           });
+          console.log("USERID IN 2PLAYER:", player2Response.data.id);
           if (player2Response.data.mfaRequired) {
             console.log(player2Response);
             setEmail(player2Response.data.email);
             setConfirmPlayer2MFA(true);
             return;
           }
+          onRegister({
+            username,
+            isGuest: false,
+            userId: player2Response?.data.id,
+          });
         }
         onRegister({ username, isGuest: false, userId: response?.data.id });
       } catch {

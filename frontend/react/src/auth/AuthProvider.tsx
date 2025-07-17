@@ -5,7 +5,7 @@ import api from "../api/axios";
 import i18n from "../i18n";
 
 export interface User {
-  id: string;
+  id: number;
   username: string;
   email?: string;
   profilePic?: string;

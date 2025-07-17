@@ -28,7 +28,7 @@ export const handleMatchPlayed = async (
     const response = await api.get(`/tournaments/${match.tournamentId}`);
     const updatedMatches = response.data.matches;
 
-    // format if needed
+    // format
     const formattedMatches = formatMatches(updatedMatches);
 
     setMatchesFromBackend(formattedMatches);
