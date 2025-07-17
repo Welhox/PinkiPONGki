@@ -170,5 +170,11 @@
 		"resendError": "Virhe OTP:n uudelleenlähetyksessä. Yritä myöhemmin uudelleen.",
 		"waitTime": "Odota {{count}} sekuntia ennen uuden OTP:n pyytämistä.",
 		"loading": "Ladataan..."
-  	}
+  	},
+	"CPM": {
+  		"choosePlayMode": "Valitse pelimuoto",
+  		"singlevsAI": "Yksinpeli tekoälyä vastaan",
+  		"twoplayersingle": "Kaksinpeli",
+  		"createTournament": "Luo turnaus"
+}
 }

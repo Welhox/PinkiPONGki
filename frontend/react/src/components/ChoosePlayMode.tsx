@@ -4,8 +4,10 @@ import PongGameWithRegistration from "./PongGameWithRegistration";
 import PongGameAI from "./PongGameAI";
 import TournamentBuilder from "./TournamentBuilder";
 import GameCustomization from "./GameCustomization";
+import { useTranslation } from "react-i18next";
 
 const ChoosePlayMode = () => {
+  const { t } = useTranslation();
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const location = useLocation();
   const initialRenderRef = useRef(true);
@@ -104,17 +106,17 @@ const ChoosePlayMode = () => {
     <div>
       <div>
         <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
-          Choose Play Mode
+          {t("CPM.choosePlayMode")}
         </h1>
         <div className="flex">
           <button className={buttonStyles} onClick={handleSinglePlayer}>
-            Single Player vs AI
+            {t("CPM.singlevsAI")}
           </button>
           <button className={buttonStyles} onClick={handleTwoPlayer}>
-            2 Player Single Game
+            {t("CPM.twoplayersingle")}
           </button>
           <button className={buttonStyles} onClick={handleCreateTournament}>
-            Create Tournament
+            {t("CPM.createTournament")}
           </button>
           {/* <button className={buttonStyles} onClick={handleJoinTournament}>Join Tournament</button> */}
         </div>

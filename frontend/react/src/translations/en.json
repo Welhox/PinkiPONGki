@@ -169,5 +169,11 @@
 		"requestNewLink": "Request New Link",
 		"validatingToken": "Validating reset link...",
 		"invalidPassword": "Password must be 8–42 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+	},
+	"CPM": {
+		"choosePlayMode": "Choose Play Mode",
+		"singlevsAI": "Single Player vs AI",
+		"twoplayersingle": "2 Player Single Game",
+		"createTournament": "Create Tournament"
 	}
 }

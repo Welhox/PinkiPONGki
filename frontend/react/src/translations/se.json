@@ -170,5 +170,11 @@
 		"requestNewLink": "Begär ny länk",
 		"validatingToken": "Verifierar återställningslänk...",
 		"invalidPassword": "Lösenordet måste vara 8–42 tecken långt och innehålla minst en versal, en gemen, en siffra och ett specialtecken."
+	},
+	"CPM": {
+  		"choosePlayMode": "Välj spelläge",
+  		"singlevsAI": "Enspelare mot AI",
+  		"twoplayersingle": "Tvåspelarläge",
+  		"createTournament": "Skapa turnering"
 	}
 }
