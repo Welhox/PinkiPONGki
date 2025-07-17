@@ -16,9 +16,10 @@ const calculateBallSpeed = (speedSetting: number): number => {
 const STANDARD_NORMALIZED_X_SPEED = 0.8; // Normalized speed components (0-1)
 const STANDARD_NORMALIZED_Y_SPEED = 0.4;
 
-const paddleSound = new Audio('../../assets/paddle.mp3');
-const scoreSound = new Audio('../../assets/score.mp3');
-const wallSound = new Audio('../../assets/wall.mp3');
+// Load audio files from the public folder for better Docker compatibility
+const paddleSound = new Audio('/paddle.mp3');
+const scoreSound = new Audio('/score.mp3');
+const wallSound = new Audio('/wall.mp3');
 
 /**
  * Time-based Movement System with Normalized Velocities
@@ -46,6 +47,7 @@ interface PongGameProps {
   player1: { username: string; isGuest: boolean };
   player2: { username: string; isGuest: boolean };
   isAIGame?: boolean; // New prop to indicate AI game
+  onReturnToMenu?: () => void; // Callback to return to menu
 }
 
 /**
@@ -557,7 +559,7 @@ function drawSevenSegment(
   ctx.restore();
 }
 
-const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
+const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onReturnToMenu }) => {
   console.log("PongGame: Initializing with players", { player1, player2, isAIGame });
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1444,6 +1446,19 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
     setScore({ left: 0, right: 0 });
     setRestartKey((prev) => prev + 1); // Trigger re-render
   }
+  
+  // New function to handle returning to the main menu/game selection
+  function handleReturnToMenu() {
+    // Call parent component's callback if provided
+    if (onReturnToMenu) {
+      onReturnToMenu();
+    } else if (window.history.length > 1) {
+      window.history.back(); // Go back to previous page if possible
+    } else {
+      // If no history and no callback, try to navigate to home
+      window.location.href = '/';
+    }
+  }
 
   console.log("PongGame: Rendering component with canvas");
   console.log("Power-up status:", { 
@@ -1477,23 +1492,32 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame }) => {
       />
       {winner && (
         <div
-          className="absolute inset-0 flex items-center justify-center text-4xl text-white font-bold bg-black bg-opacity-70"
+          className="absolute flex flex-col items-center justify-center text-4xl text-white font-bold bg-black bg-opacity-80"
           style={{
-            width: "500px",
-            height: "300px",
-            left: 0,
-            top: 0,
-            margin: "0 auto",
+            width: "500px", // Match canvas width
+            height: "300px", // Match canvas height
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
             borderRadius: "8px",
+            zIndex: 10, // Ensure it's above the canvas
           }}
         >
-          <div>{winner} wins!</div>
-          <button
-            className="mt-6 px-6 py-2 bg-teal-700 text-white rounded text-xl font-bold"
-            onClick={handleRestart}
-          >
-            Restart
-          </button>
+          <div className="mb-8">{winner} wins!</div>
+          <div className="flex flex-col gap-4 w-64">
+            <button
+              className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
+              onClick={handleRestart}
+            >
+              Restart Match
+            </button>
+            <button
+              className="px-6 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-lg text-xl font-bold transition-colors"
+              onClick={handleReturnToMenu}
+            >
+              Return to Main Menu
+            </button>
+          </div>
         </div>
       )}
     </div>

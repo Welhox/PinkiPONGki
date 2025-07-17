@@ -3,7 +3,11 @@ import PongGame from "./PongGame";
 import { useAuth } from "../auth/AuthProvider";
 import { useGameSettings } from "../contexts/GameSettingsContext";
 
-const PongGameAI: React.FC = () => {
+interface PongGameAIProps {
+  onReturnToMenu?: () => void;
+}
+
+const PongGameAI: React.FC<PongGameAIProps> = ({ onReturnToMenu }) => {
   const { user } = useAuth();
   const { settings } = useGameSettings();
 
@@ -51,6 +55,7 @@ const PongGameAI: React.FC = () => {
         player1={player1} 
         player2={player2} 
         isAIGame={true}
+        onReturnToMenu={onReturnToMenu}
       />
     </div>
   );

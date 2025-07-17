@@ -7,7 +7,11 @@ import { useGameSettings } from "../contexts/GameSettingsContext";
 const GAME_WIDTH = 500;
 const GAME_HEIGHT = 300;
 
-const PongGameWithRegistration: React.FC = () => {
+interface PongGameWithRegistrationProps {
+  onReturnToMenu?: () => void;
+}
+
+const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({ onReturnToMenu }) => {
   const { status, user } = useAuth();
   const { settings } = useGameSettings();
   const [player1, setPlayer1] = useState<{
@@ -71,7 +75,7 @@ const PongGameWithRegistration: React.FC = () => {
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Player 1: W/S keys | Player 2: Arrow Up/Down</p>
       </div>
       
-      <PongGame player1={player1} player2={player2} />
+      <PongGame player1={player1} player2={player2} onReturnToMenu={onReturnToMenu} />
     </div>
   );
 };
