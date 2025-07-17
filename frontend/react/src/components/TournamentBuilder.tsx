@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PlayerRegistrationBox from "./PlayerRegistrationBox";
 import api from "../api/axios";
 import { useGameSettings } from "../contexts/GameSettingsContext";
+import { useTranslation } from "react-i18next";
 
 type RegisteredPlayer = {
   username: string;
@@ -18,6 +19,7 @@ const TournamentBuilder = () => {
   const { settings } = useGameSettings();
   const navigate = useNavigate();
   const usernameRegex = /^[a-zA-Z0-9]+$/;
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (playerCount > 0) {
@@ -47,12 +49,12 @@ const TournamentBuilder = () => {
       (p, i) => i !== index && p.username === player.username
     );
     if (duplicate) {
-      alert(`Username "${player.username}" is already taken.`);
+      alert((t("tournament.errorUsernameTaken", { username: player.username })));
       return;
     }
     // prevent re-login of logged-in user
     if (user && index !== 0 && player.username === user.username) {
-      alert(`You're already logged in as ${user.username}.`);
+      alert(t("tournament.errorAlreadyLoggedIn", { username: user.username }));
       return;
     }
     // enforce username rules
@@ -61,7 +63,7 @@ const TournamentBuilder = () => {
       player.username.length < 2 ||
       player.username.length > 20
     ) {
-      alert("Username must be alphanumeris and between 2 and 20 characters.");
+      alert(t("tournament.errorUsernameInvalid"));
       return;
     }
     const updatedPlayers = [...players];
@@ -75,7 +77,7 @@ const TournamentBuilder = () => {
   };
 
   const handleCreateTournament = async (e: React.FormEvent) => {
-    console.log(`Let's make a tournament`);
+    console.log(t("tournament.consoleCreating"));
     e.preventDefault();
 
     // ensure logged in user is counted in all checks
@@ -93,7 +95,7 @@ const TournamentBuilder = () => {
         return !p.username;
       })
     ) {
-      alert("All players must enter a username.");
+      alert(t("tournament.errorAllPlayersRequired"));
       return;
     }
 
@@ -124,7 +126,7 @@ const TournamentBuilder = () => {
       navigate(`/tournament/${tournamentId}`, { state: { players } }); // for testing without backend
     } catch (error) {
       console.error("Tournament creation failed.");
-      alert("Error creating tournament.");
+      alert(t("tournament.errorTournamentCreation"));
     }
   };
 
@@ -137,14 +139,14 @@ const TournamentBuilder = () => {
     return (
       <div>
         <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
-          Create Tournament
+          {t("tournament.createTitle")}
         </h1>
         <div className="flex flex-col">
           <button className={buttonStyles} onClick={() => setPlayerCount(4)}>
-            4 player mode
+            {t("tournament.4playerMode")}
           </button>
           <button className={buttonStyles} onClick={() => setPlayerCount(8)}>
-            8 player mode
+            {t("tournament.8playerMode")}
           </button>
         </div>
       </div>
@@ -153,39 +155,39 @@ const TournamentBuilder = () => {
     return (
       <div className="flex flex-col">
         <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
-          Create Tournament
+          {t("tournament.createTitle")}
         </h1>
         
         <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-teal-700 dark:text-teal-300 mb-2">
-            Game Settings
+            {t("tournament.gameSettings")}
           </h3>
           
           <div className="grid grid-cols-2 gap-4 dark:text-white">
-            <p><strong>Map:</strong> {settings.mapType === 'classic' ? 'Classic' : 
-                             settings.mapType === 'corners' ? 'Corner Walls' : 'Center Wall'}</p>
-            <p><strong>Score to Win:</strong> {settings.scoreToWin}</p>
-            <p><strong>Power-ups:</strong> {settings.powerUpsEnabled ? 'Enabled' : 'Disabled'}</p>
+            <p><strong>{t("tournament.map")}:</strong> {settings.mapType === 'classic' ? t('tournament.mapClassic') : 
+                             settings.mapType === 'corners' ? t('tournament.mapCorners') : t('tournament.mapCenter')}</p>
+            <p><strong>{t("tournament.scoreToWin")}:</strong> {settings.scoreToWin}</p>
+            <p><strong>{t("tournament.powerUps")}:</strong> {settings.powerUpsEnabled ? t("tournament.enabled") : t("tournament.disabled")}</p>
           </div>
         </div>
         
         <p className="dark:text-white">
-          Enter the usernames or register as a guest.
+          {t("tournament.enterUsernames")}
         </p>
         <div className="flex flex-col">
           {players.map((player, index) => (
             <div key={index} className="my-2">
               {user && index === 0 ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-bold">
-                  Player 1 (You): {user.username}
+                  {t("tournament.playerYou", { username: user.username })}
                 </div>
               ) : registeredPlayers[index] ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-semibold">
-                  Player {index + 1}: {player.username}
+                  {t("tournament.player", { index: index + 1, username: player.username })}
                 </div>
               ) : (
                 <PlayerRegistrationBox
-                  label={`Player ${index + 1}`}
+                  label={`${t("tournament.playerLabel")} ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
                   playerId={index + 1}
                 />
@@ -193,7 +195,7 @@ const TournamentBuilder = () => {
             </div>
           ))}
           <button className={buttonStyles} onClick={handleCreateTournament}>
-            Create Tournament
+            {t("tournament.createButton")}
           </button>
         </div>
       </div>

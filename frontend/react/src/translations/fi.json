@@ -176,5 +176,30 @@
   		"singlevsAI": "Yksinpeli tekoälyä vastaan",
   		"twoplayersingle": "Kaksinpeli",
   		"createTournament": "Luo turnaus"
-}
+	},
+	"tournament": {
+		"createTitle": "Luo Turnaus",
+		"4playerMode": "4 Pelaajan Pelimuoto",
+		"8playerMode": "8 Pelaajan Pelimuoto",
+		"gameSettings": "Pelin asetukset",
+		"map": "Kartta",
+		"mapClassic": "Klassinen",
+		"mapCorners": "Kulmaseinät",
+		"mapCenter": "Keskiseinä",
+		"scoreToWin": "Voittopisteet",
+		"powerUps": "Tehosteet",
+		"enabled": "Käytössä",
+		"disabled": "Ei käytössä",
+		"enterUsernames": "Anna käyttäjänimet tai rekisteröidy vieraana.",
+		"playerYou": "Pelaaja 1 (Sinä): {{username}}",
+		"player": "Pelaaja {{index}}: {{username}}",
+		"playerLabel": "Pelaaja",
+		"createButton": "Luo Turnaus",
+		"errorUsernameInvalid": "Käyttäjänimen on oltava aakkosnumeerinen ja 2–20 merkkiä pitkä.",
+		"errorUsernameTaken": "Käyttäjänimi \"{{username}}\" on jo varattu.",
+		"errorAlreadyLoggedIn": "Olet jo kirjautunut nimellä {{username}}.",
+		"errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
+		"errorTournamentCreation": "Turnauksen luominen epäonnistui.",
+		"consoleCreating": "Luodaan turnaus"
+	}
 }

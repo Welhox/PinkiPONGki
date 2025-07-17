@@ -175,5 +175,30 @@
 		"singlevsAI": "Single Player vs AI",
 		"twoplayersingle": "2 Player Single Game",
 		"createTournament": "Create Tournament"
+	},
+	"tournament": {
+		"createTitle": "Create Tournament",
+		"4playerMode": "4 Player Mode",
+		"8playerMode": "8 Player Mode",
+		"gameSettings": "Game Settings",
+		"map": "Map",
+		"mapClassic": "Classic",
+		"mapCorners": "Corner Walls",
+		"mapCenter": "Center Wall",
+		"scoreToWin": "Score to Win",
+		"powerUps": "Power-ups",
+		"enabled": "Enabled",
+		"disabled": "Disabled",
+		"enterUsernames": "Enter the usernames or register as a guest.",
+		"playerYou": "Player 1 (You): {{username}}",
+		"player": "Player {{index}}: {{username}}",
+		"playerLabel": "Player",
+		"createButton": "Create Tournament",
+		"errorUsernameInvalid": "Username must be alphanumeric and between 2 and 20 characters.",
+		"errorUsernameTaken": "Username \"{{username}}\" is already taken.",
+		"errorAlreadyLoggedIn": "You're already logged in as {{username}}.",
+		"errorAllPlayersRequired": "All players must enter a username.",
+		"errorTournamentCreation": "Error creating tournament.",
+		"consoleCreating": "Let's make a tournament"
 	}
 }

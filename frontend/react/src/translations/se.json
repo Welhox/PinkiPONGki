@@ -176,5 +176,30 @@
   		"singlevsAI": "Enspelare mot AI",
   		"twoplayersingle": "Tvåspelarläge",
   		"createTournament": "Skapa turnering"
+	},
+	"tournament": {
+		"createTitle": "Skapa Turnering",
+		"4playerMode": "4 Spelare-läge",
+		"8playerMode": "8 Spelare-läge",
+		"gameSettings": "Spelinställningar",
+		"map": "Karta",
+		"mapClassic": "Klassisk",
+		"mapCorners": "Hörnväggar",
+		"mapCenter": "Mittvägg",
+		"scoreToWin": "Poäng för vinst",
+		"powerUps": "Power-ups",
+		"enabled": "Aktiverat",
+		"disabled": "Avaktiverat",
+		"enterUsernames": "Ange användarnamn eller registrera dig som gäst.",
+		"playerYou": "Spelare 1 (Du): {{username}}",
+		"player": "Spelare {{index}}: {{username}}",
+		"playerLabel": "Spelare",
+		"createButton": "Skapa Turnering",
+		"errorUsernameInvalid": "Användarnamnet måste vara alfanumeriskt och mellan 2 och 20 tecken.",
+		"errorUsernameTaken": "Användarnamnet \"{{username}}\" är redan taget.",
+		"errorAlreadyLoggedIn": "Du är redan inloggad som {{username}}.",
+		"errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
+		"errorTournamentCreation": "Fel vid skapande av turnering.",
+		"consoleCreating": "Skapar turnering"
 	}
 }
