@@ -41,8 +41,8 @@ const NavigationHeader = ({
 
   const onLogoutClick = async () => {
     try {
-      await handleLogout();
       navigate("/");
+      await handleLogout();
     } catch (error) {
       console.error("Logout failed:", error);
     }
