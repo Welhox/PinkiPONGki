@@ -1,5 +1,6 @@
 import React from "react";
 import { Match, Player } from "../types/game";
+import { useTranslation } from "react-i18next";
 
 interface MatchCardProps {
   match: Match;
@@ -8,6 +9,7 @@ interface MatchCardProps {
 
 const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
   const { player1, player2, result, winnerId } = match;
+  const { t } = useTranslation();
 
   return (
     <div className="flex justify-between items-center p-3 border rounded mb-2">
@@ -17,7 +19,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
       </div>
       {result ? (
         <div className="text-green-600 font-semibold">
-          Winner: {winnerId === player1.id ? player1.name : player2.name}
+          {t("matchcard.winner")}: {winnerId === player1.id ? player1.name : player2.name}
         </div>
       ) : (
         <div className="flex gap-2">
@@ -25,13 +27,13 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
             className="bg-blue-600 text-white px-3 py-1 rounded"
             onClick={() => onPlay(match, player1)}
           >
-            {player1.name} Wins
+            {t("matchcard.win", { name: player1.name })}
           </button>
           <button
             className="bg-blue-600 text-white px-3 py-1 rounded"
             onClick={() => onPlay(match, player2)}
           >
-            {player2.name} Wins
+            {t("matchcard.win", { name: player2.name })}
           </button>
         </div>
       )}

@@ -58,14 +58,14 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold text-center text-teal-700 dark:text-teal-300 mb-6">
-        Game Customization
+        {t("gamecustomization.title")}
       </h2>
 
       <div className="space-y-6">
         {/* Score to Win */}
         <div>
           <label className={labelStyles} htmlFor="scoreToWin">
-            Score to Win: {settings.scoreToWin}
+            {t("gamecustomization.scoreToWin")}: {settings.scoreToWin}
           </label>
           <input
             type="range"
@@ -87,7 +87,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
         {isAIGame && (
           <div>
             <label className={labelStyles} htmlFor="aiDifficulty">
-              AI Difficulty
+              {t("gamecustomization.aiDifficulty")}
             </label>
             <select
               id="aiDifficulty"
@@ -95,10 +95,18 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
               onChange={handleDifficultyChange}
               className={inputStyles + " w-full"}
             >
-              <option value="easy">Easy - AI makes many mistakes</option>
-              <option value="medium">Medium - Balanced gameplay</option>
-              <option value="hard">Hard - Challenging opponent</option>
-              <option value="expert">Expert - Nearly perfect AI</option>
+              <option value="easy">
+                {t("gamecustomization.difficulty.easy")}
+              </option>
+              <option value="medium">
+                {t("gamecustomization.difficulty.medium")}
+              </option>
+              <option value="hard">
+                {t("gamecustomization.difficulty.hard")}
+              </option>
+              <option value="expert">
+                {t("gamecustomization.difficulty.expert")}
+              </option>
             </select>
           </div>
         )}
@@ -106,7 +114,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
         {/* Map Selection */}
         <div>
           <label className={labelStyles} htmlFor="mapType">
-            Map Type
+            {t("gamecustomization.mapType")}
           </label>
           <select
             id="mapType"
@@ -114,12 +122,14 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
             onChange={handleMapChange}
             className={inputStyles + " w-full"}
           >
-            <option value="classic">Classic - Standard Pong</option>
+            <option value="classic">
+              {t("gamecustomization.map.classic")}
+            </option>
             <option value="corners">
-              Corner Walls - Score only through center
+              {t("gamecustomization.map.corners")}
             </option>
             <option value="center-wall">
-              Center Wall - Ball goes top/bottom only
+              {t("gamecustomization.map.centerWall")}
             </option>
           </select>
         </div>
@@ -127,7 +137,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
         {/* Ball Speed Selection - Slider */}
         <div>
           <label className={labelStyles} htmlFor="ballSpeed">
-            Ball Speed: {settings.ballSpeed}/10
+            {t("gamecustomization.ballSpeed")}: {settings.ballSpeed}/10
           </label>
           <input
             id="ballSpeed"
@@ -142,19 +152,19 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
           />
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span>Slow</span>
-            <span>Medium</span>
-            <span>Fast</span>
-            <span>Extreme</span>
+            <span>{t("gamecustomization.speed.slow")}</span>
+            <span>{t("gamecustomization.speed.medium")}</span>
+            <span>{t("gamecustomization.speed.fast")}</span>
+            <span>{t("gamecustomization.speed.extreme")}</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             {settings.ballSpeed <= 3
-              ? "Beginner friendly - Plenty of time to react"
+              ? t("gamecustomization.speedDescription.easy")
               : settings.ballSpeed <= 6
-              ? "Balanced - Good for standard gameplay"
+              ? t("gamecustomization.speedDescription.medium")
               : settings.ballSpeed <= 8
-              ? "Challenging - Test your reflexes"
-              : "Extreme - For Pong masters only!"}
+              ? t("gamecustomization.speedDescription.hard")
+              : t("gamecustomization.speedDescription.extreme")}
           </p>
         </div>
 
@@ -162,7 +172,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
         <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
           <div className="flex items-center justify-between mb-4">
             <label htmlFor="togglePowerUpsCheckbox" className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-              Power-ups
+              {t("gamecustomization.powerUps.title")}
             </label>
             <div className="flex items-center cursor-pointer">
               <input
@@ -193,10 +203,10 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <span className="font-medium text-gray-700 dark:text-gray-300">
-                    🏓 Big Paddle
+                    🏓 {t("gamecustomization.powerUps.bigPaddle")}
                   </span>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Enlarges paddle for 8 seconds
+                    {t("gamecustomization.powerUps.description")}
                   </p>
                 </div>
                 <label className="flex items-center cursor-pointer">
@@ -236,7 +246,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
             }}
 			className={altButtonStyles}
           >
-            Reset to Defaults
+            {t("gamecustomization.reset")}
           </button>
             <button
               onClick={() => {
@@ -245,7 +255,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
               }}
 			  className={altButtonStyles}
 			 >
-              Back
+               {t("gamecustomization.back")}
             </button>
             <button
               onClick={() => {
@@ -257,7 +267,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({
               }}
               className={buttonStyles}
             >
-              Start Game
+              {t("gamecustomization.start")}
             </button>
           
         </div>
