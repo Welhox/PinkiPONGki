@@ -1,6 +1,6 @@
-import React from 'react';
-import { useGameSettings } from '../contexts/GameSettingsContext';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useGameSettings } from "../contexts/GameSettingsContext";
+import { useTranslation } from "react-i18next";
 
 interface GameCustomizationProps {
   onStartGame: () => void;
@@ -8,7 +8,11 @@ interface GameCustomizationProps {
   isAIGame?: boolean; // New prop to control whether to show AI difficulty
 }
 
-const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBack, isAIGame = false }) => {
+const GameCustomization: React.FC<GameCustomizationProps> = ({
+  onStartGame,
+  onBack,
+  isAIGame = false,
+}) => {
   const { settings, updateSettings, resetToDefaults } = useGameSettings();
   const { t } = useTranslation();
 
@@ -17,7 +21,9 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
     updateSettings({ scoreToWin: value });
   };
 
-  const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleDifficultyChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     updateSettings({ aiDifficulty: event.target.value as any });
   };
 
@@ -33,24 +39,28 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
     updateSettings({ paddleEnlargePowerUp: !settings.paddleEnlargePowerUp });
   };
 
-  const buttonStyles = "px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded font-semibold transition-colors";
-  const inputStyles = "px-3 py-2 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-white";
-  const labelStyles = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2";
+  const buttonStyles =
+    "px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded font-semibold transition-colors";
+  const inputStyles =
+    "px-3 py-2 border border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700 dark:text-white";
+  const labelStyles =
+    "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2";
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <h2 className="text-3xl font-bold text-center text-teal-700 dark:text-teal-300 mb-6">
         Game Customization
       </h2>
-      
+
       <div className="space-y-6">
         {/* Score to Win */}
         <div>
-          <label className={labelStyles}>
+          <label className={labelStyles} htmlFor="scoreToWin">
             Score to Win: {settings.scoreToWin}
           </label>
           <input
             type="range"
+            id="scoreToWin"
             min="1"
             max="20"
             value={settings.scoreToWin}
@@ -67,11 +77,12 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
         {/* AI Difficulty - only shown for AI games */}
         {isAIGame && (
           <div>
-            <label className={labelStyles}>
+            <label className={labelStyles} htmlFor="aiDifficulty">
               AI Difficulty
             </label>
-            <select 
-              value={settings.aiDifficulty} 
+            <select
+              id="aiDifficulty"
+              value={settings.aiDifficulty}
               onChange={handleDifficultyChange}
               className={inputStyles + " w-full"}
             >
@@ -85,32 +96,40 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
 
         {/* Map Selection */}
         <div>
-          <label className={labelStyles}>
+          <label className={labelStyles} htmlFor="mapType">
             Map Type
           </label>
-          <select 
-            value={settings.mapType} 
+          <select
+            id="mapType"
+            value={settings.mapType}
             onChange={handleMapChange}
             className={inputStyles + " w-full"}
           >
             <option value="classic">Classic - Standard Pong</option>
-            <option value="corners">Corner Walls - Score only through center</option>
-            <option value="center-wall">Center Wall - Ball goes top/bottom only</option>
+            <option value="corners">
+              Corner Walls - Score only through center
+            </option>
+            <option value="center-wall">
+              Center Wall - Ball goes top/bottom only
+            </option>
           </select>
         </div>
 
         {/* Ball Speed Selection - Slider */}
         <div>
-          <label className={labelStyles}>
+          <label className={labelStyles} htmlFor="ballSpeed">
             Ball Speed: {settings.ballSpeed}/10
           </label>
           <input
+            id="ballSpeed"
             type="range"
             min="1"
             max="10"
             step="1"
             value={settings.ballSpeed}
-            onChange={(e) => updateSettings({ ballSpeed: parseInt(e.target.value) })}
+            onChange={(e) =>
+              updateSettings({ ballSpeed: parseInt(e.target.value) })
+            }
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
           />
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -120,10 +139,13 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
             <span>Extreme</span>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {settings.ballSpeed <= 3 ? "Beginner friendly - Plenty of time to react" :
-             settings.ballSpeed <= 6 ? "Balanced - Good for standard gameplay" :
-             settings.ballSpeed <= 8 ? "Challenging - Test your reflexes" :
-             "Extreme - For Pong masters only!"}
+            {settings.ballSpeed <= 3
+              ? "Beginner friendly - Plenty of time to react"
+              : settings.ballSpeed <= 6
+              ? "Balanced - Good for standard gameplay"
+              : settings.ballSpeed <= 8
+              ? "Challenging - Test your reflexes"
+              : "Extreme - For Pong masters only!"}
           </p>
         </div>
 
@@ -140,12 +162,18 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
                 onChange={togglePowerUps}
                 className="sr-only"
               />
-              <div className={`relative w-11 h-6 rounded-full transition-colors ${
-                settings.powerUpsEnabled ? 'bg-teal-600' : 'bg-gray-300 dark:bg-gray-600'
-              }`}>
-                <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.powerUpsEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}></div>
+              <div
+                className={`relative w-11 h-6 rounded-full transition-colors ${
+                  settings.powerUpsEnabled
+                    ? "bg-teal-600"
+                    : "bg-gray-300 dark:bg-gray-600"
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.powerUpsEnabled ? "translate-x-5" : "translate-x-0"
+                  }`}
+                ></div>
               </div>
             </label>
           </div>
@@ -154,8 +182,12 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
             <div className="ml-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">🏓 Big Paddle</span>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Enlarges paddle for 8 seconds</p>
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    🏓 Big Paddle
+                  </span>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Enlarges paddle for 8 seconds
+                  </p>
                 </div>
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -164,12 +196,20 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
                     onChange={togglePaddleEnlarge}
                     className="sr-only"
                   />
-                  <div className={`relative w-8 h-4 rounded-full transition-colors ${
-                    settings.paddleEnlargePowerUp ? 'bg-teal-600' : 'bg-gray-300 dark:bg-gray-600'
-                  }`}>
-                    <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
-                      settings.paddleEnlargePowerUp ? 'translate-x-4' : 'translate-x-0'
-                    }`}></div>
+                  <div
+                    className={`relative w-8 h-4 rounded-full transition-colors ${
+                      settings.paddleEnlargePowerUp
+                        ? "bg-teal-600"
+                        : "bg-gray-300 dark:bg-gray-600"
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${
+                        settings.paddleEnlargePowerUp
+                          ? "translate-x-4"
+                          : "translate-x-0"
+                      }`}
+                    ></div>
                   </div>
                 </label>
               </div>
@@ -188,7 +228,7 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
           >
             Reset to Defaults
           </button>
-          
+
           <div className="space-x-3">
             <button
               onClick={() => {
@@ -201,7 +241,10 @@ const GameCustomization: React.FC<GameCustomizationProps> = ({ onStartGame, onBa
             </button>
             <button
               onClick={() => {
-                console.log("GameCustomization: Start Game button clicked with settings:", settings);
+                console.log(
+                  "GameCustomization: Start Game button clicked with settings:",
+                  settings
+                );
                 onStartGame();
               }}
               className={buttonStyles}
