@@ -10,7 +10,9 @@ export async function otpRoutes(fastify, _options) {
   // a route for verifing the OTP witout making a cookie
   fastify.post(
     "/auth/otp/verify",
-    { schema: otpSchemas.otpVerifyNoCoockieSchema, preHandler: authenticate },
+    { schema: otpSchemas.otpVerifyNoCoockieSchema, preHandler: authenticate, 
+      config: { rateLimit: { max: 10, timeWindow: "1 minute", keyGenerator: (req) => req.ip }}
+     },
     async (request, reply) => {
       const userId = request.user?.id;
       try {
@@ -58,7 +60,9 @@ export async function otpRoutes(fastify, _options) {
   // check if the OTP is valid and not expired
   fastify.post(
     "/auth/verify-otp",
-    { schema: otpSchemas.otpVerifyWithCoockieSchema },
+    { schema: otpSchemas.otpVerifyWithCoockieSchema,
+      config: { rateLimit: { max: 10, timeWindow: "1 minute", keyGenerator: (req) => req.ip }}
+     },
     async (request, reply) => {
       const temp = request.cookies.otpToken;
       if (!temp) {

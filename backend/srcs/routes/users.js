@@ -5,6 +5,7 @@ import { authenticate } from "../middleware/authenticate.js";
 import { handleOtp } from "../handleOtp.js";
 import { sendResetPasswordEmail } from "../utils/mailer.js";
 import crypto from "crypto";
+import { devOnly } from "../middleware/devOnly.js";
 
 function isValidPassword(password) {
   const pwdValidationRegex =
@@ -387,8 +388,12 @@ export async function userRoutes(fastify, _options) {
   );
   //####################################################################################################################################
 
-  //REMOVE FOR PRODUCTION!!
-  fastify.get("/users/allInfo", async (req, reply) => {
+  // route to fetch all users with their OTP information
+  // This route is for development purposes only, to see all users and their OTPs
+  // It should not be used in production, hence the devOnly middleware
+  fastify.get("/users/allInfo",
+     {preHandler: devOnly}, 
+    async (req, reply) => {
     try {
       // Get users along with associated OTP information
       const users = await prisma.user.findMany({
