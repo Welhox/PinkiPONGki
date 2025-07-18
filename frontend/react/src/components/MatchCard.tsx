@@ -8,7 +8,7 @@ interface MatchCardProps {
 }
 
 const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
-  const { player1, player2, result, winnerId } = match;
+  const { player1, player2, status, winnerId } = match;
   const { t } = useTranslation();
 
   return (
@@ -17,7 +17,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onPlay }) => {
         <span className="font-semibold">{player1?.name ?? "TBD"}</span> vs{" "}
         <span className="font-semibold">{player2?.name ?? "TBD"}</span>
       </div>
-      {result ? (
+      {status === "completed" ? (
         <div className="text-green-600 font-semibold">
           {t("matchcard.winner")}: {winnerId === player1.id ? player1.name : player2.name}
         </div>

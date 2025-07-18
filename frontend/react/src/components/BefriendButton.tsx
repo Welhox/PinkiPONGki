@@ -3,8 +3,8 @@ import api from '../api/axios';
 import { useTranslation } from 'react-i18next';
 
 interface BefriendButtonProps {
-	currentUserId: string;
-	viewedUserId: string;
+	currentUserId: number;
+	viewedUserId: number;
 }
 
 const BefriendButton: React.FC<BefriendButtonProps> = ({ currentUserId, viewedUserId }) => {

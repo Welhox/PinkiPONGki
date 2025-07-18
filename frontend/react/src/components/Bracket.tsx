@@ -22,12 +22,7 @@ const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {
     <div className="flex flex-col items-center gap-12">
       {sortedRounds.map(([roundNumber, roundMatches]) => {
         const round = Number(roundNumber);
-        // filter played matches
-        const activeMatches = roundMatches.filter(
-          (m) => m.status !== "completed" && m.status !== "archived"
-        );
-        console.log("Active matches:", activeMatches);
-        if (activeMatches.length === 0) return null;
+
         return (
           <div
             key={roundNumber}
@@ -37,7 +32,7 @@ const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {
             <Round
               key={roundNumber}
               round={Number(roundNumber)}
-              matches={activeMatches}
+              matches={roundMatches}
               onPlay={onPlay}
             />
           </div>

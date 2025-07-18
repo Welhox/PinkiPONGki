@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 type RegisteredPlayer = {
   username: string;
   isGuest: boolean;
-  userId?: number | null;
+  userId: number | null;
 };
 
 const TournamentBuilder = () => {

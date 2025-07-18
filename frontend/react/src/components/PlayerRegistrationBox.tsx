@@ -11,7 +11,7 @@ interface PlayerBoxProps {
   onRegister: (player: {
     username: string;
     isGuest: boolean;
-    userId?: number | null;
+    userId: number | null;
   }) => void;
 }
 
@@ -104,7 +104,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
     }
     if (!password) {
       // Guest registration: allow any alias, no backend check
-      onRegister({ username, isGuest: true });
+      onRegister({ username, isGuest: true, userId: null });
     } else {
       // Registered user login
       let response;

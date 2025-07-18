@@ -58,7 +58,6 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
             <PlayerRegistrationBox
               label={t("pongGameWithRegistration.player1")}
               onRegister={setPlayer1}
-              playerId={1}
             />
           )}
           {player1 && <span className="text-white">{player1.username}</span>}
@@ -68,7 +67,6 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
             <PlayerRegistrationBox
               label={t("pongGameWithRegistration.player2")}
               onRegister={setPlayer2}
-              playerId={2}
             />
           )}
         </div>

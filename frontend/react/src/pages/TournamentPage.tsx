@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import Bracket from "../components/Bracket";
@@ -13,6 +13,7 @@ const TournamentPage = () => {
   const tournamentId = parseInt(id || "0", 10);
   const navigate = useNavigate();
   const location = useLocation();
+  const hasStartedRef = useRef(false);
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -37,7 +38,8 @@ const TournamentPage = () => {
       const tournamentRes = await api.get(`/tournaments/${id}`);
       let tournament = tournamentRes.data;
 
-      if (tournament.status === "waiting") {
+      if (tournament.status === "waiting" && !hasStartedRef.current) {
+        hasStartedRef.current = true;
         await api.post(`/tournaments/${id}/start`);
          const updatedTournament = await api.get(`/tournaments/${id}`);
          tournament = updatedTournament.data;
@@ -49,7 +51,7 @@ const TournamentPage = () => {
       setPlayers(playersData);
       setMatches(formattedMatches);
 
-      if (formattedMatches.length === 0 && tournament.data.status === "completed") {
+      if (formattedMatches.length === 0 && tournament.status === "completed") {
         const top3 = getTop3FromMatches(formattedMatches);
         setFinalStandings(top3);
       }

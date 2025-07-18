@@ -6,7 +6,7 @@ import type { User } from "../auth/AuthProvider";
 type NavigationHeaderProps = {
   handleLogout: () => Promise<void>;
   status: string;
-  user: User;
+  user: User | null;
 };
 type NavigationLinkProps = {
   target: string;
@@ -62,7 +62,7 @@ const NavigationHeader = ({
     );
   };
 
-  if (status === "authorized")
+  if (status === "authorized" && user)
     return (
       <>
         <nav className="hidden sm:flex justify-between bg-teal-700 p-2">
