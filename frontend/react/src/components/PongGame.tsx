@@ -1811,7 +1811,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
             e.stopPropagation();
           }}
         >
-          <div className="mb-8">Game Over! {winner} wins!</div>
+          <div className="mb-8">{t("pongGame.winnerMessage", { winner })}</div>
           <div className="flex flex-col gap-4 w-64">
             <button
               className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
@@ -1824,7 +1824,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
               tabIndex={1} 
               autoFocus
             >
-              Restart Match
+              {t("pongGame.restartMatch")}
             </button>
             <button
               className="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center"
@@ -1838,7 +1838,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
               onMouseDown={(e) => e.stopPropagation()}
               tabIndex={2}
             >
-              Return to Main Menu
+              {t("pongGame.returnToMainMenu")}
             </button>
           </div>
         </div>

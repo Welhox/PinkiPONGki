@@ -255,7 +255,7 @@
     "pressPToResume": "Press 'P' to resume",
     "winnerMessage": "{{winner}} wins!",
     "restartMatch": "Restart Match",
-    "returnToMainMenu": "Return to Main Menu"
+    "returnToMainMenu": "{t("pongGame.returnToMainMenu")}"
   },
   "pongGameAI": {
     "title": "Single Player vs AI",
