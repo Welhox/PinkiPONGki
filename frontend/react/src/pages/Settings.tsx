@@ -149,7 +149,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="p-5 mt-5 text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg text-center dark:text-white">
+    <div className="p-5 mt-5 max-w-2xl dark:bg-black bg-white mx-auto rounded-lg text-center dark:text-white">
       <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
         {t("settings.title")}
       </h1>
