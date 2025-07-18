@@ -111,7 +111,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
     }
     
     if (user && username === user.username && password) {
-      setError(t("playerBox.alreadyLoggedIn"));
+      setError("You're already logged in with this username.");
       return;
     }
     
@@ -191,12 +191,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             isGuest: false,
             id: String(userId)
           });
-          return;
         }
-        console.log("Login successful:", response?.data);
-        onRegister({ username, isGuest: false, userId: response?.data.id });
-      } catch {
-        setError(t("playerBox.loginFailed"));
         return;
       }
       
@@ -317,7 +312,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             className="bg-teal-700 text-white px-6 py-3 rounded shadow-md hover:bg-teal-600 transition-colors w-48"
             onClick={() => setShowLoginForm(true)}
           >
-            {t("playerBox.login")}
+            Login
           </button>
           <button
             className="bg-orange-500 text-white px-6 py-3 rounded shadow-md hover:bg-orange-600 transition-colors w-48"
@@ -328,7 +323,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
               onRegister({ username: guestName, isGuest: true, id: undefined });
             }}
           >
-            {t("playerBox.guest")}
+            Guest
           </button>
         </div>
       </div>
