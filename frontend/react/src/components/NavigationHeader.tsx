@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { User } from "../auth/AuthProvider";
 
 type NavigationHeaderProps = {
   handleLogout: () => Promise<void>;
   status: string;
-  user: any;
+  user: User | null;
 };
 type NavigationLinkProps = {
   target: string;
@@ -61,7 +62,7 @@ const NavigationHeader = ({
     );
   };
 
-  if (status === "authorized")
+  if (status === "authorized" && user)
     return (
       <>
         <nav className="hidden sm:flex justify-between bg-teal-700 p-2">

@@ -9,7 +9,15 @@ import { devOnly } from "../middleware/devOnly.js";
   
   export async function tournamentsRoute(fastify, _options) {
 //###############################################################
-
+  const rateLimitConfig = {
+    config: {
+      rateLimit: {
+        max: 1,
+        timeWindow: "1 seconds",
+        keyGenerator: (request) => request.user?.id?.toString() || request.ip,
+      },
+    },
+  };
 
   // Create a tournament
   fastify.post("/tournaments/create",
@@ -46,7 +54,7 @@ import { devOnly } from "../middleware/devOnly.js";
   // Register for a tournament
   fastify.post(
     "/tournaments/:id/register",
-    { schema: tournamentsSchemas.registerTournamentSchema },
+    { schema: tournamentsSchemas.registerTournamentSchema, ...rateLimitConfig },
     async (req, reply) => {
       try {
       const { id } = req.params;
@@ -66,6 +74,15 @@ import { devOnly } from "../middleware/devOnly.js";
       }
       if (!userId && !alias) {
         return reply.code(400).send({ message: "Either userId or alias is required" });
+      }
+
+      // ── new duplicate check ──
+      const exists = tournament.participants.some(
+        (p) => p.alias === alias
+      );
+      if (exists) {
+        // silently return success, no-op
+        return reply.code(204).send();
       }
 
       const participant = await prisma.tournamentParticipant.create({
@@ -118,6 +135,28 @@ import { devOnly } from "../middleware/devOnly.js";
       reply.send(tournament);
     }
   );
+
+//###############################################################
+
+  // Update tournament name
+  fastify.post(
+    "/tournaments/:id/update-name",
+    { schema: tournamentsSchemas.updateTournamentNameSchema },
+    async (req, reply) => {
+        const id = Number(req.params.id);
+        const { name } = req.body;
+        try {
+            const tournament = await prisma.tournament.update({
+                where: { id },
+                data: { name },
+            });
+            return reply.send(tournament);
+        } catch (error) {
+            // If no tournament with that ID exists, Prisma will throw
+            return reply.code(404).send({ message: "Tournament not found" });
+        }
+    }
+  )
 
 //###############################################################
 
@@ -279,7 +318,7 @@ async function isTournamentFinished(id, updatedMatch) {
     // If no pending matches, update tournament status to 'finished'
     await prisma.tournament.update({
       where: { id: Number(id) },
-      data: { status: "finished", winnerId: updatedMatch.winnerId, 
+      data: { status: "completed", winnerId: updatedMatch.winnerId, 
         winnerAlias: updatedMatch.winnerAlias },
     });
     console.log("Tournament finished:", id);

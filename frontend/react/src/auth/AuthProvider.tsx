@@ -5,7 +5,7 @@ import api from "../api/axios";
 import i18n from "../i18n";
 
 export interface User {
-  id: string;
+  id: number;
   username: string;
   email?: string;
   profilePic?: string;
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await i18n.changeLanguage("en");
         localStorage.removeItem("language");
       }
-    } catch (error) {
+    } catch {
       if (status === "authorized") {
         setSessionExpired(true);
       }

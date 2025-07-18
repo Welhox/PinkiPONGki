@@ -100,6 +100,7 @@ export async function userRoutes(fastify, _options) {
         return reply.code(200).send({
           message: "Login successful",
           language: user.language || "en",
+          id: user.id,
         });
       } catch (error) {
         console.error("Login error:", error);
@@ -194,6 +195,7 @@ export async function userRoutes(fastify, _options) {
         return reply.code(200).send({
           message: "Login successful",
           language: user.language || "en",
+          id: user.id,
         });
       } catch (error) {
         console.error("Login error:", error);
