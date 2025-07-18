@@ -266,7 +266,8 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         <label className="mb-2 font-bold">{label}</label>
         <input
           className="mb-2 p-2 border rounded w-48"
-          placeholder="Username"
+          placeholder={t("playerBox.usernamePlaceholder")}
+          aria-label={t("playerBox.usernamePlaceholder")}
           value={username}
           onChange={(e) => setUsername(e.target.value.slice(0, 30))}
           minLength={3}
@@ -275,8 +276,9 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         />
         <input
           className="mb-2 p-2 border rounded w-48"
+          aria-label={t("playerBox.passwordPlaceholder")}
           type="password"
-          placeholder="Password"
+          placeholder={t("playerBox.passwordPlaceholder")}
           value={password}
           onChange={(e) => setPassword(e.target.value.slice(0, 30))}
           minLength={2}
@@ -288,14 +290,14 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             className="bg-teal-700 text-white px-4 py-2 rounded"
             type="submit"
           >
-            Continue
+            {t("playerBox.continue")}
           </button>
           <button
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
             type="button"
             onClick={() => setShowLoginForm(false)}
           >
-            Back
+            {t("common.back")}
           </button>
         </div>
         {error && <div className="text-red-500 mt-2">{error}</div>}

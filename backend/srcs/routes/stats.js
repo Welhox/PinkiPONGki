@@ -22,6 +22,7 @@ export async function statsRoute(fastify, _options) {
           select: {
             wins: true,
             losses: true,
+            tournamentWins: true,
             matchesAsPlayer: {
               select: {
                 date: true,
@@ -79,7 +80,7 @@ export async function statsRoute(fastify, _options) {
         const stats = {
           totalWins: user.wins,
           totalLosses: user.losses,
-          totalTournamentsWon: 0, // optional if tournaments are tracked separately; fix this later
+          totalTournamentsWon: user.tournamentWins, // optional if tournaments are tracked separately; fix this later
           matchHistory: dedupedMatches,
         };
 

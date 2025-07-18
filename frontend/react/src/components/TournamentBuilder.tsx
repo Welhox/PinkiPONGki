@@ -207,12 +207,10 @@ const TournamentBuilder = () => {
 
    try {
       if (tournamentId) {
-      // 1) update name
         await api.post(`/tournaments/${tournamentId}/update-name`, {
             name: tournamentName || t("tournament.placeholder"),
         });
 
-        // 2) now navigate
         navigate(`/tournament/${tournamentId}`, {
             state: { accessKey: "yolo" },
         });
