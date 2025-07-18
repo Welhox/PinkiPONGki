@@ -18,8 +18,6 @@ import api from "./api/axios";
 import Mfa from "./pages/Mfa";
 import i18n from "./i18n";
 
-
-
 const App: React.FC = () => {
   const logout = async () => {
     try {
@@ -59,15 +57,18 @@ const App: React.FC = () => {
           element={<Navigate to="/stats" replace />}
         />
       </Routes>
-      <div className="flex justify-center my-4">
-        <button
-          className="border bg-teal-500 font-semibold hover:font-extrabold 
+      {/* This is conditional rendering that will only show the show database button if vite is running in dev mode*/}
+      {import.meta.env.DEV ? (
+        <div className="flex justify-center my-4">
+          <button
+            className="border bg-teal-500 font-semibold hover:font-extrabold 
 					  hover:underline uppercase text-white p-4 mx-4 rounded-2xl"
-          onClick={showDatabase}
-        >
-          show Database (for dev use only)
-        </button>
-      </div>
+            onClick={showDatabase}
+          >
+            show Database (for dev use only)
+          </button>
+        </div>
+      ) : null}
     </GameSettingsProvider>
   );
 };
