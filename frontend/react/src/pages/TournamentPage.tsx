@@ -70,8 +70,8 @@ const TournamentPage = () => {
         );
 
         const res = await api.get(`/tournaments/${match.tournamentId}`);
-        const updatedMatches = formatMatches(res.data.tournamentMatches);
 
+        const updatedMatches = formatMatches(res.data.tournamentMatches);
         setMatches(updatedMatches);
 
         if (res.data.status === "completed") {
