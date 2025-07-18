@@ -105,7 +105,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
       return;
     }
     
-    if (password.length < 2 || password.length > 30) {
+    if (password.length < 2 || password.length > 42) {
       setError(t("playerBox.passwordLengthError"));
       return;
     }
