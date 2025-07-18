@@ -8,11 +8,7 @@ import i18n from "../i18n";
 
 interface PlayerBoxProps {
   label: string;
-  onRegister: (player: {
-    username: string;
-    isGuest: boolean;
-    id?: string;
-  }) => void;
+  onRegister: (player: { username: string; isGuest: boolean; id?: string }) => void;
   playerId: number;
 }
 
@@ -51,10 +47,10 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         setConfirmPlayer2MFA(false);
         // Get the user ID from the response if available
         const userId = response.data?.id || response.data?.user?.id;
-        onRegister({
-          username,
+        onRegister({ 
+          username, 
           isGuest: false,
-          id: userId ? String(userId) : undefined,
+          id: userId ? String(userId) : undefined
         });
       }
     } catch (error) {
@@ -102,9 +98,9 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     // Validate username and password length
-    if (username.length < 2 || username.length > 20) {
+    if (username.length < 3 || username.length > 30) {
       setError(t("playerBox.usernameLengthError"));
       return;
     }
@@ -113,12 +109,12 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
       setError(t("playerBox.passwordLengthError"));
       return;
     }
-
+    
     if (user && username === user.username && password) {
       setError(t("playerBox.alreadyLoggedIn"));
       return;
     }
-
+    
     // Registered user login
     let response;
     try {
@@ -152,53 +148,48 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           username,
           password,
         });
-
+        
         // Log the full response to debug
         console.log("Player 2 login response:", player2Response.data);
-
+        
         if (player2Response.data.mfaRequired) {
           console.log("MFA required for Player 2");
           setEmail(player2Response.data.email);
           setConfirmPlayer2MFA(true);
           return;
         }
-
+        
         // Get the user ID if available
-        const userId =
-          player2Response.data?.id || player2Response.data?.user?.id;
+        const userId = player2Response.data?.id || player2Response.data?.user?.id;
         console.log("Player 2 ID extracted:", userId);
-
+        
         // If we don't have an ID, try to fetch it
         if (!userId) {
-          console.log(
-            "No user ID found in response, attempting to fetch user data"
-          );
+          console.log("No user ID found in response, attempting to fetch user data");
           try {
             // Use the session endpoint to get logged in user
-            const userDataResponse = await api.get(
-              "/users/findByUsername/" + username
-            );
+            const userDataResponse = await api.get("/users/findByUsername/" + username);
             const fetchedId = userDataResponse.data?.id;
             console.log("Fetched user data:", userDataResponse.data);
-
-            onRegister({
-              username,
+            
+            onRegister({ 
+              username, 
               isGuest: false,
-              id: fetchedId ? String(fetchedId) : undefined,
+              id: fetchedId ? String(fetchedId) : undefined
             });
           } catch (error) {
             console.error("Error fetching user data:", error);
-            onRegister({
-              username,
+            onRegister({ 
+              username, 
               isGuest: false,
-              id: undefined,
+              id: undefined
             });
           }
         } else {
-          onRegister({
-            username,
+          onRegister({ 
+            username, 
             isGuest: false,
-            id: String(userId),
+            id: String(userId)
           });
           return;
         }
@@ -208,16 +199,16 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         setError(t("playerBox.loginFailed"));
         return;
       }
-
+      
       // For regular login, the user object should be available after refreshSession
       // We need to refresh again to get the latest user info
       await refreshSession();
       const currentUser = await api.get("/session/user");
       const userId = currentUser.data?.id;
-      onRegister({
-        username,
+      onRegister({ 
+        username, 
         isGuest: false,
-        id: userId ? String(userId) : undefined,
+        id: userId ? String(userId) : undefined
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -276,7 +267,6 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
-        noValidate //Disabling form validation since we handle it manually for accessibility purposes
       >
         <label className="mb-2 font-bold">{label}</label>
         <input
@@ -285,8 +275,8 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           aria-label={t("playerBox.usernamePlaceholder")}
           value={username}
           onChange={(e) => setUsername(e.target.value.slice(0, 30))}
-          minLength={2}
-          maxLength={20}
+          minLength={3}
+          maxLength={30}
           required
         />
         <input
@@ -297,7 +287,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           value={password}
           onChange={(e) => setPassword(e.target.value.slice(0, 30))}
           minLength={2}
-          maxLength={42}
+          maxLength={30}
           required
         />
         <div className="flex space-x-2">
