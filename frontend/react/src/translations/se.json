@@ -124,12 +124,15 @@
     "noHistory": "Ingen matchhistorik tillgänglig"
   },
   "playerBox": {
-    "usernameRequired": "Användarnamn krävs",
-    "loginFailed": "Inloggning misslyckades. Kontrollera dina uppgifter.",
-    "usernamePlaceholder": "Användarnamn eller alias",
-    "passwordPlaceholder": "Lösenord (lämna tomt för gäst)",
+    "usernameLengthError": "Användarnamnet måste vara mellan 3 och 30 tecken långt.",
+    "passwordLengthError": "Lösenordet måste vara mellan 2 och 30 tecken långt.",
+    "alreadyLoggedIn": "Du är redan inloggad med detta användarnamn.",
+    "login": "Logga in",
+    "guest": "Gäst",
     "continue": "Fortsätt",
-    "guestHint": "Lämna lösenordet tomt för att registrera som gäst"
+    "usernamePlaceholder": "Ange användarnamn",
+    "passwordPlaceholder": "Ange lösenord",
+    "loginFailed": "Inloggning misslyckades. Försök igen."
   },
   "results": {
     "Win": "Vinst",

@@ -125,12 +125,15 @@
     "error": "Jotain meni pieleen. Yritä uudelleen."
   },
   "playerBox": {
-    "usernameRequired": "Käyttäjänimi vaaditaan",
-    "loginFailed": "Kirjautuminen epäonnistui. Tarkista tunnuksesi.",
-    "usernamePlaceholder": "Käyttäjänimi tai nimimerkki",
-    "passwordPlaceholder": "Salasana (tyhjäksi vieraalle)",
+    "usernameLengthError": "Käyttäjänimen on oltava 3–30 merkkiä pitkä.",
+    "passwordLengthError": "Salasanan on oltava 8–42 merkkiä pitkä.",
+    "alreadyLoggedIn": "Olet jo kirjautunut sisään tällä käyttäjänimellä.",
+    "login": "Kirjaudu sisään",
+    "guest": "Vieras",
     "continue": "Jatka",
-    "guestHint": "Pidä salasana tyhjänä rekisteröityäksesi vieraana"
+    "usernamePlaceholder": "Syötä käyttäjänimi",
+    "passwordPlaceholder": "Syötä salasana",
+    "loginFailed": "Kirjautuminen epäonnistui. Yritä uudelleen."
   },
   "results": {
     "Win": "Voitto",

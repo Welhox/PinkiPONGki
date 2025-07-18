@@ -124,12 +124,15 @@
     "noHistory": "No match history available"
   },
   "playerBox": {
-    "usernameRequired": "Username required",
-    "loginFailed": "Login failed. Check your credentials.",
-    "usernamePlaceholder": "Username or alias",
-    "passwordPlaceholder": "Password (leave blank for guest)",
+    "usernameLengthError": "Username must be between 3 and 30 characters.",
+    "passwordLengthError": "Password must be between 8 and 42 characters.",
+    "alreadyLoggedIn": "You're already logged in with this username.",
+    "login": "Login",
+    "guest": "Guest",
     "continue": "Continue",
-    "guestHint": "Keep password clear to sign up as guest"
+    "usernamePlaceholder": "Enter username",
+    "passwordPlaceholder": "Enter password",
+    "loginFailed": "Login failed. Please try again."
   },
   "results": {
     "Win": "Win",

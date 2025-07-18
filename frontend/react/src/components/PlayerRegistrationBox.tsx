@@ -105,13 +105,13 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
       return;
     }
     
-    if (password.length < 2 || password.length > 30) {
+    if (password.length < 8 || password.length > 42) {
       setError(t("playerBox.passwordLengthError"));
       return;
     }
     
     if (user && username === user.username && password) {
-      setError("You're already logged in with this username.");
+      setError(t("playerBox.alreadyLoggedIn"));
       return;
     }
     
@@ -312,7 +312,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             className="bg-teal-700 text-white px-6 py-3 rounded shadow-md hover:bg-teal-600 transition-colors w-48"
             onClick={() => setShowLoginForm(true)}
           >
-            Login
+            {t("playerBox.login")}
           </button>
           <button
             className="bg-orange-500 text-white px-6 py-3 rounded shadow-md hover:bg-orange-600 transition-colors w-48"
@@ -323,7 +323,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
               onRegister({ username: guestName, isGuest: true, id: undefined });
             }}
           >
-            Guest
+            {t("playerBox.guest")}
           </button>
         </div>
       </div>
