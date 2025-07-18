@@ -59,7 +59,9 @@ const App: React.FC = () => {
           element={<Navigate to="/stats" replace />}
         />
       </Routes>
-      <div className="flex justify-center my-4">
+        {/* This is conditional rendering that will only show the show database button if vite is running in dev mode*/}
+      {import.meta.env.DEV ?
+	  <div className="flex justify-center my-4">
         <button
           className="border bg-teal-500 font-semibold hover:font-extrabold 
 					  hover:underline uppercase text-white p-4 mx-4 rounded-2xl"
@@ -67,7 +69,7 @@ const App: React.FC = () => {
         >
           show Database (for dev use only)
         </button>
-      </div>
+      </div> : null}
     </GameSettingsProvider>
   );
 };
