@@ -138,6 +138,28 @@ import { devOnly } from "../middleware/devOnly.js";
 
 //###############################################################
 
+  // Update tournament name
+  fastify.post(
+    "/tournaments/:id/update-name",
+    { schema: tournamentsSchemas.updateTournamentNameSchema },
+    async (req, reply) => {
+        const id = Number(req.params.id);
+        const { name } = req.body;
+        try {
+            const tournament = await prisma.tournament.update({
+                where: { id },
+                data: { name },
+            });
+            return reply.send(tournament);
+        } catch (error) {
+            // If no tournament with that ID exists, Prisma will throw
+            return reply.code(404).send({ message: "Tournament not found" });
+        }
+    }
+  )
+
+//###############################################################
+
   // Start a tournament
   fastify.post(
     "/tournaments/:id/start",

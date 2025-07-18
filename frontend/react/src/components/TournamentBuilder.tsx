@@ -199,8 +199,23 @@ const TournamentBuilder = () => {
       return;
     }
 
-    navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access, should probably random generate it...
-  };
+   try {
+      if (tournamentId) {
+      // 1) update name
+        await api.post(`/tournaments/${tournamentId}/update-name`, {
+            name: tournamentName || t("tournament.placeholder"),
+        });
+
+        // 2) now navigate
+        navigate(`/tournament/${tournamentId}`, {
+            state: { accessKey: "yolo" },
+        });
+        }
+    } catch (err) {
+        console.error("Failed to update tournament name", err);
+        alert(t("tournament.errorTournamentCreation"));
+    }
+};
 
   const inputStyles =
     "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 m-1 w-xs dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
