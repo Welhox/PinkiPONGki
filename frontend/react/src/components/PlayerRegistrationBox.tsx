@@ -217,11 +217,11 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         onSubmit={handleMfaSubmit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
       >
-        <label className="mb-2 font-bold">Enter Verification Code</label>
+        <label className="mb-2 font-bold">{t("mfa.heading")}</label>
         <input
           className="mb-2 p-2 border rounded w-48"
           type="password"
-          placeholder="OTP Code"
+          placeholder={t("mfa.otpLabel")}
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
@@ -229,7 +229,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           className="bg-teal-700 text-white px-4 py-2 rounded"
           type="submit"
         >
-          Continue
+          {t("playerBox.continue")}
         </button>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
@@ -240,11 +240,11 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         onSubmit={handleMfaPlayer2Submit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
       >
-        <label className="mb-2 font-bold">Enter Verification Code</label>
+        <label className="mb-2 font-bold">{t("mfa.heading")}</label>
         <input
           className="mb-2 p-2 border rounded w-48"
           type="password"
-          placeholder="OTP Code"
+          placeholder={t("mfa.otpLabel")}
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
@@ -252,7 +252,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           className="bg-teal-700 text-white px-4 py-2 rounded"
           type="submit"
         >
-          Continue
+          {t("playerBox.continue")}
         </button>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
