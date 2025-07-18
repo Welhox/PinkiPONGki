@@ -52,7 +52,13 @@
     "updateFailed": "Uppdateringen misslyckades.",
     "somethingWentWrong": "Något gick fel.",
     "save": "Spara",
-    "cancel": "Avbryt"
+    "cancel": "Avbryt",
+    "otpWaitMessage": "Vänligen vänta {{seconds}} sekunder innan du begär en ny OTP.",
+    "otpSendFailed": "Misslyckades med att skicka OTP. Försök igen senare.",
+    "2faToggleFailed": "Misslyckades med att uppdatera tvåfaktorsautentisering.",
+    "uploadFailed": "Uppladdning misslyckades: {{error}}",
+    "loading": "Läser in...",
+    "rateLimitExceeded": "Gränsen överskriden, försök igen om {{time}}."
   },
   "befriendButton": {
     "befriend": "Bli vän",
@@ -303,5 +309,26 @@
   },
   "round": {
     "roundTitle": "Omgång {{round}}"
+  },
+  "victory": {
+    "tournamentFinished": "Turneringen är avslutad!",
+    "first": "1:a plats",
+    "second": "2:a plats",
+    "third": "3:e plats"
+  },
+  "tournamentPage": {
+    "title": "Turnering #{{id}}",
+    "settings": "Turneringsinställningar",
+    "map": "Karta",
+    "scoreToWin": "Poäng för att vinna",
+    "powerUps": "Power-ups",
+    "enabled": "Aktiverat",
+    "disabled": "Avaktiverat",
+    "loading": "Laddar..."
+  },
+  "map": {
+    "classic": "Klassisk",
+    "corners": "Hörnväggar",
+    "center": "Mittvägg"
   }
 }

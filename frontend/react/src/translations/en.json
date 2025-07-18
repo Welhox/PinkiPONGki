@@ -52,7 +52,13 @@
     "updateSuccess": "{{label}} updated successfully.",
     "updateFailed": "Update failed.",
     "somethingWentWrong": "Something went wrong.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "otpWaitMessage": "Please wait {{seconds}} seconds before requesting a new OTP.",
+    "otpSendFailed": "Failed to send OTP. Please try again later.",
+    "2faToggleFailed": "Failed to update two-factor authentication status.",
+    "uploadFailed": "Upload failed: {{error}}",
+    "loading": "Loading...",
+    "rateLimitExceeded": "Rate limit exceeded, please try again in {{time}}."
   },
   "befriendButton": {
     "befriend": "Befriend",
@@ -302,5 +308,26 @@
   },
   "round": {
     "roundTitle": "Round {{round}}"
+  },
+  "victory": {
+    "tournamentFinished": "Tournament Finished!",
+    "first": "1st Place",
+    "second": "2nd Place",
+    "third": "3rd Place"
+  },
+  "tournamentPage": {
+    "title": "Tournament #{{id}}",
+    "settings": "Tournament Settings",
+    "map": "Map",
+    "scoreToWin": "Score to Win",
+    "powerUps": "Power-ups",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading..."
+    },
+    "map": {
+      "classic": "Classic",
+      "corners": "Corner Walls",
+      "center": "Center Wall"
   }
 }

@@ -89,7 +89,14 @@
     "updateFailed": "Päivitys epäonnistui.",
     "somethingWentWrong": "Jokin meni pieleen.",
     "save": "Tallenna",
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "otpWaitMessage": "Odota {{seconds}} sekuntia ennen uuden OTP:n pyytämistä.",
+    "otpSendFailed": "OTP:n lähetys epäonnistui. Yritä myöhemmin uudelleen.",
+    "2faToggleFailed": "Kaksivaiheisen tunnistautumisen tilan päivittäminen epäonnistui.",
+    "uploadFailed": "Lataus epäonnistui: {{error}}",
+    "loading": "Ladataan...",
+    "rateLimitExceeded": "Rajoitus ylittynyt, yritä uudelleen {{time}} kuluttua."
+
   },
   "friendList": {
     "noFriends": "Sinulla ei ole vielä kavereita"
@@ -303,5 +310,26 @@
   },
   "round": {
     "roundTitle": "Kierros {{round}}"
+  },
+  "victory": {
+    "tournamentFinished": "Turnaus päättynyt!",
+    "first": "1. sija",
+    "second": "2. sija",
+    "third": "3. sija"
+  },
+  "tournamentPage": {
+    "title": "Turnaus #{{id}}",
+    "settings": "Turnausasetukset",
+    "map": "Kartta",
+    "scoreToWin": "Pisteet voittoon",
+    "powerUps": "Tehosteet",
+    "enabled": "Käytössä",
+    "disabled": "Pois käytöstä",
+    "loading": "Ladataan..."
+  },
+  "map": {
+    "classic": "Klassinen",
+    "corners": "Kulmaseinät",
+    "center": "Keskiseinä"
   }
 }

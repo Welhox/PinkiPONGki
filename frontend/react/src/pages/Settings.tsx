@@ -99,19 +99,20 @@ const Settings: React.FC = () => {
 
             if (waitTime > 0) {
               alert(
-                `Please wait ${waitTime} seconds before requesting a new OTP.`
+                t("settings.otpWaitMessage", { seconds: waitTime })
               );
             } else {
               await api.post("/auth/otp/send-otp", {});
             }
           } catch (error) {
             console.error("Error sending OTP:", error);
-            alert("Failed to send OTP. Please try again later.");
+            alert(t("settings.otpSendFailed"));
           }
         }
       }
     } catch (error) {
       console.error("Error updating 2FA status:", error);
+      alert(t("settings.2faToggleFailed"));
     }
   };
 
@@ -128,7 +129,9 @@ const Settings: React.FC = () => {
       console.log(user);
     } catch (error: any) {
       console.error("Error uploading file:", error);
-      alert("Upload failed: " + (error.response?.data?.error || error.message));
+      alert(t("settings.uploadFailed", {
+        error: error.response?.data?.error || error.message,
+      }));
     }
   };
 
