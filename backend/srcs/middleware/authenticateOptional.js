@@ -15,16 +15,15 @@ export async function authenticateOptional(request, reply) {
     try {
       await request.jwtDecode();
     } catch (error) {
-      console.error("JWT decode error:", error);
-      // If decoding fails, we assume no token is present
+      if (err?.code === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID' || err?.code === 'FST_JWT_AUTHORIZATION_TOKEN_EXPIRED') {
+        request.user = undefined;
+        return;
+      }
+      // Log unexpected JWT errors
+      console.error('Optional authentication unexpected error:', err);
       request.user = undefined;
       return;
     }
-    // const decoded = request.jwtDecode();
-    // if (!decoded || typeof decoded !== "object") {
-    //   request.user = undefined;
-    //   return;
-    // }
     // Check if the request has a valid JWT token and store it for time validation
     const currentToken = await request.jwtVerify();
 
@@ -61,9 +60,7 @@ export async function authenticateOptional(request, reply) {
         maxAge: 60 * 60, // 1 hour in seconds
       });
     }
-  } catch (error) {
-    console.error("Optional authentication error:", error);
-    // invalid or no token - no need to throw
+  } catch {
     request.user = undefined;
   }
 }
