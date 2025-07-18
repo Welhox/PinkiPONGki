@@ -106,8 +106,33 @@ const SettingsField: React.FC<FieldProps> = ({
       setTimeout(() => {setIsEditing(false);}, 5000);
       onUpdate?.(inputValue.trim());
     } catch (error: any) {
-      setError(error?.response?.data?.message || t("settings.updateFailed"));
-	  setTimeout(() => {setError(null);}, 8000);
+      const errorMessage = error?.response?.data?.message || "";
+      const regex = /(\d+)\s*(second|minute|hour)s?/i;
+      const match = errorMessage.match(regex);
+
+      if (match) {
+        let [_, numStr, unit] = match;
+        let num = parseInt(numStr, 10);
+        let displayTime = "";
+
+        switch (unit.toLowerCase()) {
+          case "second":
+            displayTime = `${num}s`;
+            break;
+          case "minute":
+            displayTime = `${num}min`;
+            break;
+          case "hour":
+            displayTime = `${num}h`;
+            break;
+          default:
+            displayTime = `${num}s`;
+        }
+
+        setError(t('settings.rateLimitExceeded', { time: displayTime }));
+      } else {
+        setError(errorMessage || t('settings.updateFailed'));
+      }
     }
   };
 

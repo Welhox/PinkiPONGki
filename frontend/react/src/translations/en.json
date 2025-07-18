@@ -52,7 +52,13 @@
     "updateSuccess": "{{label}} updated successfully.",
     "updateFailed": "Update failed.",
     "somethingWentWrong": "Something went wrong.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "otpWaitMessage": "Please wait {{seconds}} seconds before requesting a new OTP.",
+    "otpSendFailed": "Failed to send OTP. Please try again later.",
+    "2faToggleFailed": "Failed to update two-factor authentication status.",
+    "uploadFailed": "Upload failed: {{error}}",
+    "loading": "Loading...",
+    "rateLimitExceeded": "Rate limit exceeded, please try again in {{time}}."
   },
   "befriendButton": {
     "befriend": "Befriend",
@@ -118,12 +124,15 @@
     "noHistory": "No match history available"
   },
   "playerBox": {
-    "usernameRequired": "Username required",
-    "loginFailed": "Login failed. Check your credentials.",
-    "usernamePlaceholder": "Username or alias",
-    "passwordPlaceholder": "Password (leave blank for guest)",
+    "usernameLengthError": "Username must be between 3 and 30 characters.",
+    "passwordLengthError": "Password must be between 8 and 42 characters.",
+    "alreadyLoggedIn": "You're already logged in with this username.",
+    "login": "Login",
+    "guest": "Guest",
     "continue": "Continue",
-    "guestHint": "Keep password clear to sign up as guest"
+    "usernamePlaceholder": "Enter username",
+    "passwordPlaceholder": "Enter password",
+    "loginFailed": "Login failed. Please try again."
   },
   "results": {
     "Win": "Win",
@@ -302,5 +311,26 @@
   },
   "round": {
     "roundTitle": "Round {{round}}"
+  },
+  "victory": {
+    "tournamentFinished": "Tournament Finished!",
+    "first": "1st Place",
+    "second": "2nd Place",
+    "third": "3rd Place"
+  },
+  "tournamentPage": {
+    "title": "Tournament #{{id}}",
+    "settings": "Tournament Settings",
+    "map": "Map",
+    "scoreToWin": "Score to Win",
+    "powerUps": "Power-ups",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading..."
+    },
+    "map": {
+      "classic": "Classic",
+      "corners": "Corner Walls",
+      "center": "Center Wall"
   }
 }

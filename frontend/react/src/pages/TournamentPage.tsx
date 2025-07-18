@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../api/axios";
 import Bracket from "../components/Bracket";
 import Victory from "../components/Victory";
@@ -9,7 +10,8 @@ import { useGameSettings } from "../contexts/GameSettingsContext";
 import { getTop3FromMatches } from "../utils/getTop3FromMatches";
 
 const TournamentPage = () => {
-  const { id} = useParams<{ id: string }>();
+  const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
   const tournamentId = parseInt(id || "0", 10);
   const [tournamentName, setTournamentName] = useState<string>("");
   const navigate = useNavigate();
@@ -105,34 +107,32 @@ const TournamentPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-300 mb-6">
-        {tournamentName}
+        {t("tournamentPage.title", { id: tournamentId })}
       </h1>
 
       <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md w-full max-w-md">
         <h3 className="text-xl font-semibold text-teal-700 dark:text-teal-300 mb-2">
-          Tournament Settings
+          {t("tournamentPage.settings")}
         </h3>
         <div className="grid grid-cols-2 gap-2">
           <p>
-            <strong>Map:</strong>{" "}
-            {settings.mapType === "classic"
-              ? "Classic"
-              : settings.mapType === "corners"
-              ? "Corner Walls"
-              : "Center Wall"}
+            <strong>{t("tournamentPage.map")}:</strong>{" "}
+            {t(`map.${settings.mapType}`)}
           </p>
           <p>
-            <strong>Score to Win:</strong> {settings.scoreToWin}
+            <strong>{t("tournamentPage.scoreToWin")}:</strong> {settings.scoreToWin}
           </p>
           <p>
-            <strong>Power-ups:</strong>{" "}
-            {settings.powerUpsEnabled ? "Enabled" : "Disabled"}
+            <strong>{t("tournamentPage.powerUps")}:</strong>{" "}
+            {settings.powerUpsEnabled
+              ? t("tournamentPage.enabled")
+              : t("tournamentPage.disabled")}
           </p>
         </div>
       </div>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <p>{t("tournamentPage.loading")}</p>
       ) : finalStandings.length > 0 ? (
         <Victory standings={finalStandings} />
       ) : (
