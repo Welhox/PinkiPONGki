@@ -231,9 +231,9 @@ import { devOnly } from "../middleware/devOnly.js";
       if (!winnerId && !winnerAlias) {
         return reply.code(400).send({ message: "Either winnerId or winnerAlias is required" });
       }
-      if (winnerId && winnerAlias) {
+      /* if (winnerId && winnerAlias) {
         return reply.code(400).send({ message: "Only one of winnerId or winnerAlias should be provided" });
-      }
+      } */
       console.log("Updating match for tournament ID:", id, "Match ID:", matchId);
       try {
         const match = await prisma.tournamentMatch.findUnique({
@@ -314,6 +314,7 @@ async function isTournamentFinished(id, updatedMatch) {
     include: { tournamentMatches: true },
   });
   const pendingMatches = tournament.tournamentMatches.filter(match => match.status === "pending");
+  console.log("List of matches in isTfiniches::", tournament.tournamentMatches);
   if (pendingMatches.length === 0) {
     // If no pending matches, update tournament status to 'finished'
     await prisma.tournament.update({

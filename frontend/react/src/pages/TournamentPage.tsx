@@ -42,12 +42,12 @@ const TournamentPage = () => {
 
       setTournamentName(tournament.name);
 
-
       if (tournament.status === "waiting" && !hasStartedRef.current) {
         hasStartedRef.current = true;
         await api.post(`/tournaments/${id}/start`);
          const updatedTournament = await api.get(`/tournaments/${id}`);
          tournament = updatedTournament.data;
+         setTournamentName(tournament.name);
       }
 
       const playersData = formatPlayers(tournament.participants);
@@ -56,10 +56,12 @@ const TournamentPage = () => {
       setPlayers(playersData);
       setMatches(formattedMatches);
 
-      if (formattedMatches.length === 0 && tournament.status === "completed") {
+      if (tournament.status === "completed") {
         const top3 = getTop3FromMatches(formattedMatches);
         setFinalStandings(top3);
-      }
+        console.log("Final standings", top3);
+     }
+
     } catch (error) {
       console.error("Failed to fetch tournament data:", error);
     } finally {
@@ -74,16 +76,12 @@ const TournamentPage = () => {
         { winnerId: winner.id, winnerAlias: winner.name }
         );
 
-        const res = await api.get(`/tournaments/${match.tournamentId}`);
+        /* const res = await api.get(`/tournaments/${match.tournamentId}`);
 
         const updatedMatches = formatMatches(res.data.tournamentMatches);
-        setMatches(updatedMatches);
-
-        if (res.data.status === "completed") {
-            const top3 = getTop3FromMatches(updatedMatches);
-            setFinalStandings(top3);
-            console.log("Final standings", top3);
-        }
+        setMatches(updatedMatches); */
+        await fetchTournamentData();
+        
     } catch (error) {
         console.error("Failed to update match:", error);
     }
