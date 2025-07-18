@@ -13,7 +13,7 @@ const PongGameAI: React.FC<PongGameAIProps> = ({ onReturnToMenu }) => {
 
   // Default player setup for AI game
   const player1 = user 
-    ? { username: user.username, isGuest: false }
+    ? { username: user.username, isGuest: false, id: user.id }
     : { username: "Player", isGuest: true };
   
   const player2 = { username: "AI Opponent", isGuest: true };

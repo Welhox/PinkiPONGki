@@ -45,8 +45,8 @@ const wallSound = new Audio('/wall.mp3');
  */
 
 interface PongGameProps {
-  player1: { username: string; isGuest: boolean };
-  player2: { username: string; isGuest: boolean };
+  player1: { username: string; isGuest: boolean; id?: string };
+  player2: { username: string; isGuest: boolean; id?: string };
   isAIGame?: boolean; // New prop to indicate AI game
   onReturnToMenu?: () => void; // Callback to return to menu
 }
@@ -565,11 +565,13 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysPressed = useRef<Record<string, boolean>>({});
+  const animationFrameRef = useRef<number | null>(null);
   const [score, setScore] = useState({ left: 0, right: 0 });
   const [winner, setWinner] = useState<string | null>(null);
   const [restartKey, setRestartKey] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false); // New state to track game-over state
   const { settings } = useGameSettings();
   const { t } = useTranslation();
   
@@ -577,10 +579,11 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
 
   // Focus canvas when component loads to capture keyboard events immediately
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && !isGameOver && !winner) {
+      // Only focus the canvas if we're not in game over state and no winner is declared
       canvasRef.current.focus();
     }
-  }, []);
+  }, [isGameOver, winner]);
 
   // Create a ref to track canvas focus state that persists across renders
   const isFocusedRef = useRef(false);
@@ -588,29 +591,77 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
   // Handle keyboard events with focus awareness
   // Create ref for tracking paused state
   const isPausedRef = useRef(false);
+  
+  // Explicitly disable focus and set game over state when a winner is declared
+  useEffect(() => {
+    if (winner) {
+      // Disable focus and keyboard events when game is over
+      setIsFocused(false);
+      isFocusedRef.current = false;
+      setIsGameOver(true);
+      
+      if (canvasRef.current) {
+        canvasRef.current.blur();
+        // Remove focus programmatically to ensure no keyboard events are captured
+        canvasRef.current.removeAttribute('tabindex');
+        
+        // Stop the animation frame to prevent any game updates
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+      }
+      
+      // Prevent any keyboard events from being captured during game over state
+      document.body.focus();
+      
+      // Create a listener to prevent focus on canvas when game is over
+      const preventFocus = (event: FocusEvent) => {
+        if (event.target === canvasRef.current && canvasRef.current) {
+          canvasRef.current.blur();
+          event.preventDefault();
+          return false;
+        }
+      };
+      
+      // Add event listener to prevent focus
+      document.addEventListener('focusin', preventFocus);
+      
+      // Clean up the listener when component unmounts
+      return () => {
+        document.removeEventListener('focusin', preventFocus);
+      };
+    }
+  }, [winner]);
 
   useEffect(() => {
     // Keyboard event handlers
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Handle pause toggle with 'p' key regardless of focus state
-      if (e.key === 'p') {
-        e.preventDefault();
-        setIsPaused(prev => {
-          const newPausedState = !prev;
-          isPausedRef.current = newPausedState;
-          return newPausedState;
-        });
+      // Skip all game-related key handling if game is over
+      if (isGameOver) {
         return;
       }
       
-      // For game control keys, only prevent default behavior if canvas is focused
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
-        if (isFocusedRef.current) {
+      // Only process any game-related keys when canvas is focused
+      if (isFocusedRef.current) {
+        // Handle pause toggle with 'p' key
+        if (e.key === 'p') {
+          e.preventDefault();
+          setIsPaused(prev => {
+            const newPausedState = !prev;
+            isPausedRef.current = newPausedState;
+            return newPausedState;
+          });
+          return;
+        }
+        
+        // For other game control keys
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', ' '].includes(e.key)) {
           e.preventDefault();
           keysPressed.current[e.key] = true;
         }
-        // When not focused, allow normal browser behavior (scrolling with arrow keys)
       }
+      // When not focused, allow normal browser behavior (scrolling with arrow keys, etc.)
     };
     
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -647,9 +698,12 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     setIsFocused(false);
     isFocusedRef.current = false;
     
-    // Pause the game when focus is lost
-    setIsPaused(true);
-    isPausedRef.current = true;
+    // Only pause the game when focus is lost if the game isn't over
+    // This prevents auto-pause when clicking buttons at game end
+    if (!isGameOver && !winner) {
+      setIsPaused(true);
+      isPausedRef.current = true;
+    }
     
     // Clear all key states when focus is lost to prevent stuck keys
     keysPressed.current = {};
@@ -1408,18 +1462,68 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
 
       // Win condition with custom score
       if (leftScore === settings.scoreToWin || rightScore === settings.scoreToWin) {
-        setWinner(leftScore === settings.scoreToWin ? player1.username : player2.username);
+        const winningPlayer = leftScore === settings.scoreToWin ? player1 : player2;
+        setWinner(winningPlayer.username);
         setScore({ left: leftScore, right: rightScore });
         gameOver = true;
-        api.post('/matches', {
-          player: player1.isGuest ? 'guest' : player1.username,
-          opponent: player2.isGuest ? 'guest' : player2.username,
-          winner: leftScore === settings.scoreToWin ? player1.username : player2.username,
-          loser: leftScore === settings.scoreToWin ? player2.username : player1.username,
-          leftScore,
-          rightScore,
-        })
-        .catch(console.error);
+        
+        // Enhanced debug logging
+        console.log("Game over - checking if match result should be sent", {
+          player1: {
+            username: player1.username,
+            isGuest: player1.isGuest,
+            id: player1.id
+          },
+          player2: {
+            username: player2.username,
+            isGuest: player2.isGuest,
+            id: player2.id
+          },
+          winner: leftScore === settings.scoreToWin ? player1.username : player2.username
+        });
+        
+        // Only send match results if both players are logged in (not guests) and have IDs
+        if (!player1.isGuest && !player2.isGuest && player1.id && player2.id) {
+          console.log("Both players are logged in with IDs, sending match results");
+          
+          try {
+            // The winner is either player1 or player2's ID
+            const winnerId = leftScore === settings.scoreToWin ? player1.id : player2.id;
+            
+            // Convert IDs to integers for the API call
+            const player1Id = parseInt(player1.id);
+            const player2Id = parseInt(player2.id);
+            const winnerIdInt = parseInt(winnerId);
+            
+            console.log("Match data prepared:", {
+              player1: player1Id,
+              player2: player2Id,
+              winner: winnerIdInt
+            });
+            
+            if (isNaN(player1Id) || isNaN(player2Id) || isNaN(winnerIdInt)) {
+              throw new Error("Invalid player IDs - must be numeric");
+            }
+            
+            api.post('/matches', {
+              player1: player1Id,
+              player2: player2Id,
+              winner: winnerIdInt
+            })
+            .then(response => {
+              console.log("Match result saved:", response.data);
+            })
+            .catch(error => {
+              console.error("Error saving match result:", error.response ? error.response.data : error.message);
+            });
+          } catch (error) {
+            console.error("Error preparing match data:", error);
+          }
+        } else {
+          console.log("Match result not sent - one or both players are guests or missing IDs", 
+            { player1IsGuest: player1.isGuest, player2IsGuest: player2.isGuest, 
+              player1HasId: Boolean(player1.id), player2HasId: Boolean(player2.id) });
+        }
       }
     }
 
@@ -1465,11 +1569,19 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
       setScore({ left: leftScore, right: rightScore });
     }
 
-    let animationFrameId: number;
     let lastTimeStamp = 0; // Initialize to 0, will be set on first frame
     let frameCount = 0; // Track frame count for diagnostics
     
     const gameLoop = (timestamp: number) => {
+      // Don't process game loop if game is over, but still continue animation frame for UI updates
+      if (isGameOver || gameOver) {
+        // We still want to draw the current state (showing the final game state)
+        draw();
+        // Request next frame for UI updates but skip game logic
+        animationFrameRef.current = window.requestAnimationFrame(gameLoop);
+        return;
+      }
+      
       // Calculate delta time in seconds (time since last frame)
       const deltaTime = (timestamp - lastTimeStamp) / 1000; // Convert to seconds
       
@@ -1501,7 +1613,7 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
       }
       
       // Request next frame as soon as possible
-      animationFrameId = window.requestAnimationFrame(gameLoop);
+      animationFrameRef.current = window.requestAnimationFrame(gameLoop);
     };
     
     // Log initial ball state for debugging
@@ -1510,33 +1622,90 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     // Start the game loop with more reliable initialization
     const startGameLoop = (timestamp: number) => {
       lastTimeStamp = timestamp; // Set initial timestamp (no delta on first frame)
-      animationFrameId = window.requestAnimationFrame(gameLoop);
+      animationFrameRef.current = window.requestAnimationFrame(gameLoop);
     };
     
     // Request first frame with proper initialization
-    animationFrameId = window.requestAnimationFrame(startGameLoop);
+    animationFrameRef.current = window.requestAnimationFrame(startGameLoop);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
     };
   }, [player1.username, player2.username, restartKey, isAIGame, settings]);
 
   function handleRestart() {
+    console.log("Restart button clicked - resetting game state");
+    
+    // Reset game state
     setWinner(null);
     setScore({ left: 0, right: 0 });
-    setRestartKey((prev) => prev + 1); // Trigger re-render
+    setIsGameOver(false);
+    
+    // Explicitly ensure game is not paused when restarted
+    setIsPaused(false);
+    isPausedRef.current = false;
+    
+    // Clear all key states
+    keysPressed.current = {};
+    
+    // Trigger re-render with new key to reset game state completely
+    setRestartKey((prev) => prev + 1);
+    
+    // Re-enable focus on the canvas after a short delay
+    // This has to happen after React has updated the DOM with the new game state
+    setTimeout(() => {
+      // Check if component is still mounted
+      if (canvasRef.current) {
+        // Restore tabindex attribute if it was removed
+        canvasRef.current.setAttribute('tabindex', '0');
+        
+        // Set focus state first to prevent auto-pause behavior
+        setIsFocused(true);
+        isFocusedRef.current = true;
+        
+        // Now focus the canvas
+        canvasRef.current.focus();
+      }
+    }, 300); // Use a longer delay to ensure React has completed its updates
   }
   
   // New function to handle returning to the main menu/game selection
   function handleReturnToMenu() {
-    // Call parent component's callback if provided
-    if (onReturnToMenu) {
-      onReturnToMenu();
-    } else if (window.history.length > 1) {
-      window.history.back(); // Go back to previous page if possible
+    console.log("Return to menu button clicked");
+    
+    // Cancel any animation frames to stop the game completely
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    
+    // First use the provided callback if it exists
+    if (onReturnToMenu && typeof onReturnToMenu === 'function') {
+      console.log("Using provided onReturnToMenu callback");
+      try {
+        onReturnToMenu();
+        return; // If callback succeeds, we're done
+      } catch (err) {
+        console.error("Error calling onReturnToMenu callback:", err);
+        // Fall through to backup method if callback fails
+      }
     } else {
-      // If no history and no callback, try to navigate to home
-      window.location.href = '/';
+      console.log("No callback provided, using history navigation");
+    }
+    
+    // Backup: use history API instead of full page reload
+    // This will navigate to the home page but is gentler than a full reload
+    try {
+      window.history.pushState({}, "", "/");
+      // Dispatch a popstate event to trigger route change in React Router
+      window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
+    } catch (err) {
+      console.error("Error using history API:", err);
+      // Last resort fallback - direct navigation
+      window.location.href = "/";
     }
   }
 
@@ -1587,8 +1756,23 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
           ref={canvasRef}
           width={500}
           height={300}
-          tabIndex={0}
-          onClick={(e) => e.currentTarget.focus()}
+          tabIndex={isGameOver || winner ? -1 : 0} // Disable tab focus when game is over or winner exists
+          onClick={(e) => {
+            // Only allow focus when game is not over
+            if (!isGameOver && !winner) {
+              e.currentTarget.focus();
+              
+              // If the game was paused because focus was lost, unpause it now
+              if (isPaused && !isPausedRef.current) {
+                setIsPaused(false);
+                isPausedRef.current = false;
+              }
+            } else {
+              // Prevent default behavior when game is over
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
           onFocus={handleFocus}
           onBlur={handleBlur}
           style={{
@@ -1610,23 +1794,51 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
             top: "50%",
             transform: "translate(-50%, -50%)",
             borderRadius: "8px",
-            zIndex: 10, // Ensure it's above the canvas
+            zIndex: 30, // Higher z-index to ensure it's above everything
+            position: "absolute", // Ensure it's positioned correctly
+          }}
+          onClick={(e) => {
+            // Completely block all events from reaching the canvas
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onKeyDown={(e) => {
+            // Prevent keyboard events from reaching the canvas
+            e.stopPropagation();
           }}
         >
-          <div className="mb-8">{t("pongGame.winnerMessage", { winner })}</div>
+          <div className="mb-8">Game Over! {winner} wins!</div>
           <div className="flex flex-col gap-4 w-64">
             <button
               className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
-              onClick={handleRestart}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleRestart(); // Call restart handler without passing event
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              tabIndex={1} 
+              autoFocus
             >
-              {t("pongGame.restartMatch")}
+              Restart Match
             </button>
             <button
-              className="text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center dark:bg-amber-600 dark:hover:bg-amber-700 dark:focus:ring-amber-800"
-
-              onClick={handleReturnToMenu}
+              className="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                // Use our dedicated function to handle returning to menu
+                handleReturnToMenu();
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+              tabIndex={2}
             >
-              {t("pongGame.returnToMainMenu")}
+              Return to Main Menu
             </button>
           </div>
         </div>

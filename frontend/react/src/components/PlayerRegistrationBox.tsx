@@ -8,7 +8,7 @@ import i18n from "../i18n";
 
 interface PlayerBoxProps {
   label: string;
-  onRegister: (player: { username: string; isGuest: boolean }) => void;
+  onRegister: (player: { username: string; isGuest: boolean; id?: string }) => void;
   playerId: number;
 }
 
@@ -27,6 +27,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   const { user, refreshSession } = useAuth();
   const [confirmMFA, setConfirmMFA] = useState(false);
   const [confirmPlayer2MFA, setConfirmPlayer2MFA] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
 
   const handleMfaPlayer2Submit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -45,7 +46,13 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         console.log("MFA verification successful");
         await refreshSession();
         setConfirmPlayer2MFA(false);
-        onRegister({ username, isGuest: false });
+        // Get the user ID from the response if available
+        const userId = response.data?.id || response.data?.user?.id;
+        onRegister({ 
+          username, 
+          isGuest: false,
+          id: userId ? String(userId) : undefined
+        });
       }
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -92,62 +99,116 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username) {
-      setError(t("playerBox.usernameRequired"));
+    
+    // Validate username and password length
+    if (username.length < 3 || username.length > 30) {
+      setError(t("playerBox.usernameLengthError"));
       return;
     }
+    
+    if (password.length < 2 || password.length > 30) {
+      setError(t("playerBox.passwordLengthError"));
+      return;
+    }
+    
     if (user && username === user.username && password) {
       setError("You're already logged in with this username.");
       return;
     }
-    if (!password) {
-      // Guest registration: allow any alias, no backend check
-      onRegister({ username, isGuest: true });
-    } else {
-      // Registered user login
-      let response;
-      try {
-        if (!user) {
-          response = await api.post(
-            "/users/login",
-            { username, password },
-            {
-              headers: { "Content-Type": "application/json" },
-            }
-          );
+    
+    // Registered user login
+    let response;
+    try {
+      if (!user) {
+        response = await api.post(
+          "/users/login",
+          { username, password },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
-          const data = response.data;
-          const userLang = response.data.language ?? "en";
+        const data = response.data;
+        const userLang = response.data.language ?? "en";
 
-          // Change language immediately
-          if (i18n.language !== userLang) {
-            await i18n.changeLanguage(userLang);
-            localStorage.setItem("language", userLang);
-          }
-          if (data.mfaRequired) {
-            //setEmail(data.email);
-            setConfirmMFA(true);
-            return;
-          }
-          await refreshSession();
-        } else {
-          console.log("Implement custom two player login API here");
-          let player2Response;
-          player2Response = await api.post("/users/player-2-login", {
-            username,
-            password,
-          });
-          if (player2Response.data.mfaRequired) {
-            console.log(player2Response);
-            setEmail(player2Response.data.email);
-            setConfirmPlayer2MFA(true);
-            return;
-          }
+        // Change language immediately
+        if (i18n.language !== userLang) {
+          await i18n.changeLanguage(userLang);
+          localStorage.setItem("language", userLang);
         }
-        onRegister({ username, isGuest: false });
-      } catch {
-        setError(t("playerBox.loginFailed"));
+        if (data.mfaRequired) {
+          //setEmail(data.email);
+          setConfirmMFA(true);
+          return;
+        }
+        await refreshSession();
+      } else {
+        console.log("Calling player-2-login API for Player 2");
+        let player2Response;
+        player2Response = await api.post("/users/player-2-login", {
+          username,
+          password,
+        });
+        
+        // Log the full response to debug
+        console.log("Player 2 login response:", player2Response.data);
+        
+        if (player2Response.data.mfaRequired) {
+          console.log("MFA required for Player 2");
+          setEmail(player2Response.data.email);
+          setConfirmPlayer2MFA(true);
+          return;
+        }
+        
+        // Get the user ID if available
+        const userId = player2Response.data?.id || player2Response.data?.user?.id;
+        console.log("Player 2 ID extracted:", userId);
+        
+        // If we don't have an ID, try to fetch it
+        if (!userId) {
+          console.log("No user ID found in response, attempting to fetch user data");
+          try {
+            // Use the session endpoint to get logged in user
+            const userDataResponse = await api.get("/users/findByUsername/" + username);
+            const fetchedId = userDataResponse.data?.id;
+            console.log("Fetched user data:", userDataResponse.data);
+            
+            onRegister({ 
+              username, 
+              isGuest: false,
+              id: fetchedId ? String(fetchedId) : undefined
+            });
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+            onRegister({ 
+              username, 
+              isGuest: false,
+              id: undefined
+            });
+          }
+        } else {
+          onRegister({ 
+            username, 
+            isGuest: false,
+            id: String(userId)
+          });
+        }
+        return;
       }
+      
+      // For regular login, the user object should be available after refreshSession
+      // We need to refresh again to get the latest user info
+      await refreshSession();
+      const currentUser = await api.get("/session/user");
+      const userId = currentUser.data?.id;
+      onRegister({ 
+        username, 
+        isGuest: false,
+        id: userId ? String(userId) : undefined
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(t("playerBox.loginFailed"));
     }
   };
 
@@ -157,11 +218,11 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         onSubmit={handleMfaSubmit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
       >
-        <label className="mb-2 font-bold">{t("mfa.heading")}</label>
+        <label className="mb-2 font-bold">Enter Verification Code</label>
         <input
           className="mb-2 p-2 border rounded w-48"
           type="password"
-          placeholder={t("mfa.otpLabel")}
+          placeholder="OTP Code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
@@ -169,7 +230,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           className="bg-teal-700 text-white px-4 py-2 rounded"
           type="submit"
         >
-          {t("playerBox.continue")}
+          Continue
         </button>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
@@ -180,11 +241,11 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         onSubmit={handleMfaPlayer2Submit}
         className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200"
       >
-        <label className="mb-2 font-bold">{t("mfa.heading")}</label>
+        <label className="mb-2 font-bold">Enter Verification Code</label>
         <input
           className="mb-2 p-2 border rounded w-48"
           type="password"
-          placeholder={t("mfa.otpLabel")}
+          placeholder="OTP Code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
         />
@@ -192,12 +253,12 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           className="bg-teal-700 text-white px-4 py-2 rounded"
           type="submit"
         >
-          {t("playerBox.continue")}
+          Continue
         </button>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
     );
-  } else {
+  } else if (showLoginForm) {
     return (
       <form
         onSubmit={handleSubmit}
@@ -206,28 +267,63 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
         <label className="mb-2 font-bold">{label}</label>
         <input
           className="mb-2 p-2 border rounded w-48"
-          placeholder={t("playerBox.usernamePlaceholder")}
+          placeholder="Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value.slice(0, 30))}
+          minLength={3}
+          maxLength={30}
+          required
         />
         <input
           className="mb-2 p-2 border rounded w-48"
           type="password"
-          placeholder={t("playerBox.passwordPlaceholder")}
+          placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value.slice(0, 30))}
+          minLength={2}
+          maxLength={30}
+          required
         />
-        <button
-          className="bg-teal-700 text-white px-4 py-2 rounded"
-          type="submit"
-        >
-          {t("playerBox.continue")}
-        </button>
-        <span className="text-xs mt-1 text-gray-500">
-          {t("playerBox.guestHint")}
-        </span>
+        <div className="flex space-x-2">
+          <button
+            className="bg-teal-700 text-white px-4 py-2 rounded"
+            type="submit"
+          >
+            Continue
+          </button>
+          <button
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+            type="button"
+            onClick={() => setShowLoginForm(false)}
+          >
+            Back
+          </button>
+        </div>
         {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
+    );
+  } else {
+    return (
+      <div className="flex flex-col items-center w-full bg-white dark:bg-black dark:text-teal-200">
+        <label className="mb-4 font-bold text-lg">{label}</label>
+        <div className="flex flex-col space-y-3">
+          <button
+            className="bg-teal-700 text-white px-6 py-3 rounded shadow-md hover:bg-teal-600 transition-colors w-48"
+            onClick={() => setShowLoginForm(true)}
+          >
+            Login
+          </button>
+          <button
+            className="bg-orange-500 text-white px-6 py-3 rounded shadow-md hover:bg-orange-600 transition-colors w-48"
+            onClick={() => {
+              const guestName = `guest${playerId}`;
+              onRegister({ username: guestName, isGuest: true });
+            }}
+          >
+            Guest
+          </button>
+        </div>
+      </div>
     );
   }
 };

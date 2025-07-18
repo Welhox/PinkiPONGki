@@ -17,16 +17,22 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({ onR
   const [player1, setPlayer1] = useState<{
     username: string;
     isGuest: boolean;
+    id?: string;
   } | null>(null);
   const [player2, setPlayer2] = useState<{
     username: string;
     isGuest: boolean;
+    id?: string;
   } | null>(null);
 
-  // If logged in, set player1 automatically
+  // If logged in, set player1 automatically with user ID
   React.useEffect(() => {
     if (status === "authorized" && user && !player1) {
-      setPlayer1({ username: user.username, isGuest: false });
+      setPlayer1({ 
+        username: user.username, 
+        isGuest: false,
+        id: user.id 
+      });
     }
   }, [status, user, player1]);
 
@@ -61,6 +67,24 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({ onR
   }
 
   console.log("PongGameWithRegistration: Ready to render PongGame", { player1, player2, settings });
+  console.log("onReturnToMenu callback exists:", !!onReturnToMenu);
+  
+  const handleReturnToMenu = () => {
+    console.log("PongGameWithRegistration: handleReturnToMenu called");
+    
+    // Reset player registrations
+    setPlayer1(null);
+    setPlayer2(null);
+    
+    if (onReturnToMenu) {
+      console.log("PongGameWithRegistration: Calling parent onReturnToMenu");
+      onReturnToMenu();
+    } else {
+      console.log("PongGameWithRegistration: No onReturnToMenu callback provided");
+      // Fallback navigation to home
+      window.location.href = '/';
+    }
+  };
   
   return (
     <div className="flex flex-col items-center">
@@ -75,7 +99,7 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({ onR
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Player 1: W/S keys | Player 2: Arrow Up/Down</p>
       </div>
       
-      <PongGame player1={player1} player2={player2} onReturnToMenu={onReturnToMenu} />
+      <PongGame player1={player1} player2={player2} onReturnToMenu={handleReturnToMenu} />
     </div>
   );
 };

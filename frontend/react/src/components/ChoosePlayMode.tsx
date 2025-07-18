@@ -72,11 +72,17 @@ const ChoosePlayMode = () => {
   if (selectedMode === "two-player-single-game") {
     console.log("Rendering PongGameWithRegistration");
     return (
-      <PongGameWithRegistration onReturnToMenu={() => setSelectedMode(null)} />
+      <PongGameWithRegistration onReturnToMenu={() => {
+        console.log("ChoosePlayMode: Return to menu callback triggered");
+        setSelectedMode(null);
+      }} />
     );
   } else if (selectedMode === "single-player") {
     console.log("Rendering PongGameAI");
-    return <PongGameAI onReturnToMenu={() => setSelectedMode(null)} />;
+    return <PongGameAI onReturnToMenu={() => {
+      console.log("ChoosePlayMode: Return to menu callback triggered");
+      setSelectedMode(null);
+    }} />;
   } else if (selectedMode === "single-player-customize") {
     return (
       <GameCustomization

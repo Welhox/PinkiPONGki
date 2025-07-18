@@ -824,6 +824,43 @@ export async function userRoutes(fastify, _options) {
       }
     }
   );
+
+  //####################################################################################################################################
+
+  // Endpoint to find user by username - used for game match recording
+  fastify.get(
+    "/users/findByUsername/:username",
+    async (request, reply) => {
+      const { username } = request.params;
+
+      if (!username) {
+        return reply.code(400).send({ error: "Username is required" });
+      }
+
+      try {
+        const user = await prisma.user.findUnique({
+          where: { username },
+          select: {
+            id: true,
+            username: true,
+            profilePic: true,
+            // Don't include sensitive fields like password or email
+          },
+        });
+
+        if (!user) {
+          return reply.code(404).send({ error: "User not found" });
+        }
+
+        return reply.send(user);
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.code(500).send({ error: "Failed to retrieve user" });
+      }
+    }
+  );
+
+  //####################################################################################################################################
 }
 
 //####################################################################################################################################
