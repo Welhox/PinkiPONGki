@@ -54,7 +54,7 @@ import { devOnly } from "../middleware/devOnly.js";
   // Register for a tournament
   fastify.post(
     "/tournaments/:id/register",
-    { schema: tournamentsSchemas.registerTournamentSchema, ...rateLimitConfig },
+    { schema: tournamentsSchemas.registerTournamentSchema },
     async (req, reply) => {
       try {
       const { id } = req.params;
