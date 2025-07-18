@@ -35,6 +35,7 @@ export async function matchesRoute(fastify, _options) {
       // Determine result for player1
       const result = winner === player1 ? "win" : "loss";
 
+      // Create the match record
       await prisma.match.create({
         data: {
           playerId: player1User.id,
@@ -43,6 +44,41 @@ export async function matchesRoute(fastify, _options) {
           date: new Date(),
         },
       });
+
+      // Update user stats - wins, losses and played count
+      if (winner === player1) {
+        // Player 1 won
+        await prisma.user.update({
+          where: { id: player1User.id },
+          data: { 
+            wins: { increment: 1 },
+            played: { increment: 1 }
+          }
+        });
+        await prisma.user.update({
+          where: { id: player2User.id },
+          data: { 
+            losses: { increment: 1 },
+            played: { increment: 1 }
+          }
+        });
+      } else {
+        // Player 2 won
+        await prisma.user.update({
+          where: { id: player1User.id },
+          data: { 
+            losses: { increment: 1 },
+            played: { increment: 1 }
+          }
+        });
+        await prisma.user.update({
+          where: { id: player2User.id },
+          data: { 
+            wins: { increment: 1 },
+            played: { increment: 1 }
+          }
+        });
+      }
 
       } catch (error) {
         console.error("Error storing match:", error);

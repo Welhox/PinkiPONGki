@@ -21,16 +21,22 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
   const [player1, setPlayer1] = useState<{
     username: string;
     isGuest: boolean;
+    id?: string;
   } | null>(null);
   const [player2, setPlayer2] = useState<{
     username: string;
     isGuest: boolean;
+    id?: string;
   } | null>(null);
 
-  // If logged in, set player1 automatically
+  // If logged in, set player1 automatically with user ID
   React.useEffect(() => {
     if (status === "authorized" && user && !player1) {
-      setPlayer1({ username: user.username, isGuest: false });
+      setPlayer1({ 
+        username: user.username, 
+        isGuest: false,
+        id: String(user.id) // Ensure ID is a string
+      });
     }
   }, [status, user, player1]);
 
@@ -58,6 +64,7 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
             <PlayerRegistrationBox
               label={t("pongGameWithRegistration.player1")}
               onRegister={setPlayer1}
+              playerId={1}
             />
           )}
           {player1 && <span className="text-white">{player1.username}</span>}
@@ -67,6 +74,7 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
             <PlayerRegistrationBox
               label={t("pongGameWithRegistration.player2")}
               onRegister={setPlayer2}
+              playerId={2}
             />
           )}
         </div>
@@ -74,12 +82,25 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
     );
   }
 
-  console.log("PongGameWithRegistration: Ready to render PongGame", {
-    player1,
-    player2,
-    settings,
-  });
-
+  console.log("PongGameWithRegistration: Ready to render PongGame", { player1, player2, settings });
+  console.log("onReturnToMenu callback exists:", !!onReturnToMenu);
+  
+  const handleReturnToMenu = () => {
+    console.log("PongGameWithRegistration: handleReturnToMenu called");
+    
+    // Reset player registrations
+    setPlayer1(null);
+    setPlayer2(null);
+    
+    if (onReturnToMenu) {
+      console.log("PongGameWithRegistration: Calling parent onReturnToMenu");
+      onReturnToMenu();
+    } else {
+      console.log("PongGameWithRegistration: No onReturnToMenu callback provided");
+      // Fallback navigation to home
+      window.location.href = '/';
+    }
+  };
   return (
     <div className="flex flex-col items-center">
       <h2 className="text-2xl font-bold text-teal-700 dark:text-teal-300 mb-2">
@@ -105,11 +126,11 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
           {t("pongGameWithRegistration.instructions")}
         </p>
       </div>
-
-      <PongGame
-        player1={player1}
-        player2={player2}
-        onReturnToMenu={onReturnToMenu}
+      
+      <PongGame 
+        player1={player1} 
+        player2={player2} 
+        onReturnToMenu={handleReturnToMenu} 
       />
     </div>
   );

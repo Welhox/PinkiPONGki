@@ -9,8 +9,8 @@ export const matchResultSchema = {
       "winner",
     ],
     properties: {
-      player: { type: "integer", minimum: 1 },
-      opponent: { type: "integer", minimum: 1 },
+      player1: { type: "integer", minimum: 1 },
+      player2: { type: "integer", minimum: 1 },
       winner: { type: "integer", minimum: 1 },
     },
   },
