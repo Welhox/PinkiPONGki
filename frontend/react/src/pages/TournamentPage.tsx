@@ -76,16 +76,30 @@ const TournamentPage = () => {
         { winnerId: winner.id, winnerAlias: winner.name }
         );
 
-        /* const res = await api.get(`/tournaments/${match.tournamentId}`);
-
-        const updatedMatches = formatMatches(res.data.tournamentMatches);
-        setMatches(updatedMatches); */
         await fetchTournamentData();
         
     } catch (error) {
         console.error("Failed to update match:", error);
     }
   };
+
+  useEffect(() => {
+    if (finalStandings.length === 0) return;
+
+    const timer = setTimeout(async () => {
+      //alert(t("tournament.overMessage")); // e.g. "Tournament over! Redirecting home."
+      try {
+        await api.delete(
+          `/tournaments/${tournamentId}/${encodeURIComponent(tournamentName)}`
+        );
+      } catch (err) {
+        console.error("Failed to delete tournament:", err);
+      }
+      navigate("/", { replace: true });
+    }, 20_000); // ← 20 seconds
+
+    return () => clearTimeout(timer);
+  }, [finalStandings, tournamentId, tournamentName, navigate, /*t*/]);
 
 
   return (

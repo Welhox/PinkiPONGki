@@ -260,9 +260,9 @@ import { devOnly } from "../middleware/devOnly.js";
         console.log("Match updated successfully:", updatedMatch);
         try {
         // generate matches for net round if applicable
-        generateNextRoundMatches(id);
+        await generateNextRoundMatches(id);
         //check if the tournament is finished
-        isTournamentFinished(id, updatedMatch);
+        await isTournamentFinished(id, updatedMatch);
         
         } catch (error) {
           console.error("Error generating next round matches:", error);
