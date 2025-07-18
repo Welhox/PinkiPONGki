@@ -191,7 +191,12 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             isGuest: false,
             id: String(userId)
           });
+          return;
         }
+        console.log("Login successful:", response?.data);
+        onRegister({ username, isGuest: false, userId: response?.data.id });
+      } catch {
+        setError(t("playerBox.loginFailed"));
         return;
       }
       

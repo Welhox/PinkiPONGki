@@ -9,7 +9,7 @@ rm -rf dist
 mkdir -p public
 
 # Install dependencies and build
-npm install && npm run build
+npm install && npm run build -- --mode=production
 
 # Start nginx
 nginx -g "daemon off;"
