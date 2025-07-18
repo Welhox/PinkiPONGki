@@ -9,8 +9,9 @@ import { useGameSettings } from "../contexts/GameSettingsContext";
 import { getTop3FromMatches } from "../utils/getTop3FromMatches";
 
 const TournamentPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id} = useParams<{ id: string }>();
   const tournamentId = parseInt(id || "0", 10);
+  const [tournamentName, setTournamentName] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
   const hasStartedRef = useRef(false);
@@ -20,6 +21,7 @@ const TournamentPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [finalStandings, setFinalStandings] = useState<Player[]>([]);
   const { settings } = useGameSettings();
+
 
   useEffect(() => {
     if (!location.state) {
@@ -37,6 +39,9 @@ const TournamentPage = () => {
       // Re-fetch after starting
       const tournamentRes = await api.get(`/tournaments/${id}`);
       let tournament = tournamentRes.data;
+
+      setTournamentName(tournament.name);
+
 
       if (tournament.status === "waiting" && !hasStartedRef.current) {
         hasStartedRef.current = true;
@@ -88,7 +93,7 @@ const TournamentPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-300 mb-6">
-        Tournament #{tournamentId}
+        {tournamentName}
       </h1>
 
       <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md w-full max-w-md">
