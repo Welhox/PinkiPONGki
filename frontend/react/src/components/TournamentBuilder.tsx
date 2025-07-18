@@ -129,25 +129,31 @@ const TournamentBuilder = () => {
     }
   }, [user, players]);
 
-  const updatePlayer = async (index: number, player: RegisteredPlayer) => {
+  const updatePlayer = async (index: number, player: { username: string; isGuest: boolean; id?: string }) => {
+    // Convert player object to RegisteredPlayer format
+    const registeredPlayer: RegisteredPlayer = {
+      username: player.username,
+      isGuest: player.isGuest,
+      userId: player.id ? parseInt(player.id) : null
+    };
     // check for duplicate usernames
     const duplicate = players.some(
-        (p) => p.username === player.username && p.userId === player.userId
+        (p) => p.username === registeredPlayer.username && p.userId === registeredPlayer.userId
     );
     if (duplicate) {
-        alert(t("tournament.errorUsernameTaken", { username: player.username }));
+        alert(t("tournament.errorUsernameTaken", { username: registeredPlayer.username }));
         return;
     }
     // prevent re-login of logged-in user
-    if (user && index !== 0 && player.username === user.username) {
+    if (user && index !== 0 && registeredPlayer.username === user.username) {
       alert(t("tournament.errorAlreadyLoggedIn", { username: user.username }));
       return;
     }
     // enforce username rules
     if (
-      !usernameRegex.test(player.username) ||
-      player.username.length < 2 ||
-      player.username.length > 20
+      !usernameRegex.test(registeredPlayer.username) ||
+      registeredPlayer.username.length < 2 ||
+      registeredPlayer.username.length > 20
     ) {
       alert(t("tournament.errorUsernameInvalid"));
       return;
@@ -157,10 +163,10 @@ const TournamentBuilder = () => {
     try {
         if (tournamentId) {
             await api.post(`/tournaments/${tournamentId}/register`, {
-                userId: player.userId,
-                alias: player.username,
+                userId: registeredPlayer.userId,
+                alias: registeredPlayer.username,
             });
-            console.log(`Player ${player.username} added to tournament ${tournamentId}`);
+            console.log(`Player ${registeredPlayer.username} added to tournament ${tournamentId}`);
         }
     } catch (error) {
         if (isAxiosError(error) && error.response?.status === 429) {
@@ -174,7 +180,7 @@ const TournamentBuilder = () => {
 
     setPlayers((prev) => {
         const next = [...prev];
-        next[index] = player;
+        next[index] = registeredPlayer;
         return next;
     });
     setRegisteredPlayers((prev) => {
@@ -305,6 +311,7 @@ const TournamentBuilder = () => {
                 <PlayerRegistrationBox
                   label={`${t("tournament.playerLabel")} ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
+                  playerId={index + 1}
                 />
               )}
             </div>
