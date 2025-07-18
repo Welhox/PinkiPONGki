@@ -297,7 +297,7 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
             type="button"
             onClick={() => setShowLoginForm(false)}
           >
-            {t("common.back")}
+            {t("gamecustomization.back")}
           </button>
         </div>
         {error && <div className="text-red-500 mt-2">{error}</div>}
