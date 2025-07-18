@@ -121,7 +121,7 @@ const TournamentPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-300 mb-6">
-        {t("tournamentPage.title", { id: tournamentId })}
+        {tournamentName}
       </h1>
 
       <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md w-full max-w-md">
