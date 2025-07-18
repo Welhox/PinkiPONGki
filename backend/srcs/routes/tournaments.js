@@ -9,7 +9,15 @@ import { devOnly } from "../middleware/devOnly.js";
   
   export async function tournamentsRoute(fastify, _options) {
 //###############################################################
-
+  const rateLimitConfig = {
+    config: {
+      rateLimit: {
+        max: 1,
+        timeWindow: "1 seconds",
+        keyGenerator: (request) => request.user?.id?.toString() || request.ip,
+      },
+    },
+  };
 
   // Create a tournament
   fastify.post("/tournaments/create",
@@ -46,7 +54,7 @@ import { devOnly } from "../middleware/devOnly.js";
   // Register for a tournament
   fastify.post(
     "/tournaments/:id/register",
-    { schema: tournamentsSchemas.registerTournamentSchema },
+    { schema: tournamentsSchemas.registerTournamentSchema, ...rateLimitConfig },
     async (req, reply) => {
       try {
       const { id } = req.params;
@@ -66,6 +74,15 @@ import { devOnly } from "../middleware/devOnly.js";
       }
       if (!userId && !alias) {
         return reply.code(400).send({ message: "Either userId or alias is required" });
+      }
+
+      // ── new duplicate check ──
+      const exists = tournament.participants.some(
+        (p) => p.alias === alias
+      );
+      if (exists) {
+        // silently return success, no-op
+        return reply.code(204).send();
       }
 
       const participant = await prisma.tournamentParticipant.create({

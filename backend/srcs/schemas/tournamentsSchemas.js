@@ -113,6 +113,10 @@ const registerTournamentSchema = {
   },
   response: {
     200: participantSchema,
+    204: {
+      description: "No-op: already registered",
+      type: "null",
+    },
     400: {
       type: "object",
       properties: {

@@ -3,6 +3,7 @@ import { useAuth } from "../auth/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import PlayerRegistrationBox from "./PlayerRegistrationBox";
 import api from "../api/axios";
+import { isAxiosError } from "axios";
 import { useGameSettings } from "../contexts/GameSettingsContext";
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +18,7 @@ const TournamentBuilder = () => {
   const [players, setPlayers] = useState<RegisteredPlayer[]>([]);
   const [registeredPlayers, setRegisteredPlayers] = useState<boolean[]>([]);
   const [tournamentName, setTournamentName] = useState("");
+  const [tournamentId, setTournamentId] = useState<number | null>(null);
   const { user } = useAuth();
   const { settings } = useGameSettings();
   const navigate = useNavigate();
@@ -42,42 +44,99 @@ const TournamentBuilder = () => {
       setPlayers(initialPlayers);
       setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
     }
-  }, [playerCount]);
+  }, [playerCount, user]);
 
   useEffect(() => {
+    if (tournamentName === "") {
+      setTournamentName(t("tournament.placeholder")); // default name if not provided
+    }
+    // Create the tournament immediately when the component is mounted
+    const createTournament = async () => {
+      try {
+        const res = await api.post("/tournaments/create", {
+          name: tournamentName,
+          size: playerCount,
+          createdById: user?.id, // use user ID if logged in, otherwise 0
+          status: "waiting",
+        });
+        const id = res.data.id;
+        setTournamentId(id); // Store the tournament ID after creation
+        console.log("Tournament created with ID:", res.data.id);
+
+        if (user) {
+            await api.post(`/tournaments/${id}/register`, {
+                userId: user.id,
+                alias: user.username,
+            });
+            console.log(`Player ${user.username} added to tournament ${id}`);
+
+            setPlayers((prev) => {
+                const next = [...prev];
+                // ensure array length
+                if (next.length < playerCount) {
+                    next.length = playerCount;
+                    next.fill({ username: "", isGuest: true, userId: null });
+                }
+                next[0] = {
+                    username: user.username,
+                    isGuest: false,
+                    userId: user.id,
+                };
+                return next;
+                });
+                setRegisteredPlayers((prev) => {
+                const next = [...prev];
+                if (next.length < playerCount) {
+                    next.length = playerCount;
+                    next.fill(false);
+                }
+                next[0] = true;
+                return next;
+                });
+        }
+
+      } catch (error) {
+        console.error("Tournament creation failed.", error);
+        alert(t("tournament.errorTournamentCreation"));
+      }
+    };
+
+    if (playerCount > 0 && !tournamentId) {
+      createTournament();
+    }
+  }, [playerCount, tournamentName, user, tournamentId, t]);
+
+  useEffect(() => {
+    // This useEffect should only be triggered when the user changes
     if (user && players.length > 0) {
-      const alreadyInSlot = players.some(
+      const updatedPlayers = [...players];
+      const alreadyInSlot = updatedPlayers.some(
         (p) => !p.isGuest && p.username === user.username
       );
       if (alreadyInSlot) return; // prevent duplicates
 
-      const firstGuestIndex = players.findIndex(
+      const firstGuestIndex = updatedPlayers.findIndex(
         (p) => p.isGuest && !p.username
       );
       if (firstGuestIndex !== -1) {
-        const updated = [...players];
-        updated[firstGuestIndex] = {
+        updatedPlayers[firstGuestIndex] = {
           username: user.username,
           isGuest: false,
           userId: user.id,
         };
-        setPlayers(updated);
-
-        const updatedRegistered = [...registeredPlayers];
-        updatedRegistered[firstGuestIndex] = true;
-        setRegisteredPlayers(updatedRegistered);
+        setPlayers(updatedPlayers); // Only update state here
       }
     }
   }, [user, players]);
 
-  const updatePlayer = (index: number, player: RegisteredPlayer) => {
+  const updatePlayer = async (index: number, player: RegisteredPlayer) => {
     // check for duplicate usernames
     const duplicate = players.some(
-      (p, i) => i !== index && p.username === player.username
+        (p) => p.username === player.username && p.userId === player.userId
     );
     if (duplicate) {
-      alert(t("tournament.errorUsernameTaken", { username: player.username }));
-      return;
+        alert(t("tournament.errorUsernameTaken", { username: player.username }));
+        return;
     }
     // prevent re-login of logged-in user
     if (user && index !== 0 && player.username === user.username) {
@@ -93,22 +152,36 @@ const TournamentBuilder = () => {
       alert(t("tournament.errorUsernameInvalid"));
       return;
     }
-    const updatedPlayers = [...players];
-    updatedPlayers[index] = {
-      ...player,
-      userId:
-        !player.isGuest && player.userId != null
-          ? player.userId
-          : user?.username === player.username
-          ? Number(user.id)
-          : null,
-    };
-    setPlayers(updatedPlayers);
 
-    // mark this player as registered (hides input fields from them)
-    const updatedRegistered = [...registeredPlayers];
-    updatedRegistered[index] = true;
-    setRegisteredPlayers(updatedRegistered);
+    // Add the player to the tournament in the backend first
+    try {
+        if (tournamentId) {
+            await api.post(`/tournaments/${tournamentId}/register`, {
+                userId: player.userId,
+                alias: player.username,
+            });
+            console.log(`Player ${player.username} added to tournament ${tournamentId}`);
+        }
+    } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 429) {
+            // silently swallow 429
+            return;
+        }
+        console.error("Error adding player to tournament", error);
+        alert(t("tournament.errorAddingPlayer"));
+        return;
+    }
+
+    setPlayers((prev) => {
+        const next = [...prev];
+        next[index] = player;
+        return next;
+    });
+    setRegisteredPlayers((prev) => {
+        const next = [...prev];
+        next[index] = true;
+        return next;
+    });
   };
 
   const handleCreateTournament = async (e: React.FormEvent) => {
@@ -125,36 +198,8 @@ const TournamentBuilder = () => {
       alert(t("tournament.errorAllPlayersRequired"));
       return;
     }
-    if (tournamentName === "") {
-      setTournamentName(t("tournament.placeholder")); // default name if not provided
-    }
-    try {
-      // create a tournament
 
-      const res = await api.post("/tournaments/create", {
-        name: tournamentName,
-        size: playerCount,
-        createdById: user?.id, // use user ID if logged in, otherwise 0
-        status: "waiting",
-      });
-
-      const tournamentId = res.data.id;
-
-      console.log("Players:", players);
-      // add participants
-      await Promise.all(
-        players.map((player) =>
-          api.post(`/tournaments/${tournamentId}/register`, {
-            userId: player.userId,
-            alias: player.username,
-          })
-        )
-      );
-      navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access, should probably random generate it...
-    } catch (error) {
-      console.error("Tournament creation failed.");
-      alert(t("tournament.errorTournamentCreation"));
-    }
+    navigate(`/tournament/${tournamentId}`, { state: { accessKey: "yolo" } }); // send arbitrary key in state to prevent direct url access, should probably random generate it...
   };
 
   const inputStyles =
