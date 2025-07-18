@@ -30,6 +30,7 @@ model User {
   updatedAt     DateTime @updatedAt
   profilePic    String?
   isOnline      Boolean  @default(false)
+  tournamentWins Int     @default(0)
 
   matchesAsPlayer   Match[] @relation("PlayerMatches")
   matchesAsOpponent Match[] @relation("OpponentMatches")

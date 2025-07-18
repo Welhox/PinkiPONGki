@@ -9,8 +9,9 @@ import { useGameSettings } from "../contexts/GameSettingsContext";
 import { getTop3FromMatches } from "../utils/getTop3FromMatches";
 
 const TournamentPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id} = useParams<{ id: string }>();
   const tournamentId = parseInt(id || "0", 10);
+  const [tournamentName, setTournamentName] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
   const hasStartedRef = useRef(false);
@@ -20,6 +21,7 @@ const TournamentPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [finalStandings, setFinalStandings] = useState<Player[]>([]);
   const { settings } = useGameSettings();
+
 
   useEffect(() => {
     if (!location.state) {
@@ -38,11 +40,14 @@ const TournamentPage = () => {
       const tournamentRes = await api.get(`/tournaments/${id}`);
       let tournament = tournamentRes.data;
 
+      setTournamentName(tournament.name);
+
       if (tournament.status === "waiting" && !hasStartedRef.current) {
         hasStartedRef.current = true;
         await api.post(`/tournaments/${id}/start`);
          const updatedTournament = await api.get(`/tournaments/${id}`);
          tournament = updatedTournament.data;
+         setTournamentName(tournament.name);
       }
 
       const playersData = formatPlayers(tournament.participants);
@@ -51,10 +56,12 @@ const TournamentPage = () => {
       setPlayers(playersData);
       setMatches(formattedMatches);
 
-      if (formattedMatches.length === 0 && tournament.status === "completed") {
+      if (tournament.status === "completed") {
         const top3 = getTop3FromMatches(formattedMatches);
         setFinalStandings(top3);
-      }
+        console.log("Final standings", top3);
+     }
+
     } catch (error) {
       console.error("Failed to fetch tournament data:", error);
     } finally {
@@ -69,26 +76,36 @@ const TournamentPage = () => {
         { winnerId: winner.id, winnerAlias: winner.name }
         );
 
-        const res = await api.get(`/tournaments/${match.tournamentId}`);
-        const updatedMatches = formatMatches(res.data.tournamentMatches);
-
-        setMatches(updatedMatches);
-
-        if (res.data.status === "completed") {
-            const top3 = getTop3FromMatches(updatedMatches);
-            setFinalStandings(top3);
-            console.log("Final standings", top3);
-        }
+        await fetchTournamentData();
+        
     } catch (error) {
         console.error("Failed to update match:", error);
     }
   };
 
+  useEffect(() => {
+    if (finalStandings.length === 0) return;
+
+    const timer = setTimeout(async () => {
+      //alert(t("tournament.overMessage")); // e.g. "Tournament over! Redirecting home."
+      try {
+        await api.delete(
+          `/tournaments/${tournamentId}/${encodeURIComponent(tournamentName)}`
+        );
+      } catch (err) {
+        console.error("Failed to delete tournament:", err);
+      }
+      navigate("/", { replace: true });
+    }, 20_000); // ← 20 seconds
+
+    return () => clearTimeout(timer);
+  }, [finalStandings, tournamentId, tournamentName, navigate, /*t*/]);
+
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-300 mb-6">
-        Tournament #{tournamentId}
+        {tournamentName}
       </h1>
 
       <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md w-full max-w-md">
