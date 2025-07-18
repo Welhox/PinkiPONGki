@@ -146,7 +146,7 @@ const TournamentPage = () => {
       </div>
 
         {isLoading ? (
-        <p>Loading...</p>
+        <p>{t("tournamentPage.loading")}</p>
         ) : currentMatch ? (
         <PongGame
             player1={mapToPongPlayer(currentMatch.player1)}

@@ -251,7 +251,9 @@
   },
   "matchcard": {
     "winner": "Winner",
-    "win": "{{name}} Wins"
+    "win": "{{name}} Wins",
+    "play": "Play",
+    "unknownPlayer": "TBD"
   },
   "powerups": {
     "bigPaddle": "Big Paddle"

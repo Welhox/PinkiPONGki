@@ -33,7 +33,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLaunch }) => {
             className="w-full py-2 bg-blue-600 text-white text-lg font-semibold rounded hover:bg-blue-700"
             onClick={() => onLaunch(match)}
           >
-            Play
+            {t("matchcard.play")}
           </button>
         </>
       ) : (
