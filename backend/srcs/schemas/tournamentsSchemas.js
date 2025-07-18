@@ -113,6 +113,10 @@ const registerTournamentSchema = {
   },
   response: {
     200: participantSchema,
+    204: {
+      description: "No-op: already registered",
+      type: "null",
+    },
     400: {
       type: "object",
       properties: {
@@ -371,8 +375,52 @@ const deleteTournamentSchema = {
   },
 };
 
+//schema for updating tournament name
+const updateTournamentNameSchema = {
+  description: "Update a tournament's name",
+  tags: ["tournaments"],
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "integer", minimum: 1 }
+    },
+    required: ["id"]
+  },
+  body: {
+    type: "object",
+    properties: {
+      name: { type: "string" }
+    },
+    required: ["name"],
+    additionalProperties: false
+  },
+  response: {
+    200: {
+      description: "The updated tournament object",
+      type: "object",
+      properties: {
+        id:           { type: "integer" },
+        name:         { type: "string" },
+        size:         { type: "integer" },
+        createdById:  { type: "integer" },
+        status:       { type: "string" }
+      },
+      required: ["id","name","size","createdById","status"]
+    },
+    404: {
+      description: "Tournament not found",
+      type: "object",
+      properties: {
+        message: { type: "string", example: "Tournament not found" }
+      },
+      required: ["message"]
+    }
+  }
+};
+
 export const tournamentsSchemas = {
   deleteTournamentSchema,
+  updateTournamentNameSchema,
   updateTournamentMatchSchema,
   startTournamentSchema,
   createTournamentSchema,

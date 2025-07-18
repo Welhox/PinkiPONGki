@@ -59,10 +59,11 @@ const ChoosePlayMode = () => {
     setSelectedMode("tournament-customize");
   };
 
-  const handleJoinTournament = () => {
+  // this got flagged by linter
+  /* const handleJoinTournament = () => {
     console.log("Selected Join Tournament mode");
     setSelectedMode("join-tournament");
-  };
+  }; */
 
   // Added logging to debug transitions
   useEffect(() => {

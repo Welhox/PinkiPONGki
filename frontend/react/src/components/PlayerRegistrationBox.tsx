@@ -15,7 +15,6 @@ interface PlayerBoxProps {
 const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
   label,
   onRegister,
-  playerId,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -316,8 +315,10 @@ const PlayerRegistrationBox: React.FC<PlayerBoxProps> = ({
           <button
             className="bg-orange-500 text-white px-6 py-3 rounded shadow-md hover:bg-orange-600 transition-colors w-48"
             onClick={() => {
-              const guestName = `guest${playerId}`;
-              onRegister({ username: guestName, isGuest: true });
+              // Use a random number between 1 and 999 as guest ID
+              const randomId = Math.floor(Math.random() * 999) + 1;
+              const guestName = `guest${randomId}`;
+              onRegister({ username: guestName, isGuest: true, id: undefined });
             }}
           >
             Guest

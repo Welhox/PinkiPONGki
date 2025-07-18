@@ -67,7 +67,7 @@ const ConfirmOtpField: React.FC<Props> = ({
         setIsError(true);
         setMessage(t("confirmOtp.otp_invalid"));
       }
-    } catch (message) {
+    } catch {
       setIsError(true);
       setMessage(t("confirmOtp.otp_invalid"));
       // console.error('error verifying OTP:', error);

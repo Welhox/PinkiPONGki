@@ -22,6 +22,7 @@ const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {
     <div className="flex flex-col items-center gap-12">
       {sortedRounds.map(([roundNumber, roundMatches]) => {
         const round = Number(roundNumber);
+
         return (
           <div
             key={roundNumber}
