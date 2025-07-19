@@ -1,9 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { User, AuthContextType } from "../auth/AuthProvider";
-import NavigationHeader from "../components/NavigationHeader";
-import PongGame from "../components/PongGame";
-import PongGameWithRegistration from "../components/PongGameWithRegistration";
+import { AuthContextType } from "../auth/AuthProvider";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import ChoosePlayMode from "../components/ChoosePlayMode";
@@ -26,7 +23,6 @@ const Home: React.FC<HomeProps> = ({ status, user }) => {
     <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg my-5">
       <div className="flex justify-center">
         <ChoosePlayMode />
-        {/* <PongGameWithRegistration /> */}
       </div>
       <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
         {t("home.welcome")}

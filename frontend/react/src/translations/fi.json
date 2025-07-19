@@ -96,7 +96,6 @@
     "uploadFailed": "Lataus epäonnistui: {{error}}",
     "loading": "Ladataan...",
     "rateLimitExceeded": "Rajoitus ylittynyt, yritä uudelleen {{time}} kuluttua."
-
   },
   "friendList": {
     "noFriends": "Sinulla ei ole vielä kavereita"
@@ -201,7 +200,7 @@
     "enabled": "Käytössä",
     "disabled": "Ei käytössä",
     "enterUsernames": "Anna käyttäjänimet tai rekisteröidy vieraana.",
-    "playerYou": "Pelaaja 1 (Sinä): {{username}}",
+    "playerYou": "Pelaaja {{index}} (Sinä): {{username}}",
     "player": "Pelaaja {{index}}: {{username}}",
     "playerLabel": "Pelaaja",
     "createButton": "Luo Turnaus",
