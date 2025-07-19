@@ -6,7 +6,15 @@ import TournamentBuilder from "./TournamentBuilder";
 import GameCustomization from "./GameCustomization";
 import { useTranslation } from "react-i18next";
 
-const ChoosePlayMode = () => {
+interface ChoosePlayModeProps {
+  onInteract?: () => void; // optional so it's reusable
+  onReturnToMenu?: () => void;
+}
+
+const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
+  onInteract,
+  onReturnToMenu,
+}) => {
   const { t } = useTranslation();
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const location = useLocation();
@@ -55,16 +63,19 @@ const ChoosePlayMode = () => {
   const handleSinglePlayer = () => {
     console.log("Selected Single Player mode");
     setSelectedMode("single-player-customize");
+    onInteract?.();
   };
 
   const handleTwoPlayer = () => {
     console.log("Selected Two Player mode");
     setSelectedMode("two-player-customize");
+    onInteract?.();
   };
 
   const handleCreateTournament = () => {
     console.log("Selected Tournament mode");
     setSelectedMode("tournament-customize");
+    onInteract?.();
   };
 
   // Added logging to debug transitions
