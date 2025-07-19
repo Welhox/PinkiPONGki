@@ -12,6 +12,8 @@ const ChoosePlayMode = () => {
   const location = useLocation();
   const initialRenderRef = useRef(true);
   const prevKeyRef = useRef(location.key);
+  const headerRef = useRef<HTMLHeadingElement>(null);
+  const [headerWidth, setHeaderWidth] = useState<number | null>(null);
 
   // Handle home button click detection and game state reset
   useEffect(() => {
@@ -35,6 +37,12 @@ const ChoosePlayMode = () => {
     // Always update the previous key reference
     prevKeyRef.current = location.key;
   }, [location.key, location.pathname, selectedMode]);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderWidth(headerRef.current.offsetWidth);
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedMode) {
@@ -124,20 +132,38 @@ const ChoosePlayMode = () => {
   return (
     <div>
       <div>
-        <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
+        <h1
+          ref={headerRef}
+          className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3"
+        >
           {t("CPM.choosePlayMode")}
         </h1>
-        <div className="flex">
-          <button className={buttonStyles} onClick={handleSinglePlayer}>
-            {t("CPM.singlevsAI")}
-          </button>
-          <button className={buttonStyles} onClick={handleTwoPlayer}>
-            {t("CPM.twoplayersingle")}
-          </button>
-          <button className={buttonStyles} onClick={handleCreateTournament}>
-            {t("CPM.createTournament")}
-          </button>
-        </div>
+
+        {headerWidth && (
+          <div
+            className="mx-auto mt-6 flex justify-between"
+            style={{ width: headerWidth }}
+          >
+            <button
+              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              onClick={handleSinglePlayer}
+            >
+              {t("CPM.singlevsAI")}
+            </button>
+            <button
+              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              onClick={handleTwoPlayer}
+            >
+              {t("CPM.twoplayersingle")}
+            </button>
+            <button
+              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              onClick={handleCreateTournament}
+            >
+              {t("CPM.createTournament")}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

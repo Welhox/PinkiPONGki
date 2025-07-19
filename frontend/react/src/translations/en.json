@@ -181,14 +181,14 @@
   },
   "CPM": {
     "choosePlayMode": "Choose Play Mode",
-    "singlevsAI": "Single Player vs AI",
-    "twoplayersingle": "2 Player Single Game",
-    "createTournament": "Create Tournament"
+    "singlevsAI": "1 Player",
+    "twoplayersingle": "2 Player",
+    "createTournament": "Tournament"
   },
   "tournament": {
     "createTitle": "Create Tournament",
-    "4playerMode": "4 Player Mode",
-    "8playerMode": "8 Player Mode",
+    "4playerMode": "4 Players",
+    "8playerMode": "8 Players",
     "gameSettings": "Game Settings",
     "map": "Map",
     "mapClassic": "Classic",
