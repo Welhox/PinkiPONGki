@@ -199,7 +199,7 @@
     "powerUps": "Power-ups",
     "enabled": "Aktiverat",
     "disabled": "Avaktiverat",
-    "enterUsernames": "Ange användarnamn eller registrera dig som gäst.",
+    "enterUsernames": "Logga in eller registrera dig som gäst.",
     "playerYou": "Spelare {{index}} (Du): {{username}}",
     "player": "Spelare {{index}}: {{username}}",
     "playerLabel": "Spelare",
@@ -210,7 +210,8 @@
     "errorAllPlayersRequired": "Alla spelare måste ange ett användarnamn.",
     "errorTournamentCreation": "Fel vid skapande av turnering.",
     "consoleCreating": "Skapar turnering",
-    "placeholder": "Pong Turnering"
+    "placeholder": "Pong Turnering",
+    "nameYourTournament": "Namnge din turnering"
   },
   "gamecustomization": {
     "title": "Spelanpassning",

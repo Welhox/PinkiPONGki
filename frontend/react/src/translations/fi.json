@@ -199,7 +199,7 @@
     "powerUps": "Tehosteet",
     "enabled": "Käytössä",
     "disabled": "Ei käytössä",
-    "enterUsernames": "Anna käyttäjänimet tai rekisteröidy vieraana.",
+    "enterUsernames": "Kirjaudu sisään tai rekisteröidy vieraana.",
     "playerYou": "Pelaaja {{index}} (Sinä): {{username}}",
     "player": "Pelaaja {{index}}: {{username}}",
     "playerLabel": "Pelaaja",
@@ -210,7 +210,8 @@
     "errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",
     "consoleCreating": "Luodaan turnaus",
-    "placeholder": "Pong Turnaus"
+    "placeholder": "Pong Turnaus",
+    "nameYourTournament": "Nimeä turnaus"
   },
   "gamecustomization": {
     "title": "Pelin mukautus",

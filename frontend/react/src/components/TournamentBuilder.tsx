@@ -28,6 +28,7 @@ const TournamentBuilder = () => {
   const [playerCount, setPlayerCount] = useState<number>(0);
   const [players, setPlayers] = useState<RegisteredPlayer[]>([]);
   const [registeredPlayers, setRegisteredPlayers] = useState<boolean[]>([]);
+  const [currentRegistrationIndex, setCurrentRegistrationIndex] = useState(0);
   const [tournamentName, setTournamentName] = useState("");
   const { user } = useAuth();
   const { settings } = useGameSettings();
@@ -43,7 +44,8 @@ const TournamentBuilder = () => {
       });
 
       setPlayers(initialPlayers);
-      setRegisteredPlayers(Array(playerCount).fill(false));
+      setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
+      setCurrentRegistrationIndex(initialPlayers.findIndex((p) => !p.username)); // start from first unfilled
     }
   }, [playerCount]);
 
@@ -122,6 +124,18 @@ const TournamentBuilder = () => {
       const next = [...prev];
       next[index] = true;
       return next;
+    });
+
+    // Advance to the next unregistered player
+    const nextUnregistered = registeredPlayers.findIndex((_, i) => {
+      return !registeredPlayers[i] && i !== index;
+    });
+
+    setCurrentRegistrationIndex((prev) => {
+      for (let i = index + 1; i < playerCount; i++) {
+        if (!registeredPlayers[i] && i !== index) return i;
+      }
+      return playerCount; // All done
     });
   };
 
@@ -227,7 +241,7 @@ const TournamentBuilder = () => {
             className="dark:text-white mb-2 font-bold"
             htmlFor="nameTournament"
           >
-            {t("tournament.placeholder")}
+            {t("tournament.nameYourTournament")}
           </label>
           <input
             id="nameTournament"
@@ -257,18 +271,20 @@ const TournamentBuilder = () => {
                     username: player.username,
                   })}
                 </div>
-              ) : (
+              ) : index === currentRegistrationIndex ? (
                 <PlayerRegistrationBox
                   label={`${t("tournament.playerLabel")} ${index + 1}`}
                   onRegister={(p) => updatePlayer(index, p)}
                   playerId={index + 1}
                 />
-              )}
+              ) : null}
             </div>
           ))}
-          <button className={buttonStyles} onClick={handleCreateTournament}>
-            {t("tournament.createButton")}
-          </button>
+          {registeredPlayers.every(Boolean) && (
+            <button className={buttonStyles} onClick={handleCreateTournament}>
+              {t("tournament.createButton")}
+            </button>
+          )}
         </div>
       </div>
     );

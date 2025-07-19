@@ -198,7 +198,7 @@
     "powerUps": "Power-ups",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "enterUsernames": "Enter the usernames or register as a guest.",
+    "enterUsernames": "Login or register as a guest.",
     "playerYou": "Player {{index}} (You): {{username}}",
     "player": "Player {{index}}: {{username}}",
     "playerLabel": "Player",
@@ -209,7 +209,8 @@
     "errorAllPlayersRequired": "All players must enter a username.",
     "errorTournamentCreation": "Error creating tournament",
     "consoleCreating": "Let's make a tournament",
-    "placeholder": "Pong Tournament"
+    "placeholder": "Pong Tournament",
+    "nameYourTournament": "Name your tournament"
   },
   "gamecustomization": {
     "title": "Game Customization",
