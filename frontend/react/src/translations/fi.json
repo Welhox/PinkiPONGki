@@ -253,7 +253,9 @@
   },
   "matchcard": {
     "winner": "Voittaja",
-    "win": "{{name}} voitti"
+    "win": "{{name}} voitti",
+    "play": "Aloita",
+    "unknownPlayer": "Randomi"
   },
   "powerups": {
     "bigPaddle": "Iso Maila"

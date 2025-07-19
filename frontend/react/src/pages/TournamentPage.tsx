@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import api from "../api/axios";
 import Bracket from "../components/Bracket";
 import Victory from "../components/Victory";
+import PongGame from "../components/PongGame";
 import { formatPlayers, formatMatches } from "../utils/initTournament";
 import { Match, Player } from "../types/game";
 import { useGameSettings } from "../contexts/GameSettingsContext";
 import { getTop3FromMatches } from "../utils/getTop3FromMatches";
+import { mapToPongPlayer } from "../utils/mapToPongPlayer";
 
 const TournamentPage = () => {
   const { t } = useTranslation();
@@ -20,6 +22,7 @@ const TournamentPage = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
+  const [currentMatch, setCurrentMatch] = useState<Match | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [finalStandings, setFinalStandings] = useState<Player[]>([]);
   const { settings } = useGameSettings();
@@ -32,6 +35,31 @@ const TournamentPage = () => {
       fetchTournamentData();
     }
   }, []);
+
+  const handleLaunch = (match: Match) => {
+    setCurrentMatch(match);
+  };
+
+  const handleGameEnd = async (data: {
+    winnerId: number;
+    winnerAlias: string;
+  }) => {
+    if (!currentMatch) return;
+    try {
+      await api.post(
+        `/tournaments/${currentMatch.tournamentId}/match/${currentMatch.id}/update`,
+        {
+          winnerId: data.winnerId,
+          winnerAlias: data.winnerAlias,
+        }
+      );
+      // reset and re-fetch
+      setCurrentMatch(null);
+      await fetchTournamentData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchTournamentData = async () => {
     setIsLoading(true);
@@ -71,20 +99,6 @@ const TournamentPage = () => {
     }
   };
 
-  const handleMatchPlayed = async (match: Match, winner: Player) => {
-    try {
-        await api.post(
-        `/tournaments/${match.tournamentId}/match/${match.id}/update`,
-        { winnerId: winner.id, winnerAlias: winner.name }
-        );
-
-        await fetchTournamentData();
-        
-    } catch (error) {
-        console.error("Failed to update match:", error);
-    }
-  };
-
   useEffect(() => {
     if (finalStandings.length === 0) return;
 
@@ -107,7 +121,7 @@ const TournamentPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white py-8 px-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold text-teal-700 dark:text-teal-300 mb-6">
-        {t("tournamentPage.title", { id: tournamentId })}
+        {tournamentName}
       </h1>
 
       <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md w-full max-w-md">
@@ -131,15 +145,21 @@ const TournamentPage = () => {
         </div>
       </div>
 
-      {isLoading ? (
+        {isLoading ? (
         <p>{t("tournamentPage.loading")}</p>
-      ) : finalStandings.length > 0 ? (
+        ) : currentMatch ? (
+        <PongGame
+            player1={mapToPongPlayer(currentMatch.player1)}
+            player2={mapToPongPlayer(currentMatch.player2)}
+            onGameEnd={handleGameEnd}
+        />
+        ) : finalStandings.length > 0 ? (
         <Victory standings={finalStandings} />
-      ) : (
-        <Bracket matches={matches} onPlay={handleMatchPlayed} />
-      )}
+        ) : (
+        <Bracket matches={matches} onLaunch={handleLaunch} />
+        )}
     </div>
-  );
+    );
 };
 
 export default TournamentPage;

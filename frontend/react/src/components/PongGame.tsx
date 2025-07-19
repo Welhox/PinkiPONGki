@@ -47,6 +47,11 @@ const wallSound = new Audio('/wall.mp3');
 interface PongGameProps {
   player1: { username: string; isGuest: boolean; id?: string };
   player2: { username: string; isGuest: boolean; id?: string };
+  onGameEnd?: (result: {
+    winnerId: number;
+    winnerAlias: string;
+    // e.g. score: { p1: number; p2: number };
+  }) => void;
   isAIGame?: boolean; // New prop to indicate AI game
   onReturnToMenu?: () => void; // Callback to return to menu
 }
@@ -560,12 +565,14 @@ function drawSevenSegment(
   ctx.restore();
 }
 
-const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onReturnToMenu }) => {
+
+const PongGame: React.FC<PongGameProps> = ({ player1, player2, onGameEnd, isAIGame, onReturnToMenu }) => {
   console.log("PongGame: Initializing with players", { player1, player2, isAIGame });
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const keysPressed = useRef<Record<string, boolean>>({});
   const animationFrameRef = useRef<number | null>(null);
+  const embedded = Boolean(onGameEnd);
   const [score, setScore] = useState({ left: 0, right: 0 });
   const [winner, setWinner] = useState<string | null>(null);
   const [restartKey, setRestartKey] = useState(0);
@@ -1715,6 +1722,23 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
     player2: player2PowerUpsRef.current.paddleEnlarge.active,
     lastHit: lastPaddleHitRef.current
   });
+
+        // helper to fire the tournament callback
+    const handleReturnToBracket = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (!winner) return;
+
+        const winnerId =
+        winner === player1.username
+            ? Number(player1.id)
+            : Number(player2.id);
+
+        onGameEnd!({
+        winnerId,
+        winnerAlias: winner,
+        });
+    };
   
   return (
     <div>
@@ -1813,33 +1837,46 @@ const PongGame: React.FC<PongGameProps> = ({ player1, player2, isAIGame, onRetur
         >
           <div className="mb-8">{t("pongGame.winnerMessage", { winner })}</div>
           <div className="flex flex-col gap-4 w-64">
-            <button
-              className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleRestart(); // Call restart handler without passing event
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              tabIndex={1} 
-              autoFocus
-            >
-              {t("pongGame.restartMatch")}
-            </button>
-            <button
-              className="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 mx-3 my-3 text-center"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                // Use our dedicated function to handle returning to menu
-                handleReturnToMenu();
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              tabIndex={2}
-            >
-              {t("pongGame.returnToMainMenu")}
-            </button>
+            {/* only show “Restart” if not embedded in TournamentPage */}
+            {!embedded && (
+              <button
+                className="px-6 py-3 bg-teal-700 hover:bg-teal-600 text-white rounded-lg text-xl font-bold transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleRestart();
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                tabIndex={1}
+                autoFocus
+              >
+                {t("pongGame.restartMatch")}
+              </button>
+            )}
+            {/* only show “Return to Menu” if not embedded; when embedded we call back to TournamentPage */}
+            {!embedded ? (
+              <button
+                className="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 text-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleReturnToMenu(); // your existing menu handler
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
+                tabIndex={2}
+              >
+                {t("pongGame.returnToMainMenu")}
+              </button>
+            ) : (
+              <button
+                className="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-11 py-3 text-center"
+                onClick={handleReturnToBracket}
+                onMouseDown={(e) => e.stopPropagation()}
+                tabIndex={2}
+              >
+                {t("pongGame.returnToBracket")}
+              </button>
+            )}
           </div>
         </div>
       )}

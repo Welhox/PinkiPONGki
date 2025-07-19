@@ -1,13 +1,13 @@
 import React from "react";
 import Round from "./Round";
-import { Match, Player } from "../types/game";
+import { Match } from "../types/game";
 
 interface BracketProps {
   matches: Match[];
-  onPlay: (match: Match, winner: Player) => void;
+  onLaunch: (match: Match) => void;
 }
 
-const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {
+const Bracket: React.FC<BracketProps> = ({ matches, onLaunch }) => {
   const rounds = matches.reduce<Record<number, Match[]>>((acc, match) => {
     if (!acc[match.round]) acc[match.round] = [];
     acc[match.round].push(match);
@@ -33,7 +33,7 @@ const Bracket: React.FC<BracketProps> = ({ matches, onPlay }) => {
               key={roundNumber}
               round={Number(roundNumber)}
               matches={roundMatches}
-              onPlay={onPlay}
+              onLaunch={onLaunch}
             />
           </div>
         );

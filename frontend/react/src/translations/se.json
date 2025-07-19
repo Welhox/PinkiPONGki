@@ -252,7 +252,9 @@
   },
   "matchcard": {
     "winner": "Vinnare",
-    "win": "{{name}} vinner"
+    "win": "{{name}} vinner",
+    "play": "Spela",
+    "unknownPlayer": "Okänd"
   },
   "powerups": {
     "bigPaddle": "Stor Racket"
