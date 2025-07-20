@@ -292,7 +292,7 @@ async function isTournamentFinished(id, updatedMatch) {
     include: { tournamentMatches: true },
   });
   const pendingMatches = tournament.tournamentMatches.filter(match => match.status === "pending");
-  console.log("List of matches in isTfiniches::", tournament.tournamentMatches);
+  console.log("List of matches in isTournamentFinished:", tournament.tournamentMatches);
   if (pendingMatches.length === 0) {
     // If no pending matches, update tournament status to 'finished'
     await prisma.tournament.update({

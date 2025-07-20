@@ -107,7 +107,7 @@ model Tournament {
   participants      TournamentParticipant[]
   winnerId          Int?
   winnerAlias       String?
-  status            String // "waiting" | "in_progress" | "finished"
+  status            String // "waiting" | "in_progress" | "completed"
 }
 
 model TournamentParticipant {
@@ -115,8 +115,8 @@ model TournamentParticipant {
   tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   tournamentId Int
   user         User?      @relation(fields: [userId], references: [id])
-  userId       Int?
-  alias        String? // for guests
+  userId       Int? // null for guests
+  alias        String? 
   joinedAt     DateTime   @default(now())
 }
 
@@ -129,7 +129,7 @@ model TournamentMatch {
 
   player1Id    Int?
   player1      User?   @relation("TM_Player1", fields: [player1Id], references: [id])
-  player1Alias String? // <– For guests
+  player1Alias String? 
 
   player2Id    Int?
   player2      User?   @relation("TM_Player2", fields: [player2Id], references: [id])
@@ -140,6 +140,4 @@ model TournamentMatch {
   winnerAlias String?
 
   status    String    @default("pending")
-  startedAt DateTime?
-  endedAt   DateTime?
 }

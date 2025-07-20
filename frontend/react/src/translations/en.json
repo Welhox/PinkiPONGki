@@ -217,7 +217,8 @@
     "consoleCreating": "Let's make a tournament",
     "placeholder": "Pong Tournament",
     "nameYourTournament": "Name your tournament",
-    "customizeDisplayName": "Customize display name"
+    "customizeDisplayName": "Customize display name",
+    "overMessage": "Tournament over, redirecting..."
   },
   "gamecustomization": {
     "title": "Game Customization",

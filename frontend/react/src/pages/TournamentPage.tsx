@@ -103,7 +103,7 @@ const TournamentPage = () => {
     if (finalStandings.length === 0) return;
 
     const timer = setTimeout(async () => {
-      //alert(t("tournament.overMessage")); // e.g. "Tournament over! Redirecting home."
+      alert(t("tournament.overMessage")); // e.g. "Tournament over! Redirecting home."
       try {
         await api.delete(
           `/tournaments/${tournamentId}/${encodeURIComponent(tournamentName)}`
@@ -112,7 +112,7 @@ const TournamentPage = () => {
         console.error("Failed to delete tournament:", err);
       }
       navigate("/", { replace: true });
-    }, 20_000); // ← 20 seconds
+    }, 15_000); // ← 15 seconds
 
     return () => clearTimeout(timer);
   }, [finalStandings, tournamentId, tournamentName, navigate, /*t*/]);

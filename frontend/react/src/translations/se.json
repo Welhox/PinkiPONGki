@@ -212,7 +212,8 @@
     "consoleCreating": "Skapar turnering",
     "placeholder": "Pong Turnering",
     "nameYourTournament": "Namnge din turnering",
-    "customizeDisplayName": "Anpassa visningsnamn"
+    "customizeDisplayName": "Anpassa visningsnamn",
+    "overMessage": "Turneringen är över, omdirigerar..."
   },
   "gamecustomization": {
     "title": "Spelanpassning",

@@ -627,7 +627,6 @@ export async function userRoutes(fastify, _options) {
 
   //####################################################################################################################################
 
-  // change isActivated = true once MFA is ready
   // is using queryRaw because Prisma 6 doesn't support the cleaner version I originally went for (requires Prisma < 5)
   fastify.get(
     "/users/search",
@@ -642,9 +641,8 @@ export async function userRoutes(fastify, _options) {
       const users = await prisma.$queryRaw`
 		   SELECT id, username
 		   FROM User
-		   WHERE isActivated = false
-		   	AND id != ${Number(excludeUserId) || -1}
-		    AND LOWER(username) LIKE ${query.toLowerCase() + "%"}
+		   WHERE id != ${Number(excludeUserId) || -1}
+		    AND username LIKE ${query + "%"}
 			LIMIT 20;
 		`;
 

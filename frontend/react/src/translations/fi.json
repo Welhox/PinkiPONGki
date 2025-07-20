@@ -212,7 +212,8 @@
     "consoleCreating": "Luodaan turnaus",
     "placeholder": "Pong Turnaus",
     "nameYourTournament": "Nimeä turnaus",
-    "customizeDisplayName": "Vaihda näyttönimi"
+    "customizeDisplayName": "Vaihda näyttönimi",
+    "overMessage": "Turnaus päättyi, uudelleenohjataan..."
   },
   "gamecustomization": {
     "title": "Pelin mukautus",
