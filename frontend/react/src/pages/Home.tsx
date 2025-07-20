@@ -33,49 +33,55 @@ const Home: React.FC<HomeProps> = ({ status, user }) => {
   }, [location.key, location.pathname]);
 
   return (
-    <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg my-5">
-      <div className="flex justify-center">
-        <ChoosePlayMode
-          onInteract={() => {
-            console.log("User interacted — hiding welcome");
-            setInMenu(false);
-          }}
-          onReturnToMenu={() => {
-            console.log("User returned to menu — showing welcome");
-            setInMenu(true);
-          }}
-        />
-      </div>
+    <div className="text-center max-w-2xl dark:bg-black bg-white mx-auto rounded-lg my-5 flex flex-col justify-center items-center min-h-[400px] px-4 py-6">
       {inMenu && (
         <>
-          <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
-            {t("home.welcome")}
-          </h1>
-
           {status === "loading" ? (
             <p>{t("home.checkingSession")}</p>
           ) : status === "authorized" && user ? (
-            <p className="dark:text-white pb-10">
-              {t("home.hello")}, {user.username}
-            </p>
+            <>
+                <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
+                    {t("home.welcome")}
+                </h1>
+                <p className="dark:text-white pb-10">
+                ✨{" "}{t("home.hello")}, {user.username}{" "}✨
+                </p>
+            </>
           ) : (
             <>
-              <p className="dark:text-white text-center">
-                {t("home.pleaseLogin")}
-              </p>
+              <section className="max-w-3xl mx-auto text-center pt-8 px-6">
+                <h1 className="text-4xl font-bold mb-4 text-teal-900 dark:text-teal-300">
+                  {t("pongIntro.title")}
+                </h1>
+                <p className="text-lg mb-6 text-gray-800 dark:text-gray-200">{t("pongIntro.paragraph1")}</p>
+                <p className="text-lg mb-6 text-gray-800 dark:text-gray-200">{t("pongIntro.paragraph2")}</p>
+                <p className="text-xl font-semibold text-red-900 dark:text-red-500">
+                  {t("pongIntro.conclusion")}
+                </p>
+              </section>
               <p className="dark:text-white text-center font-bold p-5">
-                {t("home.noAccount")}{" "}
+                🏓 {t("home.noAccount")}{" "}
                 <Link
                   className="text-amber-900 dark:text-amber-300 font:bold hover:font-extrabold"
                   to="/register"
                 >
-                  {t("home.register")}
+                  {t("home.register")} 🏓
                 </Link>
               </p>
             </>
           )}
         </>
       )}
+      <ChoosePlayMode
+        onInteract={() => {
+          console.log("User interacted — hiding welcome");
+          setInMenu(false);
+        }}
+        onReturnToMenu={() => {
+          console.log("User returned to menu — showing welcome");
+          setInMenu(true);
+        }}
+      />
     </div>
   );
 };

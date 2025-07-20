@@ -142,33 +142,33 @@ const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
   }
   return (
     <div>
-      <div>
+      <div className="flex flex-col items-center">
         <h1
           ref={headerRef}
-          className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3"
+          className="text-5xl font-bold text-center text-teal-800 dark:text-teal-300 m-3"
         >
           {t("CPM.choosePlayMode")}
         </h1>
 
         {headerWidth && (
           <div
-            className="mx-auto mt-6 flex justify-between"
+            className="flex justify-center space-x-4 mt-4"
             style={{ width: headerWidth }}
           >
             <button
-              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
               onClick={handleSinglePlayer}
             >
               {t("CPM.singlevsAI")}
             </button>
             <button
-              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
               onClick={handleTwoPlayer}
             >
               {t("CPM.twoplayersingle")}
             </button>
             <button
-              className={`${buttonStyles} flex-1 text-xl mx-2`}
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
               onClick={handleCreateTournament}
             >
               {t("CPM.createTournament")}

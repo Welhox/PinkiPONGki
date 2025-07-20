@@ -3,7 +3,7 @@
     "welcome": "Välkommen!",
     "checkingSession": "Kontrollerar session...",
     "hello": "Hej",
-    "pleaseLogin": "Vänligen logga in för att få tillgång till exklusivt Pong-innehåll och för att kunna koppla upp dig med andra registrerade spelare!",
+    "pleaseLogin": "Logga in för att hålla koll på din statistik och för att kunna ansluta med andra registrerade spelare!",
     "noAccount": "Inget konto?",
     "register": "Registrera dig"
   },
@@ -268,7 +268,8 @@
     "pressPToResume": "Tryck på 'P' för att fortsätta",
     "winnerMessage": "{{winner}} vinner!",
     "restartMatch": "Starta om Match",
-    "returnToMainMenu": "Tillbaka till Huvudmenyn"
+    "returnToMainMenu": "Tillbaka till Huvudmenyn",
+    "returnToBracket": "Fortsätta"
   },
   "pongGameAI": {
     "title": "Enspelare mot AI",
