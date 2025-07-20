@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PlayerRegistrationBox from "./PlayerRegistrationBox";
 import api from "../api/axios";
 import { useGameSettings } from "../contexts/GameSettingsContext";
+import CustomAliasField from "./CustomAliasField";
 import { useTranslation } from "react-i18next";
 
 type RegisteredPlayer = {
@@ -29,6 +30,7 @@ const TournamentBuilder = () => {
   const [players, setPlayers] = useState<RegisteredPlayer[]>([]);
   const [registeredPlayers, setRegisteredPlayers] = useState<boolean[]>([]);
   const [currentRegistrationIndex, setCurrentRegistrationIndex] = useState(0);
+  const [finalizedCustomName, setFinalizedCustomName] = useState<Set<number>>(new Set());
   const [tournamentName, setTournamentName] = useState("");
   const { user } = useAuth();
   const { settings } = useGameSettings();
@@ -265,12 +267,28 @@ const TournamentBuilder = () => {
                   })}
                 </div>
               ) : registeredPlayers[index] ? (
-                <div className="text-center text-teal-800 dark:text-teal-300 font-semibold">
-                  {t("tournament.player", {
-                    index: index + 1,
-                    username: player.username,
-                  })}
-                </div>
+                <CustomAliasField
+                    index={index}
+                    username={player.username}
+                    finalized={finalizedCustomName.has(index)}
+                    onUpdate={(newName) => {
+                    const duplicate = players.some(
+                        (p, i) => i !== index && p.username === newName
+                    );
+                    if (duplicate) {
+                        alert(t("tournament.errorUsernameTaken", { username: newName }));
+                        return;
+                    }
+
+                    const updated = [...players];
+                    updated[index] = {
+                        ...updated[index],
+                        username: newName,
+                    };
+                    setPlayers(updated);
+                    setFinalizedCustomName((prev) => new Set(prev).add(index));
+                    }}
+                />
               ) : index === currentRegistrationIndex ? (
                 <PlayerRegistrationBox
                   label={`${t("tournament.playerLabel")} ${index + 1}`}
