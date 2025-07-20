@@ -211,7 +211,8 @@
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",
     "consoleCreating": "Luodaan turnaus",
     "placeholder": "Pong Turnaus",
-    "nameYourTournament": "Nimeä turnaus"
+    "nameYourTournament": "Nimeä turnaus",
+    "customizeDisplayName": "Vaihda näyttönimi"
   },
   "gamecustomization": {
     "title": "Pelin mukautus",

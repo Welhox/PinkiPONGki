@@ -211,7 +211,8 @@
     "errorTournamentCreation": "Fel vid skapande av turnering.",
     "consoleCreating": "Skapar turnering",
     "placeholder": "Pong Turnering",
-    "nameYourTournament": "Namnge din turnering"
+    "nameYourTournament": "Namnge din turnering",
+    "customizeDisplayName": "Anpassa visningsnamn"
   },
   "gamecustomization": {
     "title": "Spelanpassning",

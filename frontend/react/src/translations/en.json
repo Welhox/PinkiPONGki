@@ -216,7 +216,8 @@
     "errorTournamentCreation": "Error creating tournament",
     "consoleCreating": "Let's make a tournament",
     "placeholder": "Pong Tournament",
-    "nameYourTournament": "Name your tournament"
+    "nameYourTournament": "Name your tournament",
+    "customizeDisplayName": "Customize display name"
   },
   "gamecustomization": {
     "title": "Game Customization",

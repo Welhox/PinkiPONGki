@@ -39,11 +39,11 @@ const TournamentBuilder = () => {
 
   useEffect(() => {
     if (playerCount > 0) {
-      const initialPlayers: RegisteredPlayer[] = Array(playerCount).fill({
-        username: "",
-        isGuest: true,
-        userId: null,
-      });
+      const initialPlayers: RegisteredPlayer[] = Array.from({ length: playerCount }, () => ({
+    username: "",
+    isGuest: true,
+    userId: null,
+  }));
 
       setPlayers(initialPlayers);
       setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
@@ -56,7 +56,7 @@ const TournamentBuilder = () => {
     if (user && players.length > 0) {
       const updatedPlayers = [...players];
       const alreadyInSlot = updatedPlayers.some(
-        (p) => !p.isGuest && p.username === user.username
+        (p) => !p.isGuest && p.userId === user.id
       );
       if (alreadyInSlot) return; // prevent duplicates
 
@@ -67,7 +67,7 @@ const TournamentBuilder = () => {
         updatedPlayers[firstGuestIndex] = {
           username: user.username,
           isGuest: false,
-          userId: user.id,
+          userId: Number(user.id),
         };
         setPlayers(updatedPlayers); // Only update state here
 
@@ -259,6 +259,55 @@ const TournamentBuilder = () => {
         <div className="flex flex-col">
           {players.map((player, index) => (
             <div key={index} className="my-2">
+              {registeredPlayers[index] ? (
+                <CustomAliasField
+                    index={index}
+                    username={player.username}
+                    finalized={finalizedCustomName.has(index)}
+                    isYou={!!user && player.username === user.username && !player.isGuest}
+                    onUpdate={(newName) => {
+                    const duplicate = players.some(
+                        (p, i) => i !== index && p.username === newName
+                    );
+                    if (duplicate) {
+                        alert(t("tournament.errorUsernameTaken", { username: newName }));
+                        return;
+                    }
+
+                    const updated = [...players];
+                    updated[index] = {
+                        ...updated[index],
+                        username: newName,
+                    };
+                    setPlayers(updated);
+                    setFinalizedCustomName((prev) => new Set(prev).add(index));
+                    }}
+                />
+              ) : index === currentRegistrationIndex ? (
+                <PlayerRegistrationBox
+                  label={`${t("tournament.playerLabel")} ${index + 1}`}
+                  onRegister={(p) => updatePlayer(index, p)}
+                  playerId={index + 1}
+                />
+              ) : null}
+            </div>
+          ))}
+          {registeredPlayers.every(Boolean) && (
+            <button className={buttonStyles} onClick={handleCreateTournament}>
+              {t("tournament.createButton")}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+};
+export default TournamentBuilder;
+
+
+{/* <p className="dark:text-white">{t("tournament.enterUsernames")}</p>
+        <div className="flex flex-col">
+          {players.map((player, index) => (
+            <div key={index} className="my-2">
               {user && player.username === user.username && !player.isGuest ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-bold">
                   {t("tournament.playerYou", {
@@ -304,7 +353,4 @@ const TournamentBuilder = () => {
             </button>
           )}
         </div>
-      </div>
-    );
-};
-export default TournamentBuilder;
+      </div> */}
