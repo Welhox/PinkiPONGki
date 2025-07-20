@@ -37,12 +37,12 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLaunch }) => {
           </button>
         </>
       ) : (
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col items-center">
+          <div className="mb-1">
             <span className="font-semibold">{player1.name}</span> vs{" "}
             <span className="font-semibold">{player2.name}</span>
           </div>
-          <div className="text-green-600 font-semibold">
+          <div className="text-green-600 font-bold text-2xl">
             {t("matchcard.winner")}: {winnerDisplay}
           </div>
         </div>

@@ -87,10 +87,14 @@ const CustomAliasField: React.FC<Props> = ({
   // dropdown display
   return (
     <div className="flex items-center justify-center space-x-2 text-lg">
-      <label className="font-bold text-teal-800 dark:text-teal-300 whitespace-nowrap">
+      <label htmlFor={`custom-alias-select-${index}`} className="font-bold text-teal-800 dark:text-teal-300 whitespace-nowrap">
         {t("tournament.playerLabel")} {index + 1}:
       </label>
-      <select
+      <select id={`custom-alias-select-${index}`}
+        aria-label={t("tournament.customAliasSelectAriaLabel", {
+        index: index + 1,
+        username,
+        })}
         className="text-teal-800 dark:text-teal-300 font-semibold bg-transparent text-lg"
         onChange={(e) => {
           if (e.target.value === "customize") {

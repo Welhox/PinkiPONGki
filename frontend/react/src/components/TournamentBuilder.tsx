@@ -32,6 +32,7 @@ const TournamentBuilder = () => {
   const [currentRegistrationIndex, setCurrentRegistrationIndex] = useState(0);
   const [finalizedCustomName, setFinalizedCustomName] = useState<Set<number>>(new Set());
   const [tournamentName, setTournamentName] = useState("");
+  const [userInserted, setUserInserted] = useState(false);
   const { user } = useAuth();
   const { settings } = useGameSettings();
   const navigate = useNavigate();
@@ -46,19 +47,20 @@ const TournamentBuilder = () => {
   }));
 
       setPlayers(initialPlayers);
-      setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
+      setRegisteredPlayers(initialPlayers.map(() => false)); // if username is filled, mark as registered
       setCurrentRegistrationIndex(initialPlayers.findIndex((p) => !p.username)); // start from first unfilled
+      setUserInserted(false);
     }
   }, [playerCount]);
 
   useEffect(() => {
     // This useEffect should only be triggered when the user changes
-    if (user && players.length > 0) {
+    if (user && players.length > 0 && !userInserted) {
       const updatedPlayers = [...players];
       const alreadyInSlot = updatedPlayers.some(
         (p) => !p.isGuest && p.userId === user.id
       );
-      if (alreadyInSlot) return; // prevent duplicates
+      if (alreadyInSlot) { setUserInserted(true); return;}  // prevent duplicates
 
       const firstGuestIndex = updatedPlayers.findIndex(
         (p) => p.isGuest && !p.username
@@ -74,9 +76,12 @@ const TournamentBuilder = () => {
         const updatedRegistered = [...registeredPlayers];
         updatedRegistered[firstGuestIndex] = true;
         setRegisteredPlayers(updatedRegistered);
+
+        setCurrentRegistrationIndex(updatedRegistered.findIndex((r) => !r));
+        setUserInserted(true);
       }
     }
-  }, [user, players, registeredPlayers]);
+  }, [user, players, registeredPlayers, userInserted]);
 
   const updatePlayer = async (
     index: number,
@@ -302,55 +307,3 @@ const TournamentBuilder = () => {
     );
 };
 export default TournamentBuilder;
-
-
-{/* <p className="dark:text-white">{t("tournament.enterUsernames")}</p>
-        <div className="flex flex-col">
-          {players.map((player, index) => (
-            <div key={index} className="my-2">
-              {user && player.username === user.username && !player.isGuest ? (
-                <div className="text-center text-teal-800 dark:text-teal-300 font-bold">
-                  {t("tournament.playerYou", {
-                    index: index + 1,
-                    username: user.username,
-                  })}
-                </div>
-              ) : registeredPlayers[index] ? (
-                <CustomAliasField
-                    index={index}
-                    username={player.username}
-                    finalized={finalizedCustomName.has(index)}
-                    onUpdate={(newName) => {
-                    const duplicate = players.some(
-                        (p, i) => i !== index && p.username === newName
-                    );
-                    if (duplicate) {
-                        alert(t("tournament.errorUsernameTaken", { username: newName }));
-                        return;
-                    }
-
-                    const updated = [...players];
-                    updated[index] = {
-                        ...updated[index],
-                        username: newName,
-                    };
-                    setPlayers(updated);
-                    setFinalizedCustomName((prev) => new Set(prev).add(index));
-                    }}
-                />
-              ) : index === currentRegistrationIndex ? (
-                <PlayerRegistrationBox
-                  label={`${t("tournament.playerLabel")} ${index + 1}`}
-                  onRegister={(p) => updatePlayer(index, p)}
-                  playerId={index + 1}
-                />
-              ) : null}
-            </div>
-          ))}
-          {registeredPlayers.every(Boolean) && (
-            <button className={buttonStyles} onClick={handleCreateTournament}>
-              {t("tournament.createButton")}
-            </button>
-          )}
-        </div>
-      </div> */}
