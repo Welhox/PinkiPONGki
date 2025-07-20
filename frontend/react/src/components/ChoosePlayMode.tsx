@@ -111,7 +111,7 @@ const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
           console.log("Starting single player game");
           setSelectedMode("single-player");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "two-player-customize") {
@@ -122,7 +122,7 @@ const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
           console.log("Starting two player game");
           setSelectedMode("two-player-single-game");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "tournament-customize") {
@@ -133,7 +133,7 @@ const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
           console.log("Starting tournament creation");
           setSelectedMode("create-tournament");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "create-tournament") {
