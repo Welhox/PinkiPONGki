@@ -200,7 +200,7 @@
     "enabled": "Aktiverat",
     "disabled": "Avaktiverat",
     "enterUsernames": "Ange användarnamn eller registrera dig som gäst.",
-    "playerYou": "Spelare 1 (Du): {{username}}",
+    "playerYou": "Spelare {{index}} (Du): {{username}}",
     "player": "Spelare {{index}}: {{username}}",
     "playerLabel": "Spelare",
     "createButton": "Skapa Turnering",

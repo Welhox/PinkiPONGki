@@ -59,12 +59,6 @@ const ChoosePlayMode = () => {
     setSelectedMode("tournament-customize");
   };
 
-  // this got flagged by linter
-  /* const handleJoinTournament = () => {
-    console.log("Selected Join Tournament mode");
-    setSelectedMode("join-tournament");
-  }; */
-
   // Added logging to debug transitions
   useEffect(() => {
     console.log(`Mode changed to: ${selectedMode}`);
@@ -73,17 +67,23 @@ const ChoosePlayMode = () => {
   if (selectedMode === "two-player-single-game") {
     console.log("Rendering PongGameWithRegistration");
     return (
-      <PongGameWithRegistration onReturnToMenu={() => {
-        console.log("ChoosePlayMode: Return to menu callback triggered");
-        setSelectedMode(null);
-      }} />
+      <PongGameWithRegistration
+        onReturnToMenu={() => {
+          console.log("ChoosePlayMode: Return to menu callback triggered");
+          setSelectedMode(null);
+        }}
+      />
     );
   } else if (selectedMode === "single-player") {
     console.log("Rendering PongGameAI");
-    return <PongGameAI onReturnToMenu={() => {
-      console.log("ChoosePlayMode: Return to menu callback triggered");
-      setSelectedMode(null);
-    }} />;
+    return (
+      <PongGameAI
+        onReturnToMenu={() => {
+          console.log("ChoosePlayMode: Return to menu callback triggered");
+          setSelectedMode(null);
+        }}
+      />
+    );
   } else if (selectedMode === "single-player-customize") {
     return (
       <GameCustomization
@@ -137,7 +137,6 @@ const ChoosePlayMode = () => {
           <button className={buttonStyles} onClick={handleCreateTournament}>
             {t("CPM.createTournament")}
           </button>
-          {/* <button className={buttonStyles} onClick={handleJoinTournament}>Join Tournament</button> */}
         </div>
       </div>
     </div>

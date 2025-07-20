@@ -33,18 +33,10 @@ const TournamentBuilder = () => {
         userId: null,
       });
 
-      if (user) {
-        initialPlayers[0] = {
-          username: user.username,
-          isGuest: false,
-          userId: Number(user.id),
-        };
-      }
-
       setPlayers(initialPlayers);
-      setRegisteredPlayers(initialPlayers.map((p) => !!p.username)); // if username is filled, mark as registered
+      setRegisteredPlayers(Array(playerCount).fill(false));
     }
-  }, [playerCount, user]);
+  }, [playerCount]);
 
   useEffect(() => {
     if (tournamentName === "") {
@@ -64,37 +56,12 @@ const TournamentBuilder = () => {
         console.log("Tournament created with ID:", res.data.id);
 
         if (user) {
-            await api.post(`/tournaments/${id}/register`, {
-                userId: user.id,
-                alias: user.username,
-            });
-            console.log(`Player ${user.username} added to tournament ${id}`);
-
-            setPlayers((prev) => {
-                const next = [...prev];
-                // ensure array length
-                if (next.length < playerCount) {
-                    next.length = playerCount;
-                    next.fill({ username: "", isGuest: true, userId: null });
-                }
-                next[0] = {
-                    username: user.username,
-                    isGuest: false,
-                    userId: user.id,
-                };
-                return next;
-                });
-                setRegisteredPlayers((prev) => {
-                const next = [...prev];
-                if (next.length < playerCount) {
-                    next.length = playerCount;
-                    next.fill(false);
-                }
-                next[0] = true;
-                return next;
-                });
+          await api.post(`/tournaments/${id}/register`, {
+            userId: user.id,
+            alias: user.username,
+          });
+          console.log(`Player ${user.username} added to tournament ${id}`);
         }
-
       } catch (error) {
         console.error("Tournament creation failed.", error);
         alert(t("tournament.errorTournamentCreation"));
@@ -127,22 +94,31 @@ const TournamentBuilder = () => {
         setPlayers(updatedPlayers); // Only update state here
       }
     }
-  }, [user, players]);
+  }, [user, players, registeredPlayers]);
 
-  const updatePlayer = async (index: number, player: { username: string; isGuest: boolean; id?: string }) => {
+  const updatePlayer = async (
+    index: number,
+    player: { username: string; isGuest: boolean; id?: string }
+  ) => {
     // Convert player object to RegisteredPlayer format
     const registeredPlayer: RegisteredPlayer = {
       username: player.username,
       isGuest: player.isGuest,
-      userId: player.id ? parseInt(player.id) : null
+      userId: player.id ? parseInt(player.id) : null,
     };
     // check for duplicate usernames
     const duplicate = players.some(
-        (p) => p.username === registeredPlayer.username && p.userId === registeredPlayer.userId
+      (p) =>
+        p.username === registeredPlayer.username &&
+        p.userId === registeredPlayer.userId
     );
     if (duplicate) {
-        alert(t("tournament.errorUsernameTaken", { username: registeredPlayer.username }));
-        return;
+      alert(
+        t("tournament.errorUsernameTaken", {
+          username: registeredPlayer.username,
+        })
+      );
+      return;
     }
     // prevent re-login of logged-in user
     if (user && index !== 0 && registeredPlayer.username === user.username) {
@@ -161,32 +137,30 @@ const TournamentBuilder = () => {
 
     // Add the player to the tournament in the backend first
     try {
-        if (tournamentId) {
-            await api.post(`/tournaments/${tournamentId}/register`, {
-                userId: registeredPlayer.userId,
-                alias: registeredPlayer.username,
-            });
-            console.log(`Player ${registeredPlayer.username} added to tournament ${tournamentId}`);
-        }
+      if (tournamentId) {
+        await api.post(`/tournaments/${tournamentId}/register`, {
+          userId: registeredPlayer.userId,
+          alias: registeredPlayer.username,
+        });
+        console.log(
+          `Player ${registeredPlayer.username} added to tournament ${tournamentId}`
+        );
+      }
     } catch (error) {
-        if (isAxiosError(error) && error.response?.status === 429) {
-            // silently swallow 429
-            return;
-        }
-        console.error("Error adding player to tournament", error);
-        alert(t("tournament.errorAddingPlayer"));
-        return;
+      console.error("Error adding player to tournament", error);
+      alert(t("tournament.errorAddingPlayer"));
+      return;
     }
 
     setPlayers((prev) => {
-        const next = [...prev];
-        next[index] = registeredPlayer;
-        return next;
+      const next = [...prev];
+      next[index] = registeredPlayer;
+      return next;
     });
     setRegisteredPlayers((prev) => {
-        const next = [...prev];
-        next[index] = true;
-        return next;
+      const next = [...prev];
+      next[index] = true;
+      return next;
     });
   };
 
@@ -205,21 +179,21 @@ const TournamentBuilder = () => {
       return;
     }
 
-   try {
+    try {
       if (tournamentId) {
         await api.post(`/tournaments/${tournamentId}/update-name`, {
-            name: tournamentName || t("tournament.placeholder"),
+          name: tournamentName || t("tournament.placeholder"),
         });
 
         navigate(`/tournament/${tournamentId}`, {
-            state: { accessKey: "yolo" },
+          state: { accessKey: "yolo" },
         });
-        }
+      }
     } catch (err) {
-        console.error("Failed to update tournament name", err);
-        alert(t("tournament.errorTournamentCreation"));
+      console.error("Failed to update tournament name", err);
+      alert(t("tournament.errorTournamentCreation"));
     }
-};
+  };
 
   const inputStyles =
     "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 m-1 w-xs dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
@@ -289,7 +263,7 @@ const TournamentBuilder = () => {
             value={tournamentName}
             className="dark:text-white mb-2 p-2 border rounded w-100"
             onChange={(e) => setTournamentName(e.target.value)}
-			maxLength={50}
+            maxLength={50}
           />
         </div>
         <p className="dark:text-white">{t("tournament.enterUsernames")}</p>
@@ -298,7 +272,10 @@ const TournamentBuilder = () => {
             <div key={index} className="my-2">
               {user && player.username === user.username && !player.isGuest ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-bold">
-                  {t("tournament.playerYou", { username: user.username })}
+                  {t("tournament.playerYou", {
+                    index: index + 1,
+                    username: user.username,
+                  })}
                 </div>
               ) : registeredPlayers[index] ? (
                 <div className="text-center text-teal-800 dark:text-teal-300 font-semibold">
