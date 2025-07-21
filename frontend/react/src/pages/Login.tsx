@@ -31,7 +31,7 @@ const Login: React.FC = () => {
   const { status, refreshSession } = useAuth();
 
   useEffect(() => {
-     if (error || success) {
+    if (error || success) {
       setLiveMessage(null); // force remount
       setTimeout(() => {
         setLiveMessage(success ? success : error);
@@ -39,7 +39,8 @@ const Login: React.FC = () => {
           liveRegionRef.current?.focus();
         }, 10);
       }, 100);
-  }}, [error, success]);
+    }
+  }, [error, success]);
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
     if (cooldown > 0) {
@@ -50,8 +51,10 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (status === "authorized") {
-        setSuccess("Login successful, redirecting to main page");
-        setTimeout(() => {navigate("/");}, 3000);
+      setSuccess("Login successful, redirecting to main page");
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     }
   }, [navigate, status]);
 
@@ -72,11 +75,13 @@ const Login: React.FC = () => {
       return;
     }
 
-    // enable for production
-    /* if (!isValidPassword(password)) {
-			setError('Invalid password syntax.');
-			return;
-		} */
+    const inProduction = import.meta.env.VITE_API_BASE_URL || "";
+    if (inProduction === "") {
+      if (!isValidPassword(password)) {
+        setError("Invalid password syntax.");
+        return;
+      }
+    }
 
     let response;
     try {
@@ -115,7 +120,7 @@ const Login: React.FC = () => {
         setError("Invalid username or password");
         console.error("Invalid username or password");
       } else {
-        console.log("Epic failure: ", response);
+        console.log("Error logging in:", response);
       }
 
       if (attempts + 1 >= MAX_ATTEMPTS) {
@@ -180,9 +185,9 @@ const Login: React.FC = () => {
           {cooldown > 0 ? `Wait (${cooldown}s)` : "Login"}
         </button>
       </form>
-            {/* This next part is a secret div, visible only to screen readers, which ensures that the error
+      {/* This next part is a secret div, visible only to screen readers, which ensures that the error
 	  or success messages get announced using aria. */}
-       {liveMessage && (
+      {liveMessage && (
         <div
           ref={liveRegionRef}
           tabIndex={-1}
@@ -198,8 +203,6 @@ const Login: React.FC = () => {
       <p className="text-amber-700 dark:text-amber-300 font-bold text-center mb-5">
         No account? <Link to="/register">Register here</Link>
       </p>
-
-     
 
       <p className="pt-3 pb-8 text-center">
         <Link
