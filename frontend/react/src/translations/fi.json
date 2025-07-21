@@ -3,7 +3,7 @@
     "welcome": "Tervetuloa!",
     "checkingSession": "Tarkistetaan istuntoa...",
     "hello": "Hei",
-    "pleaseLogin": "Kirjaudu sisään päästäksesi eksklusiiviseen Pong-sisältöön ja yhdistääksesi muihin rekisteröityihin pelaajiin!",
+    "pleaseLogin": "Kirjaudu sisään seurataksesi tuloksiasi ja vittuillaksesi muille pelaajille",
     "noAccount": "Ei tiliä?",
     "register": "Rekisteröidy"
   },
@@ -199,7 +199,7 @@
     "powerUps": "Tehosteet",
     "enabled": "Käytössä",
     "disabled": "Ei käytössä",
-    "enterUsernames": "Anna käyttäjänimet tai rekisteröidy vieraana.",
+    "enterUsernames": "Kirjaudu sisään tai rekisteröidy vieraana.",
     "playerYou": "Pelaaja {{index}} (Sinä): {{username}}",
     "player": "Pelaaja {{index}}: {{username}}",
     "playerLabel": "Pelaaja",
@@ -210,7 +210,10 @@
     "errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",
     "consoleCreating": "Luodaan turnaus",
-    "placeholder": "Pong Turnaus"
+    "placeholder": "Pong Turnaus",
+    "nameYourTournament": "Nimeä turnaus",
+    "customizeDisplayName": "Vaihda näyttönimi",
+    "overMessage": "Turnaus päättyi, uudelleenohjataan..."
   },
   "gamecustomization": {
     "title": "Pelin mukautus",
@@ -267,7 +270,8 @@
     "pressPToResume": "Paina 'P' jatkaaksesi",
     "winnerMessage": "{{winner}} voitti!",
     "restartMatch": "Aloita Uudelleen",
-    "returnToMainMenu": "Palaa Päävalikkoon"
+    "returnToMainMenu": "Palaa Päävalikkoon",
+    "returnToBracket": "Jatka Turnausta"
   },
   "pongGameAI": {
     "title": "Yksinpeli tekoälyä vastaan",

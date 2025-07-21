@@ -3,9 +3,15 @@
     "welcome": "Welcome!",
     "checkingSession": "Checking session...",
     "hello": "Hello",
-    "pleaseLogin": "Please log in to access exclusive Pong content and connect with other registered players!",
+    "pleaseLogin": "Please log in to keep track of your stats, connect with other registered players and play in other languages!",
     "noAccount": "No account?",
     "register": "Register"
+  },
+  "pongIntro": {
+    "title": "🎮 Welcome to Pong — The Game That Started It All! 🕹️",
+    "paragraph1": "Step back in time to 1972, when two paddles, one bouncing ball, and a black-and-white screen changed gaming forever. Pong isn't just a game — it's the spark that lit the video game revolution. Simple, addictive, and endlessly competitive, this digital table tennis classic brings back the golden age of arcade fun.",
+    "paragraph2": "Whether you're here for nostalgia or discovering it for the first time, Pong proves that great gameplay never gets old. So grab your paddle, challenge a friend, and see who can keep the rally going the longest.",
+    "conclusion": "Let the original battle of reflexes begin! 🏓"
   },
   "stats": {
     "loading": "Loading...",
@@ -181,14 +187,14 @@
   },
   "CPM": {
     "choosePlayMode": "Choose Play Mode",
-    "singlevsAI": "Single Player vs AI",
-    "twoplayersingle": "2 Player Single Game",
-    "createTournament": "Create Tournament"
+    "singlevsAI": "1 Player",
+    "twoplayersingle": "2 Player",
+    "createTournament": "Tournament"
   },
   "tournament": {
     "createTitle": "Create Tournament",
-    "4playerMode": "4 Player Mode",
-    "8playerMode": "8 Player Mode",
+    "4playerMode": "4 Players",
+    "8playerMode": "8 Players",
     "gameSettings": "Game Settings",
     "map": "Map",
     "mapClassic": "Classic",
@@ -198,7 +204,7 @@
     "powerUps": "Power-ups",
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "enterUsernames": "Enter the usernames or register as a guest.",
+    "enterUsernames": "Login or register as a guest.",
     "playerYou": "Player {{index}} (You): {{username}}",
     "player": "Player {{index}}: {{username}}",
     "playerLabel": "Player",
@@ -209,7 +215,10 @@
     "errorAllPlayersRequired": "All players must enter a username.",
     "errorTournamentCreation": "Error creating tournament",
     "consoleCreating": "Let's make a tournament",
-    "placeholder": "Pong Tournament"
+    "placeholder": "Pong Tournament",
+    "nameYourTournament": "Name your tournament",
+    "customizeDisplayName": "Customize display name",
+    "overMessage": "Tournament over, redirecting..."
   },
   "gamecustomization": {
     "title": "Game Customization",
@@ -266,7 +275,8 @@
     "pressPToResume": "Press 'P' to resume",
     "winnerMessage": "{{winner}} wins!",
     "restartMatch": "Restart Match",
-    "returnToMainMenu": "Return to Main Menu"
+    "returnToMainMenu": "Return to Main Menu",
+    "returnToBracket": "Continue Tournament"
   },
   "pongGameAI": {
     "title": "Single Player vs AI",

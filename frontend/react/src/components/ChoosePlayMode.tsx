@@ -6,12 +6,22 @@ import TournamentBuilder from "./TournamentBuilder";
 import GameCustomization from "./GameCustomization";
 import { useTranslation } from "react-i18next";
 
-const ChoosePlayMode = () => {
+interface ChoosePlayModeProps {
+  onInteract?: () => void; // optional so it's reusable
+  onReturnToMenu?: () => void;
+}
+
+const ChoosePlayMode: React.FC<ChoosePlayModeProps> = ({
+  onInteract,
+  onReturnToMenu,
+}) => {
   const { t } = useTranslation();
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const location = useLocation();
   const initialRenderRef = useRef(true);
   const prevKeyRef = useRef(location.key);
+  const headerRef = useRef<HTMLHeadingElement>(null);
+  const [headerWidth, setHeaderWidth] = useState<number | null>(null);
 
   // Handle home button click detection and game state reset
   useEffect(() => {
@@ -37,6 +47,12 @@ const ChoosePlayMode = () => {
   }, [location.key, location.pathname, selectedMode]);
 
   useEffect(() => {
+    if (headerRef.current) {
+      setHeaderWidth(headerRef.current.offsetWidth);
+    }
+  }, []);
+
+  useEffect(() => {
     if (selectedMode) {
       console.log("selectedMode: ", selectedMode);
     }
@@ -47,16 +63,19 @@ const ChoosePlayMode = () => {
   const handleSinglePlayer = () => {
     console.log("Selected Single Player mode");
     setSelectedMode("single-player-customize");
+    onInteract?.();
   };
 
   const handleTwoPlayer = () => {
     console.log("Selected Two Player mode");
     setSelectedMode("two-player-customize");
+    onInteract?.();
   };
 
   const handleCreateTournament = () => {
     console.log("Selected Tournament mode");
     setSelectedMode("tournament-customize");
+    onInteract?.();
   };
 
   // Added logging to debug transitions
@@ -92,7 +111,7 @@ const ChoosePlayMode = () => {
           console.log("Starting single player game");
           setSelectedMode("single-player");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "two-player-customize") {
@@ -103,7 +122,7 @@ const ChoosePlayMode = () => {
           console.log("Starting two player game");
           setSelectedMode("two-player-single-game");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "tournament-customize") {
@@ -114,7 +133,7 @@ const ChoosePlayMode = () => {
           console.log("Starting tournament creation");
           setSelectedMode("create-tournament");
         }}
-        onBack={() => setSelectedMode(null)}
+        onBack={() => { setSelectedMode(null); onReturnToMenu?.();}}
       />
     );
   } else if (selectedMode === "create-tournament") {
@@ -123,21 +142,39 @@ const ChoosePlayMode = () => {
   }
   return (
     <div>
-      <div>
-        <h1 className="text-6xl text-center text-teal-800 dark:text-teal-300 m-3">
+      <div className="flex flex-col items-center">
+        <h1
+          ref={headerRef}
+          className="text-5xl font-bold text-center text-teal-800 dark:text-teal-300 m-3"
+        >
           {t("CPM.choosePlayMode")}
         </h1>
-        <div className="flex">
-          <button className={buttonStyles} onClick={handleSinglePlayer}>
-            {t("CPM.singlevsAI")}
-          </button>
-          <button className={buttonStyles} onClick={handleTwoPlayer}>
-            {t("CPM.twoplayersingle")}
-          </button>
-          <button className={buttonStyles} onClick={handleCreateTournament}>
-            {t("CPM.createTournament")}
-          </button>
-        </div>
+
+        {headerWidth && (
+          <div
+            className="flex justify-center space-x-4 mt-4"
+            style={{ width: headerWidth }}
+          >
+            <button
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
+              onClick={handleSinglePlayer}
+            >
+              {t("CPM.singlevsAI")}
+            </button>
+            <button
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
+              onClick={handleTwoPlayer}
+            >
+              {t("CPM.twoplayersingle")}
+            </button>
+            <button
+              className={`${buttonStyles} text-xl px-6 py-3 min-w-[180px]`}
+              onClick={handleCreateTournament}
+            >
+              {t("CPM.createTournament")}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
