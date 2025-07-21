@@ -101,6 +101,7 @@ const PongGameWithRegistration: React.FC<PongGameWithRegistrationProps> = ({
               playerId={2}
             />
           )}
+          {player2 && <span className="text-white">{player2.username}</span>}
         </div>
       </div>
     );
