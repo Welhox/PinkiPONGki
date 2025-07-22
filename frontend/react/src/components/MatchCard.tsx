@@ -5,9 +5,10 @@ import { useTranslation } from "react-i18next";
 interface MatchCardProps {
   match: Match;
   onLaunch: (match: Match) => void;
+  disabled?: boolean;
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, onLaunch }) => {
+const MatchCard: React.FC<MatchCardProps> = ({ match, onLaunch, disabled }) => {
   const { player1, player2, status, winnerId, winnerAlias } = match;
   const { t } = useTranslation();
 
@@ -31,12 +32,13 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLaunch }) => {
             <span className="font-semibold">{player1.name}</span> vs{" "}
             <span className="font-semibold">{player2.name}</span>
           </div>
-          <button
-            className={buttonStyles}
-            onClick={() => onLaunch(match)}
-          >
-            {t("matchcard.play")}
-          </button>
+          {disabled ? (
+            <div className="text-3xl text-gray-500 text-center">{"🔒"}</div>
+          ) : (
+            <button className={buttonStyles} onClick={() => onLaunch(match)}>
+              {t("matchcard.play")}
+            </button>
+          )}
         </>
       ) : (
         <div className="flex flex-col items-center">

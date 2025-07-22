@@ -8,7 +8,7 @@ export async function settingsRoutes(fastify, _options) {
     config: {
       rateLimit: {
         max: 1,
-        timeWindow: "1 hour",
+        timeWindow: "10 minutes",
         keyGenerator: (request) => request.user?.id?.toString() || request.ip,
       },
     },

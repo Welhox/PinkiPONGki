@@ -75,8 +75,12 @@ const SettingsField: React.FC<FieldProps> = ({
       }
     }
 
-    if (!currentPassword /* || currentPassword.length < 8*/) {
-      // COMMENT BACK IN FOR FINAL PRODUCT!!
+    const inProduction = import.meta.env.VITE_API_BASE_URL || "";
+
+    if (
+      !currentPassword ||
+      (currentPassword.length < 8 && inProduction === "")
+    ) {
       return t("settings.currentPasswordRequired");
     }
 
@@ -99,11 +103,15 @@ const SettingsField: React.FC<FieldProps> = ({
       });
 
       setSuccess(t("settings.updateSuccess", { label }));
-	  setTimeout(() => {setSuccess(null);}, 5000);
-	  setConfirmInput("");
-	  setCurrentPassword("");
+      setTimeout(() => {
+        setSuccess(null);
+      }, 5000);
+      setConfirmInput("");
+      setCurrentPassword("");
       setError(null);
-      setTimeout(() => {setIsEditing(false);}, 5000);
+      setTimeout(() => {
+        setIsEditing(false);
+      }, 5000);
       onUpdate?.(inputValue.trim());
     } catch (error: any) {
       const errorMessage = error?.response?.data?.message || "";
@@ -129,9 +137,9 @@ const SettingsField: React.FC<FieldProps> = ({
             displayTime = `${num}s`;
         }
 
-        setError(t('settings.rateLimitExceeded', { time: displayTime }));
+        setError(t("settings.rateLimitExceeded", { time: displayTime }));
       } else {
-        setError(errorMessage || t('settings.updateFailed'));
+        setError(errorMessage || t("settings.updateFailed"));
       }
     }
   };
