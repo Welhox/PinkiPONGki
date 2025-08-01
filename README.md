@@ -1,6 +1,7 @@
 # Transcendence
+![Homepage](https://github.com/user-attachments/assets/7c0e21ab-4517-4db3-892f-a6c08ab1acc7)
 
-A **starter template** for building full-stack **ping-pong** web applications with:
+A **full-stack** web project built around the iconic game of **PONG** with:
 
 - **Fastify** + **Prisma/SQLite** on the backend  
 - **React** (via **Vite**) + **TypeScript** on the frontend  
@@ -17,11 +18,9 @@ A **starter template** for building full-stack **ping-pong** web applications wi
 2. [Component Deep-Dive](#component-deep-dive)  
 3. [Data Flow](#data-flow)  
 4. [Core Features](#core-features)  
-5. [Extending & Customizing](#extending--customizing)  
-6. [Visuals & Demos](#visuals--demos)  
-7. [Getting Started (Light)](#getting-started-light)  
-8. [Contributors](#contributors)  
-9. [License](#license)  
+5. [Visuals & Demos](#visuals--demos)  
+6. [Contributors](#contributors)  
+7. [License](#license)  
 
 ---
 
@@ -109,39 +108,43 @@ It’s designed as a learning-friendly, production-style codebase you can explor
 
 ---
 
-## Extending & Customizing
-
-- Swap **SQLite** for Postgres (update `DATABASE_URL`)  
-- Plug in real SMTP creds via `backend/.env`  
-- Add Fastify plugins (caching, metrics, GraphQL)  
-- Extend the UI: new Tailwind components, additional languages, themes  
-
----
-
 ## Visuals & Demos
 
-> Embed your GIFs, screenshots, or architecture diagrams here.
+<details>
+  <summary>▶️ Homepage</summary>
+  
+  ![Homepage](https://github.com/user-attachments/assets/7c0e21ab-4517-4db3-892f-a6c08ab1acc7)
+</details>
 
----
+<details>
+  <summary>▶️ Pong Game</summary>
+  
+  ![Pong Game](https://github.com/user-attachments/assets/6a405ab4-fe1f-4d0a-bf50-4b238300687d)
+</details>
 
-## Getting Started (Light)
+<details>
+  <summary>▶️ Settings</summary>
+  
+  ![Settings](https://github.com/user-attachments/assets/a8180969-6ee9-4b3b-ab18-937c8b92eb1c)
+</details>
 
-```bash
-git clone https://github.com/Welhox/Transcendence.git
-cd Transcendence
+<details>
+  <summary>▶️ OTP</summary>
+  
+  ![OTP](https://github.com/user-attachments/assets/c61e4be8-2149-4174-a3b1-17788550962f)
+</details>
 
-# Copy env files from examples
-cp .env.example .env
-cp backend/.env.example backend/.env
+<details>
+  <summary>▶️ Stats</summary>
+  
+  ![Stats](https://github.com/user-attachments/assets/699144a9-1478-4d3f-9559-546c371c4eb5)
+</details>
 
-# Generate SSL cert & JWT secret
-make ssl
-make jwt-secret
-
-# (Optional) spin up with Docker
-make up
-
-> You’ll need to supply mailing/SMS/third-party credentials before using notification features.
+<details>
+  <summary>▶️ Pong Pals</summary>
+  
+  ![Pong Pals](https://github.com/user-attachments/assets/45608c0f-ab1e-4517-aa29-8433619c061e)
+</details>
 
 ---
 
@@ -157,4 +160,4 @@ make up
 
 ## License
 
-Released under the **MIT License**. See [LICENSE](LICENSE) for details.
+Released under the **MIT License**. See [LICENSE](LICENSE) for details.  
