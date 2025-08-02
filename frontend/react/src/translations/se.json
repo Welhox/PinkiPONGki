@@ -58,7 +58,8 @@
     "2faToggleFailed": "Misslyckades med att uppdatera tvåfaktorsautentisering.",
     "uploadFailed": "Uppladdning misslyckades: {{error}}",
     "loading": "Läser in...",
-    "rateLimitExceeded": "Gränsen överskriden, försök igen om {{time}}."
+    "rateLimitExceeded": "Gränsen överskriden, försök igen om {{time}}.",
+    "invalidCurrentPassword": "Ogiltigt nuvarande lösenord."
   },
   "befriendButton": {
     "befriend": "Bli vän",
