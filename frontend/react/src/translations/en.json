@@ -64,7 +64,8 @@
     "2faToggleFailed": "Failed to update two-factor authentication status.",
     "uploadFailed": "Upload failed: {{error}}",
     "loading": "Loading...",
-    "rateLimitExceeded": "Rate limit exceeded, please try again in {{time}}."
+    "rateLimitExceeded": "Rate limit exceeded, please try again in {{time}}.",
+    "invalidCurrentPassword": "Invalid current password."
   },
   "befriendButton": {
     "befriend": "Befriend",

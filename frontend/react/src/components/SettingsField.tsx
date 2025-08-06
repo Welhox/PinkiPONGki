@@ -118,7 +118,10 @@ const SettingsField: React.FC<FieldProps> = ({
       const regex = /(\d+)\s*(second|minute|hour)s?/i;
       const match = errorMessage.match(regex);
 
-      if (match) {
+      if (errorMessage.includes("Invalid current password")) {
+         setError(t("settings.invalidCurrentPassword"));
+      } 
+      else if (match) {
         let [_, numStr, unit] = match;
         let num = parseInt(numStr, 10);
         let displayTime = "";

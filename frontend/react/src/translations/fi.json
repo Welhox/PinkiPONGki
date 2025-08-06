@@ -100,7 +100,8 @@
     "2faToggleFailed": "Kaksivaiheisen tunnistautumisen tilan päivittäminen epäonnistui.",
     "uploadFailed": "Lataus epäonnistui: {{error}}",
     "loading": "Ladataan...",
-    "rateLimitExceeded": "Rajoitus ylittynyt, yritä uudelleen {{time}} kuluttua."
+    "rateLimitExceeded": "Rajoitus ylittynyt, yritä uudelleen {{time}} kuluttua.",
+   "invalidCurrentPassword": "Virheellinen nykyinen salasana."
   },
   "friendList": {
     "noFriends": "Sinulla ei ole vielä kavereita"
