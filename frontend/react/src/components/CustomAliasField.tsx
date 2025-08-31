@@ -23,6 +23,26 @@ const CustomAliasField: React.FC<Props> = ({
   const [customName, setCustomName] = useState(username);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const finalizedLabel = isYou
+    ? t("tournament.playerYou", {
+        index: index + 1,
+        username,
+      })
+    : t("tournament.player", {
+        index: index + 1,
+        username,
+      });
+
+  const editingLabel = isYou
+    ? t("tournament.playerYouEditing", {
+        index: index + 1,
+        username,
+      })
+    : t("tournament.playerEditing", {
+        index: index + 1,
+        username,
+      });
+
   const buttonStyles =
     "px-5 mx-3 my-2 text-white bg-teal-700 hover:bg-teal-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto py-2.5 text-center dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800";
   const altButtonStyles =
@@ -37,17 +57,7 @@ const CustomAliasField: React.FC<Props> = ({
   if (finalized) {
     return (
       <div className="flex items-center space-x-2 justify-center text-teal-800 dark:text-teal-300 font-semibold">
-        <span className="font-bold text-lg">
-          {isYou
-            ? t("tournament.playerYou", {
-                index: index + 1,
-                username,
-              })
-            : t("tournament.player", {
-                index: index + 1,
-                username,
-              })}
-        </span>
+        <span className="font-bold text-lg">{finalizedLabel}</span>
       </div>
     );
   }
@@ -56,7 +66,7 @@ const CustomAliasField: React.FC<Props> = ({
     return (
       <div className="flex items-center justify-center space-x-2 text-lg">
         <label className="font-bold text-teal-800 dark:text-teal-300 whitespace-nowrap">
-          {t("tournament.playerLabel")} {index + 1}:
+          {editingLabel}
         </label>
         <input
           ref={inputRef}
@@ -70,7 +80,6 @@ const CustomAliasField: React.FC<Props> = ({
         />
         <button
           className={buttonStyles}
-          // className="bg-green-500 text-white px-4 py-1 rounded"
           onClick={() => {
             const newName = customName.trim();
             if (
@@ -89,11 +98,7 @@ const CustomAliasField: React.FC<Props> = ({
         >
           {t("settings.save")}
         </button>
-        <button
-          className={altButtonStyles}
-          // className="bg-gray-400 text-white px-4 py-1 rounded"
-          onClick={() => setEditing(false)}
-        >
+        <button className={altButtonStyles} onClick={() => setEditing(false)}>
           {t("settings.cancel")}
         </button>
       </div>
@@ -107,7 +112,7 @@ const CustomAliasField: React.FC<Props> = ({
         htmlFor={`custom-alias-select-${index}`}
         className="font-bold text-teal-800 dark:text-teal-300 whitespace-nowrap"
       >
-        {t("tournament.playerLabel")} {index + 1}:
+        {editingLabel}
       </label>
       <select
         id={`custom-alias-select-${index}`}

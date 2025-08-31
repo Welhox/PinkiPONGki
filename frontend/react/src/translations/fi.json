@@ -101,7 +101,7 @@
     "uploadFailed": "Lataus epäonnistui: {{error}}",
     "loading": "Ladataan...",
     "rateLimitExceeded": "Rajoitus ylittynyt, yritä uudelleen {{time}} kuluttua.",
-   "invalidCurrentPassword": "Virheellinen nykyinen salasana."
+    "invalidCurrentPassword": "Virheellinen nykyinen salasana."
   },
   "friendList": {
     "noFriends": "Sinulla ei ole vielä kavereita"
@@ -209,10 +209,13 @@
     "enterUsernames": "Kirjaudu sisään tai rekisteröidy vieraana.",
     "playerYou": "Pelaaja {{index}} (Sinä): {{username}}",
     "player": "Pelaaja {{index}}: {{username}}",
+    "playerYouEditing": "Pelaaja {{index}} (Sinä): ",
+    "playerEditing": "Pelaaja {{index}}: ",
     "playerLabel": "Pelaaja",
     "createButton": "Luo Turnaus",
     "errorUsernameInvalid": "Käyttäjänimen on oltava aakkosnumeerinen ja 2–20 merkkiä pitkä.",
     "errorUsernameTaken": "Käyttäjänimi \"{{username}}\" on jo varattu.",
+    "errorCreateUniqueAlias": "Käyttäjänimi \"{{username}}\" on jo varattu. Luodaan uniikkia näyttönimeä...",
     "errorAlreadyLoggedIn": "Olet jo kirjautunut nimellä {{username}}.",
     "errorAllPlayersRequired": "Kaikkien pelaajien on annettava käyttäjänimi.",
     "errorTournamentCreation": "Turnauksen luominen epäonnistui.",

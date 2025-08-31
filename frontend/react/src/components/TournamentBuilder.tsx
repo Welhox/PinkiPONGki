@@ -15,6 +15,24 @@ type RegisteredPlayer = {
 
 const usernameRegex = /^[a-zA-Z0-9]+$/;
 
+const isAliasTaken = (
+  alias: string,
+  players: RegisteredPlayer[],
+  excludeIndex?: number
+) => players.some((p, i) => i !== excludeIndex && p.username === alias);
+
+const makeUniqueAlias = (
+  base: string,
+  players: RegisteredPlayer[],
+  excludeIndex?: number
+) => {
+  const root = base.trim();
+  if (!isAliasTaken(root, players, excludeIndex)) return root;
+  let n = 2;
+  while (isAliasTaken(`${root}${n}`, players, excludeIndex)) n++;
+  return `${root}${n}`;
+};
+
 const isPlayerListValid = (players: RegisteredPlayer[]) => {
   return players.every(
     (p) =>
@@ -30,7 +48,9 @@ const TournamentBuilder = () => {
   const [players, setPlayers] = useState<RegisteredPlayer[]>([]);
   const [registeredPlayers, setRegisteredPlayers] = useState<boolean[]>([]);
   const [currentRegistrationIndex, setCurrentRegistrationIndex] = useState(0);
-  const [finalizedCustomName, setFinalizedCustomName] = useState<Set<number>>(new Set());
+  const [finalizedCustomName, setFinalizedCustomName] = useState<Set<number>>(
+    new Set()
+  );
   const [tournamentName, setTournamentName] = useState("");
   const [userInserted, setUserInserted] = useState(false);
   const { user } = useAuth();
@@ -40,11 +60,14 @@ const TournamentBuilder = () => {
 
   useEffect(() => {
     if (playerCount > 0) {
-      const initialPlayers: RegisteredPlayer[] = Array.from({ length: playerCount }, () => ({
-    username: "",
-    isGuest: true,
-    userId: null,
-  }));
+      const initialPlayers: RegisteredPlayer[] = Array.from(
+        { length: playerCount },
+        () => ({
+          username: "",
+          isGuest: true,
+          userId: null,
+        })
+      );
 
       setPlayers(initialPlayers);
       setRegisteredPlayers(initialPlayers.map(() => false)); // if username is filled, mark as registered
@@ -60,14 +83,23 @@ const TournamentBuilder = () => {
       const alreadyInSlot = updatedPlayers.some(
         (p) => !p.isGuest && p.userId === user.id
       );
-      if (alreadyInSlot) { setUserInserted(true); return;}  // prevent duplicates
+      if (alreadyInSlot) {
+        setUserInserted(true);
+        return;
+      } // prevent duplicates
 
       const firstGuestIndex = updatedPlayers.findIndex(
         (p) => p.isGuest && !p.username
       );
       if (firstGuestIndex !== -1) {
+        const uniqueAlias = makeUniqueAlias(
+          user.username,
+          updatedPlayers,
+          firstGuestIndex
+        );
+
         updatedPlayers[firstGuestIndex] = {
-          username: user.username,
+          username: uniqueAlias,
           isGuest: false,
           userId: Number(user.id),
         };
@@ -87,26 +119,16 @@ const TournamentBuilder = () => {
     index: number,
     player: { username: string; isGuest: boolean; id?: string }
   ) => {
+    const requested = player.username.trim();
+    const uniqueAlias = makeUniqueAlias(requested, players, index);
+
     // Convert player object to RegisteredPlayer format
     const registeredPlayer: RegisteredPlayer = {
-      username: player.username,
+      username: uniqueAlias,
       isGuest: player.isGuest,
       userId: player.id ? parseInt(player.id) : null,
     };
-    // check for duplicate usernames
-    const duplicate = players.some(
-      (p) =>
-        p.username === registeredPlayer.username &&
-        p.userId === registeredPlayer.userId
-    );
-    if (duplicate) {
-      alert(
-        t("tournament.errorUsernameTaken", {
-          username: registeredPlayer.username,
-        })
-      );
-      return;
-    }
+
     // prevent re-login of logged-in user
     if (user && index !== 0 && registeredPlayer.username === user.username) {
       alert(t("tournament.errorAlreadyLoggedIn", { username: user.username }));
@@ -144,6 +166,14 @@ const TournamentBuilder = () => {
       }
       return playerCount; // All done
     });
+
+    if (uniqueAlias !== requested) {
+      alert(
+        t("tournament.errorCreateUniqueAlias", {
+          username: requested,
+        })
+      );
+    }
   };
 
   const handleCreateTournament = async (e: React.FormEvent) => {
@@ -266,27 +296,31 @@ const TournamentBuilder = () => {
             <div key={index} className="my-2">
               {registeredPlayers[index] ? (
                 <CustomAliasField
-                    index={index}
-                    username={player.username}
-                    finalized={finalizedCustomName.has(index)}
-                    isYou={!!user && player.username === user.username && !player.isGuest}
-                    onUpdate={(newName) => {
+                  index={index}
+                  username={player.username}
+                  finalized={finalizedCustomName.has(index)}
+                  isYou={!!user && player.userId === Number(user.id)}
+                  onUpdate={(newName) => {
                     const duplicate = players.some(
-                        (p, i) => i !== index && p.username === newName
+                      (p, i) => i !== index && p.username === newName
                     );
                     if (duplicate) {
-                        alert(t("tournament.errorUsernameTaken", { username: newName }));
-                        return;
+                      alert(
+                        t("tournament.errorUsernameTaken", {
+                          username: newName,
+                        })
+                      );
+                      return;
                     }
 
                     const updated = [...players];
                     updated[index] = {
-                        ...updated[index],
-                        username: newName,
+                      ...updated[index],
+                      username: newName,
                     };
                     setPlayers(updated);
                     setFinalizedCustomName((prev) => new Set(prev).add(index));
-                    }}
+                  }}
                 />
               ) : index === currentRegistrationIndex ? (
                 <PlayerRegistrationBox
