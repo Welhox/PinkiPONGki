@@ -1,8 +1,8 @@
-# PinkiPONGki  
+# WebPONG  
 
 ![Homepage](https://github.com/user-attachments/assets/7c0e21ab-4517-4db3-892f-a6c08ab1acc7)  
 
-**PinkiPONGki** is a **full-stack web app** inspired by the iconic game of PONG.  
+**WebPONG** is a **full-stack web app** inspired by the iconic game of PONG.  
 Built with **React (Vite + TypeScript)** on the frontend, **Fastify + Prisma/SQLite** on the backend, and **Docker + Nginx** for deployment.  
 
 This was a **collaborative project**, but here I highlight my **personal contributions** — mainly backend systems, tournament/game logic, DevOps automation, and accessibility features.  
@@ -11,7 +11,7 @@ This was a **collaborative project**, but here I highlight my **personal contrib
 
 ## Table of Contents  
 
-1. [What Is PinkiPONGki?](#what-is-pinkipongki)  
+1. [What Is WebPONG?](#what-is-WebPONG)  
 2. [My Contributions](#my-contributions)  
 3. [Visuals & Demos](#visuals--demos)  
 4. [Core Features](#core-features)  
@@ -22,9 +22,9 @@ This was a **collaborative project**, but here I highlight my **personal contrib
 
 ---
 
-## What Is PinkiPONGki?  
+## What Is WebPONG?  
 
-PinkiPONGki is a **full-stack ping-pong web application** that showcases:  
+WebPONG is a **full-stack PONG web application** that showcases:  
 
 - **Single matches** for guests or authenticated users  
 - **Tournament brackets** with customizable rounds  
@@ -57,11 +57,11 @@ While this was a team project, my main work focused on:
   - Nginx reverse proxy setup  
   - Makefile automation (SSL generation, JWT secret creation, stack management)  
 
-👉 [My commits](https://github.com/Welhox/PinkiPONGki/commits?author=Welhox)  
+👉 [My commits](https://github.com/Welhox/WebPONG/commits?author=Welhox)  
 
 ---
 
-## Visuals & Demos  
+## Visuals  
 
 <details>
   <summary>▶️ Homepage</summary>
