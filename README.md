@@ -42,10 +42,20 @@ It’s designed as a **production-style learning project** you can explore, exte
 
 While this was a team project, my main work focused on:  
 
-- 🛠 **Backend development**: secure JWT authentication with cookies, MFA/OTP with bcrypt, Prisma schema design  
-- 🎮 **Game logic**: tournament bracket system, AI opponent difficulty, match customization features  
-- ⚡ **DevOps / Infrastructure**: Docker Compose orchestration, Nginx reverse proxy, Makefile automation (SSL, JWT secret)  
-- 🌍 **Localization & Accessibility**: i18next translations (Finnish/Swedish), ARIA roles, screen-reader support  
+- 🛠 **Backend development**:  
+  - Main responsibility for designing and implementing backend APIs and Prisma schemas  
+  - Connected backend APIs with the frontend (auth flows, game logic, tournaments, stats)  
+  - JWT authentication with secure cookie handling  
+  - MFA/OTP support with bcrypt hashing  
+  - Rate limiting and security hardening of endpoints  
+
+- 🎮 **Game logic**:  
+  - Tournament system (bracket generation, creation, and progression)  
+
+- ⚡ **DevOps / Infrastructure**:  
+  - Docker Compose orchestration  
+  - Nginx reverse proxy setup  
+  - Makefile automation (SSL generation, JWT secret creation, stack management)  
 
 👉 [My commits](https://github.com/Welhox/PinkiPONGki/commits?author=Welhox)  
 
